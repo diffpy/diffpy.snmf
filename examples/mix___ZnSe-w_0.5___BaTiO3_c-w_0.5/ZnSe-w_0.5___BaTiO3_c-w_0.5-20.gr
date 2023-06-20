@@ -1,6 +1,6 @@
 # [simulation configs]
 # steps: 20
-# qdump: 0.03
+# qdamp: 0.03
 # qbroad: 0.0
 # qmin: 0.1
 # qmax: 30
