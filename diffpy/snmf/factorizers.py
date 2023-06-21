@@ -1,17 +1,17 @@
 import numpy as np
 import scipy.optimize
-def lsqnonneg(C,d):
+def lsqnonneg(c, d):
     """
 
     Parameters
     ----------
-    C
+    c
     d
 
     Returns
     -------
 
     """
-    C = np.asarray(C)
+    c = np.asarray(c)
     d = np.asarray(d)
-    return scipy.optimize.nnls(C,d)[0]
+    return scipy.optimize.nnls(c, d)[0]
