@@ -9,19 +9,25 @@ def rooth(linear_coefficient, constant_term):
     ----------
     linear_coefficient: ndarray of floats
         The matrix coefficient of the linear term
-    constant_term: ndarray of floats
-        The matrix constant term
+    constant_term: ndarray of floats or float
+        The constant term as a 1 x 1 matrix
 
     Returns
     -------
     ndarray of floats
-        The largest real root of x^3+(linear_coefficient) * x + constant_term if roots are real else return 0 array
+        The largest real root of x^3+(linear_coefficient) * x + constant_term if roots are real, else return 0 array
 
 
     """
-    inputs = [1, 0, linear_coefficient, constant_term]
-    y = np.roots(inputs)
-    if ((constant_term / 2) ** 2 + (linear_coefficient / 3) ** 3) < 0:  # Discriminant of depressed cubic equation
-        return max(np.real(y))
-    else:
-        return 0
+    linear_coefficient = np.asarray(linear_coefficient)
+    constant_term = np.asarray(constant_term)
+    solution = np.empty_like(linear_coefficient, dtype=np.float64)
+
+    for index, value in np.ndenumerate(linear_coefficient):
+        inputs = [1, 0, value, constant_term]
+        roots = np.roots(inputs)
+        if ((constant_term / 2) ** 2 + (value / 3) ** 3) < 0:  # Discriminant of depressed cubic equation
+            solution[index] = max(np.real(roots))
+        else:
+            solution[index] = 0
+    return solution
