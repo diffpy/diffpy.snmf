@@ -7,10 +7,10 @@ def pearson(data1, data2):
 
     Parameters
     ----------
-    data1: ndarray
-        An array of the values of a XRD or PDF pattern
-    data2: ndarray
-        An array of the values of a XRD or PDF pattern
+    data1: ndarray or list
+        An array/list of the values of a XRD or PDF pattern
+    data2: ndarray or list
+        An array/list of the values of a XRD or PDF pattern
     Returns
     -------
     float
@@ -19,5 +19,5 @@ def pearson(data1, data2):
     """
     data1 = np.asarray(data1)
     data2 = np.asarray(data2)
-    correlation_matrix = np.corrcoef(data1, data2)
-    return correlation_matrix[0, 1]
+    pearson_coefficient = np.corrcoef(data1, data2)[0, 1]
+    return pearson_coefficient
