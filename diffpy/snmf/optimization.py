@@ -20,13 +20,13 @@ def mkr_box(Q, q, b):
     q = np.asarray(q)
     b = np.asarray(b)
 
-    n = Q.shape[0]
-    x = cp.Variable(n)
+    problem_size = max(q.shape)
+    solution_variable = cp.Variable(n)
 
-    objective = cp.Minimize(q.T @ x + 0.5 * cp.quad_form(x, Q))
-    constraints = [x <= b]
+    objective = cp.Minimize(q.T @ solution_variable + 0.5 * cp.quad_form(solution_variable, Q))
+    constraints = [solution_variable <= b]
 
     problem = cp.Problem(objective, constraints)
     problem.solve()
 
-    return x.value
+    return solution_variable.value
