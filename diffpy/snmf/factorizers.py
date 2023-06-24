@@ -22,6 +22,7 @@ def lsqnonneg(coefficient, target):
     ------
     ValueError
         If the coefficient or target matrices are not the correct shape
+
     """
     coefficient = np.asarray(coefficient)
     target = np.asarray(target)
