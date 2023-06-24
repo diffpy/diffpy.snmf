@@ -8,14 +8,14 @@ def lsqnonneg(coefficient, target):
 
     Parameters
     ----------
-    coefficient: ndarray or list of lists
+    coefficient: 2-dimensional ndarray or list
         The coefficient matrix of the least squares problem
-    target: ndarray or list of lists
+    target: 1-dimensional ndarray or list
         The target vector for the least squares problem
 
     Returns
     -------
-    ndarray
+    1-dimensional ndarray
         The solution vector to the least squares problem
     """
     coefficient = np.asarray(coefficient)
