@@ -4,8 +4,8 @@ import cvxpy as cp
 
 def mkr_box(quadratic_coefficient, linear_coefficient, lower_bound, upper_bound):
     """
-    Solves min J(x) = linear_coefficient'x + (1/2) * x'Qx where x <= upper_bound and linear_coefficient is symmetric
-    positive definite
+    Solves min J(x) = (linear_coefficient)' * x + (1/2) * x' * (quadratic coefficient) * x where lower_bound <= x <=
+    upper_bound and quadratic_coefficient is symmetric positive definite
 
     Parameters
     ----------
