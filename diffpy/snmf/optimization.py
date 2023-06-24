@@ -2,29 +2,33 @@ import numpy as np
 import cvxpy as cp
 
 
-def mkr_box(Q, q, b):
+def mkr_box(quadratic_coefficient, linear_coefficient, lower_bound, upper_bound):
     """
-    Solves min J(x) = q'x + (1/2) * x'Qx where x <= b and Q is symmetric positive definite
+    Solves min J(x) = linear_coefficient'x + (1/2) * x'Qx where x <= upper_bound and linear_coefficient is symmetric
+    positive definite
 
     Parameters
     ----------
-    Q
-    q
-    b
+    quadratic_coefficient
+    linear_coefficient
+    lower_bound
+    upper_bound
 
     Returns
     -------
 
     """
-    Q = np.asarray(Q)
-    q = np.asarray(q)
-    b = np.asarray(b)
+    quadratic_coefficient = np.asarray(quadratic_coefficient)
+    linear_coefficient = np.asarray(linear_coefficient)
+    upper_bound = np.asarray(upper_bound)
+    lower_bound = np.asarray(lower_bound)
 
-    problem_size = max(q.shape)
-    solution_variable = cp.Variable(n)
+    problem_size = max(linear_coefficient.shape)
+    solution_variable = cp.Variable(problem_size)
 
-    objective = cp.Minimize(q.T @ solution_variable + 0.5 * cp.quad_form(solution_variable, Q))
-    constraints = [solution_variable <= b]
+    objective = cp.Minimize(
+        linear_coefficient.T @ solution_variable + 0.5 * cp.quad_form(solution_variable, quadratic_coefficient))
+    constraints = [lower_bound <= solution_variable, solution_variable <= upper_bound]
 
     problem = cp.Problem(objective, constraints)
     problem.solve()
