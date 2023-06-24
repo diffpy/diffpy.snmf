@@ -17,6 +17,11 @@ def lsqnonneg(coefficient, target):
     -------
     1-dimensional ndarray
         The solution vector to the least squares problem
+
+    Raises
+    ------
+    ValueError
+        If the coefficient or target matrices are not the correct shape
     """
     coefficient = np.asarray(coefficient)
     target = np.asarray(target)
