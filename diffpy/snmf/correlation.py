@@ -11,10 +11,16 @@ def pearson(data1, data2):
         An array/list of the values of a XRD or PDF pattern
     data2: ndarray or list
         An array/list of the values of a XRD or PDF pattern
+
     Returns
     -------
     float
         The pearson correlation coefficient between data1 and data2
+
+    Raises
+    ------
+    ValueError
+        If data1 and data2 are not the same shape
 
     """
     data1 = np.asarray(data1)
