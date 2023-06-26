@@ -9,13 +9,26 @@ def mkr_box(quadratic_coefficient, linear_coefficient, lower_bound, upper_bound)
 
     Parameters
     ----------
-    quadratic_coefficient
-    linear_coefficient
-    lower_bound
-    upper_bound
+    quadratic_coefficient: 2d array like
+        A symmetric positive definite 2 dimensional array like object.
+
+    linear_coefficient: 1d array like
+        A vector
+
+    lower_bound: 1d array like
+        Represents the lower bounds on the value of x element wise
+
+    upper_bound: 1d array like
+        Represents the upper bounds on the value of x element wise.
 
     Returns
     -------
+    1d array like
+
+    Raises
+    ------
+    ValueError
+        If P is not a Hermitian matrix
 
     """
     quadratic_coefficient = np.asarray(quadratic_coefficient)
