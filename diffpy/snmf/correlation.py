@@ -7,9 +7,9 @@ def pearson(data1, data2):
 
     Parameters
     ----------
-    data1: ndarray or list
+    data1: 1d array like
         An array/list of the values of a XRD or PDF pattern
-    data2: ndarray or list
+    data2: 1d array like
         An array/list of the values of a XRD or PDF pattern
 
     Returns
