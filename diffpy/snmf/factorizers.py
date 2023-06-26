@@ -4,19 +4,24 @@ import scipy.optimize
 
 def lsqnonneg(coefficient, target):
     """
-    Solve ``argmin_x || Ax - b ||_2`` for ``x>=0``.
+    Solves ``argmin_x || Ax - b ||_2`` for ``x>=0``.
 
     Parameters
     ----------
-    coefficient: 2-dimensional ndarray or list
-        The coefficient matrix of the least squares problem
-    target: 1-dimensional ndarray or list
-        The target vector for the least squares problem
+    coefficient: 2d array like
+        A 2-dimensional array like object representing the coefficient matrix 'A' of the least square problem.
+        In context, A represents a matrix of the stretched components given by the getAfun function at a certain moment.
+        Each column corresponds with an individual stretched component. The number of rows is the number of independent
+        variable values. The matrix does not need to be nonnegative.
+
+    target: 1d array like
+        A 1d array like vector representing the target vector 'b' which contains a series of unstretched PDF/XRD values.
+        The array does not need to be nonnegative. Contains only row elements, shape(N,).
 
     Returns
     -------
-    1-dimensional ndarray
-        The solution vector to the least squares problem
+    1d array like
+        The solution vector (x) to the least squares problem
 
     Raises
     ------
