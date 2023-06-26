@@ -7,10 +7,10 @@ def rooth(linear_coefficient, constant_term):
 
     Parameters
     ----------
-    linear_coefficient: ndarray of floats
+    linear_coefficient: nd array like of floats
         The matrix coefficient of the linear term
-    constant_term: ndarray of floats or float
-        The constant term as a 1 x 1 matrix
+    constant_term: 0d array like, 1d array like of floats or scalar
+        The constant scalar term of the problem
 
     Returns
     -------
