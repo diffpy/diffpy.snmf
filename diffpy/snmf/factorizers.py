@@ -3,9 +3,10 @@ import scipy.optimize
 
 
 def lsqnonneg(stretched_component_matrix, target_signal):
-    """
-    Solves ``argmin_x || Ax - b ||_2`` for ``x>=0``. Finds the weights of component signals given unfactorized signal
-    data and stretched components.
+    """Finds the weights of component signals given unfactorized signal data and stretched components.
+
+    Solves ``argmin_x || Ax - b ||_2`` for ``x>=0`` where A is the stretched_component_matrix and b is the target_signal
+    vector.
 
     Parameters
     ----------
@@ -27,7 +28,7 @@ def lsqnonneg(stretched_component_matrix, target_signal):
     Raises
     ------
     ValueError
-      If the stretched_component_matrix or target_signal matrices are not the correct shape
+      If the stretched_component_matrix or target_signal matrices are not the correct shape.
 
     """
     stretched_component_matrix = np.asarray(stretched_component_matrix)
