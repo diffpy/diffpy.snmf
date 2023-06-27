@@ -2,33 +2,34 @@ import numpy as np
 import scipy.optimize
 
 
-def lsqnonneg(coefficient, target):
+def lsqnonneg(stretched_component_matrix, target_signal):
     """
-    Solves ``argmin_x || Ax - b ||_2`` for ``x>=0``.
+    Solves ``argmin_x || Ax - b ||_2`` for ``x>=0``. Finds the weights of component signals given unfactorized signal
+    data and stretched components.
 
     Parameters
     ----------
-    coefficient: 2d array like
-        A 2-dimensional array like object representing the coefficient matrix 'A' of the least square problem.
-        In context, A represents a matrix of the stretched components given by the getAfun function at a certain moment.
-        Each column corresponds with an individual stretched component. The number of rows is the number of independent
-        variable values. The matrix does not need to be nonnegative.
+    stretched_component_matrix: 2d array like
+      The component matrix where each column contains a stretched component signal. Has dimensions R x C where R is
+      the length of the signal and C is the number of components. Does not need to be nonnegative. Corresponds with 'A'
+      from the objective function.
 
-    target: 1d array like
-        A 1d array like vector representing the target vector 'b' which contains a series of unstretched PDF/XRD values.
-        The array does not need to be nonnegative. Contains only row elements, shape(N,).
+    target_signal: 1d array like
+      The signal that is used as reference against which weight factors will be determined. Any column from the matrix
+      of the entire, unfactorized input data could be used. Has length R. Does not need to be nonnegative. Corresponds
+      with 'b' from the objective function.
 
     Returns
     -------
     1d array like
-        The solution vector (x) to the least squares problem
+      The vector containing component signal weights at a moment. Has length C.
 
     Raises
     ------
     ValueError
-        If the coefficient or target matrices are not the correct shape
+      If the stretched_component_matrix or target_signal matrices are not the correct shape
 
     """
-    coefficient = np.asarray(coefficient)
-    target = np.asarray(target)
-    return scipy.optimize.nnls(coefficient, target)[0]
+    stretched_component_matrix = np.asarray(stretched_component_matrix)
+    target_signal = np.asarray(target_signal)
+    return scipy.optimize.nnls(stretched_component_matrix, target_signal)[0]
