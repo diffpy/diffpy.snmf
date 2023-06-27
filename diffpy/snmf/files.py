@@ -3,7 +3,7 @@ import numpy as np
 
 def processing(*path):
     """
-    Returns an ndarray of PDF/XRD values and a vector of independent variable values corresponding with each output.
+    Returns a ndarray of PDF/XRD values and a vector of independent variable values corresponding with each output.
 
     Parameters
     ----------
@@ -22,4 +22,7 @@ def processing(*path):
         pattern_list.append(file)
 
     for file in pattern_list:
-        with open(fr"{file}", 'r') as input_file:
+        with open(fr"{file.name}", 'r') as input_file:
+            for line in input_file:
+                print(line)
+
