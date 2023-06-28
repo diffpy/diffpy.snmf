@@ -1,12 +1,13 @@
 import numpy as np
-import cvxpy as cp
+import cvxpy
 
 
-def mkr_box(stretched_component_gram_matrix, linear_coefficient, lower_bound, upper_bound):
+def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound, upper_bound):
     """ Finds the weightings of stretched component signals
 
-    Solves min J(x) = (linear_coefficient)' * x + (1/2) * x' * (quadratic coefficient) * x where lower_bound <= x <=
-    upper_bound and stretched_component_gram_matrix is symmetric positive definite
+    Solves min J(y) = (linear_coefficient)' * y + (1/2) * y' * (quadratic coefficient) * y where lower_bound <= y <=
+    upper_bound and stretched_component_gram_matrix is symmetric positive definite. Finds the weightings of stretched
+    component signals under a two-sided constraint.
 
     Parameters
     ----------
@@ -15,23 +16,22 @@ def mkr_box(stretched_component_gram_matrix, linear_coefficient, lower_bound, up
       dimensions C x C where C is the number of component signals.
 
     linear_coefficient: 1d array like
-      The vector containing
+      The vector containing the product of the stretched component matrix and the transpose of the observed data matrix.
+      Has length C.
 
     lower_bound: 1d array like
-      The lower limit on the value of the output element wise. Has length C
+      The lower bound on the values of the output weights. Has the same dimensions of the function output. Each 
+      element in 'lower_bound' determines the minimum value the corresponding element in the function output may take.
 
     upper_bound: 1d array like
-      The upper limit on the values of the output element wise. Has length C.
+      The upper bound on the values of the output weights. Has the same dimensions of the function output. Each element
+      in 'upper_bound' determines the maxiumum value the corresponding element in the function output may take. 
 
     Returns
     -------
     1d array like
-      The vector containing the weightings of the component signal at a certain moment. Has length C.
-
-    Raises
-    ------
-    ValueError
-        If stretched_component_gram_matrix is not a Symmetric Positive Definite Matrix.
+      The vector containing the weightings of the components needed to reconstruct a given input signal from the input
+      set. Has length C
 
     """
     stretched_component_gram_matrix = np.asarray(stretched_component_gram_matrix)
@@ -40,13 +40,14 @@ def mkr_box(stretched_component_gram_matrix, linear_coefficient, lower_bound, up
     lower_bound = np.asarray(lower_bound)
 
     problem_size = max(linear_coefficient.shape)
-    solution_variable = cp.Variable(problem_size)
+    solution_variable = cvxpy.Variable(problem_size)
 
-    objective = cp.Minimize(
-        linear_coefficient.T @ solution_variable + 0.5 * cp.quad_form(solution_variable, stretched_component_gram_matrix))
+    objective = cvxpy.Minimize(
+        linear_coefficient.T @ solution_variable + 0.5 * cvxpy.quad_form(solution_variable,
+                                                                         stretched_component_gram_matrix))
     constraints = [lower_bound <= solution_variable, solution_variable <= upper_bound]
 
-    problem = cp.Problem(objective, constraints)
+    problem = cvxpy.Problem(objective, constraints)
     problem.solve()
 
     return solution_variable.value
