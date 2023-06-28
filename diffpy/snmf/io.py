@@ -2,8 +2,8 @@ import numpy as np
 from scipy.sparse import csc
 
 
-def get_constants(data_input, component_amount, data_type, sparsity=1, stretching_factor_smoothing=1e18):
-    """Determines the constants and initial values used in the SNMF algorithm.
+def get_variables(data_input, component_amount, data_type, sparsity=1, smoothness=1e18):
+    """Determines the variables and initial values used in the SNMF algorithm.
 
     Parameters
     ----------
@@ -17,9 +17,14 @@ def get_constants(data_input, component_amount, data_type, sparsity=1, stretchin
     data_type: str
       The type of data the user has passed into the program. Can assume the value of 'PDF' or 'XRD.'
 
-    sparsity: int, optional
+    sparsity: float, optional
+      The regularization parameter that behaves as the coefficient of a "sparseness" regularization term that enhances
+      the ability to decompose signals in the case of sparse data e.g. X-ray Diffraction data. A non-zero value
+      indicates sparsity in the data; greater magnitudes indicate greater amounts of sparsity.
 
-    stretching_factor_smoothing: int, optional
+    smoothness: float, optional
+      The regularization parameter that behaves as the coefficient of a "smoothness" term that ensures that component
+      signal weightings change smoothly with time. Assumes a default value of 1e18.
 
     Returns
     -------
@@ -27,7 +32,8 @@ def get_constants(data_input, component_amount, data_type, sparsity=1, stretchin
       The collection of the names and values of the constants used in the algorithm. Contains the number of observed PDF
       /XRD patterns, the length of each pattern, the type of the data, the number of components the user would like to
       decompose the data into, an initial guess for the component matrix, and initial guess for the weight factor matrix
-      ,an initial guess for the stretching factor matrix, and ... [not finised]
+      ,an initial guess for the stretching factor matrix, a parameter controlling smoothness of the solution, a
+      parameter controlling sparseness of the solution,
 
     """
     signal_length = data_input.shape[0]
@@ -37,6 +43,8 @@ def get_constants(data_input, component_amount, data_type, sparsity=1, stretchin
     weight_matrix_guess = np.random.rand(component_amount, moment_amount)
     stretching_matrix_guess = np.random.rand(component_amount, moment_amount)
 
+
+
     return {
         "signal_length": signal_length,
         "moment_amount": moment_amount,
@@ -44,8 +52,8 @@ def get_constants(data_input, component_amount, data_type, sparsity=1, stretchin
         "weight_matrix_guess": weight_matrix_guess,
         "stretching_matrix_guess": stretching_matrix_guess,
         "component_amount": component_amount,
-        "data_type": data_type
-        "sparsity": sparsity
-        "stretching_factor_smoothing": stretching_factor_smoothing
+        "data_type": data_type,
+        "smoothness": smoothness,
+        "sparsity": sparsity,
 
     }
