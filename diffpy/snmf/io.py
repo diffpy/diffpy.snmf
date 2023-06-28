@@ -41,9 +41,8 @@ def get_variables(data_input, component_amount, data_type, sparsity=1, smoothnes
 
     component_matrix_guess = np.random.rand(signal_length, component_amount)
     weight_matrix_guess = np.random.rand(component_amount, moment_amount)
-    stretching_matrix_guess = np.ones(component_amount,moment_amount) + np.random.randn(component_amount,moment_amount) * 1e-3
-
-
+    stretching_matrix_guess = np.ones(component_amount, moment_amount) + np.random.randn(component_amount,
+                                                                                         moment_amount) * 1e-3
 
     return {
         "signal_length": signal_length,
