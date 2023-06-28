@@ -3,7 +3,7 @@ import cvxpy
 
 
 def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound, upper_bound):
-    """ Finds the weightings of stretched component signals
+    """Finds the weightings of stretched component signals
 
     Solves min J(y) = (linear_coefficient)' * y + (1/2) * y' * (quadratic coefficient) * y where lower_bound <= y <=
     upper_bound and stretched_component_gram_matrix is symmetric positive definite. Finds the weightings of stretched
