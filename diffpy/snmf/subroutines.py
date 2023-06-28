@@ -1,7 +1,8 @@
 import numpy as np
+from scipy.sparse import csc
 
 
-def get_constants(data_input, component_amount, data_type):
+def get_constants(data_input, component_amount, data_type, sparsity=1, stretching_factor_smoothing=1e18):
     """Determines the constants and initial values used in the SNMF algorithm.
 
     Parameters
@@ -9,10 +10,16 @@ def get_constants(data_input, component_amount, data_type):
     data_input: 2d array like
       The observed or simulated PDF or XRD data provided by the user. Has dimensions R x N where R is the signal length
       and N is the number of PDF/XRD signals.
+
     component_amount: int
       The number of component signals the user would like to decompose 'data_input' into.
+
     data_type: str
       The type of data the user has passed into the program. Can assume the value of 'PDF' or 'XRD.'
+
+    sparsity: int, optional
+
+    stretching_factor_smoothing: int, optional
 
     Returns
     -------
@@ -38,4 +45,7 @@ def get_constants(data_input, component_amount, data_type):
         "stretching_matrix_guess": stretching_matrix_guess,
         "component_amount": component_amount,
         "data_type": data_type
+        "sparsity": sparsity
+        "stretching_factor_smoothing": stretching_factor_smoothing
+
     }
