@@ -13,7 +13,7 @@ def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound
     ----------
     stretched_component_gram_matrix: 2d array like
       The Gram matrix constructed from the stretched component matrix. It is a square positive definite matrix. It has
-      dimensions C x C where C is the number of component signals.
+      dimensions C x C where C is the number of component signals. Must be symmetric positive definite.
 
     linear_coefficient: 1d array like
       The vector containing the product of the stretched component matrix and the transpose of the observed data matrix.
