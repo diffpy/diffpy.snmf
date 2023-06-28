@@ -25,11 +25,6 @@ def lsqnonneg(stretched_component_matrix, target_signal):
     1d array like
       The vector containing component signal weights at a moment. Has length C.
 
-    Raises
-    ------
-    ValueError
-      If the stretched_component_matrix or target_signal matrices are not the correct shape.
-
     """
     stretched_component_matrix = np.asarray(stretched_component_matrix)
     target_signal = np.asarray(target_signal)
