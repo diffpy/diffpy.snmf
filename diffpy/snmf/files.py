@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 
 
-def processing(*path):
+def processing(file_path=None):
     """Processes a directory of a series of PDF/XRD patterns into a usable format.
 
     Constructs a 2d array out of a directory of PDF/XRD patterns containing each files dependent variable column in a
@@ -10,9 +10,9 @@ def processing(*path):
 
     Parameters
     ----------
-    path: str, optional
-      The specific location/path of a directory containing only PDF or XRD data. The default is the path of the
-      current working directory. It may be a POSIX or Windows path.
+    file_path: str or Path object, optional
+      The path to the directory containing the input data. If no path is specified, defaults to the current working
+      directory.  Accepts a string or a pathlib.Path object.
 
     Returns
     -------
@@ -21,12 +21,23 @@ def processing(*path):
       independent variable values of the PDF/XRD pattern series.
 
     """
-    if not path:
+
+    if file_path is None:
         directory_path = Path.cwd()
     else:
-        directory_path = Path(path)
+        directory_path = Path(file_path)
 
     for pattern_path in directory_path.glob('*'):
+
         if pattern_path.is_file():
             with pattern_path.open() as in_file:
-                for line in in_file:
+                data_list = [line.strip().split() for line in in_file]
+                values_list = []
+                grid_list = []
+                values_array = np.empty((len(data_list)))
+                grid_points = np.empty((len(data_list)))
+
+                for point in data_list:
+                    pass
+
+
