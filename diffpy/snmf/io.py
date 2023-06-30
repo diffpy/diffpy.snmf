@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.sparse import csc
+import scipy.sparse
 
 
 def get_variables(data_input, component_amount, data_type, sparsity=1, smoothness=1e18):
@@ -44,6 +44,9 @@ def get_variables(data_input, component_amount, data_type, sparsity=1, smoothnes
     stretching_matrix_guess = np.ones(component_amount, moment_amount) + np.random.randn(component_amount,
                                                                                          moment_amount) * 1e-3
 
+    diagonals = [np.ones(moment_amount-2),-2*np.ones(moment_amount-2),np.ones(moment_amount-2)]
+    sparsity_term = .25 * scipy.sparse.diags(diagonals,[0,1,2], shape=(moment_amount-2,moment_amount))
+
     return {
         "signal_length": signal_length,
         "moment_amount": moment_amount,
@@ -54,5 +57,6 @@ def get_variables(data_input, component_amount, data_type, sparsity=1, smoothnes
         "data_type": data_type,
         "smoothness": smoothness,
         "sparsity": sparsity,
+        "sparsity_term": sparsity_term
 
     }
