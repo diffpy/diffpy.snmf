@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 
 
-def processing(file_path=None):
+def load_input_signals(file_path=None):
     """Processes a directory of a series of PDF/XRD patterns into a usable format.
 
     Constructs a 2d array out of a directory of PDF/XRD patterns containing each files dependent variable column in a
