@@ -45,8 +45,8 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
     stretching_matrix_guess = np.ones(component_amount, moment_amount) + np.random.randn(component_amount,
                                                                                          moment_amount) * 1e-3
 
-    diagonals = [np.ones(moment_amount-2),-2*np.ones(moment_amount-2),np.ones(moment_amount-2)]
-    sparsity_term = .25 * scipy.sparse.diags(diagonals,[0,1,2], shape=(moment_amount-2,moment_amount))
+    diagonals = [np.ones(moment_amount - 2), -2 * np.ones(moment_amount - 2), np.ones(moment_amount - 2)]
+    sparsity_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(moment_amount - 2, moment_amount))
 
     return {
         "signal_length": signal_length,
@@ -61,6 +61,7 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
         "sparsity_term": sparsity_term
 
     }
+
 
 def load_input_signals(file_path=None):
     """Processes a directory of a series of PDF/XRD patterns into a usable format.
@@ -99,5 +100,3 @@ def load_input_signals(file_path=None):
 
                 for point in data_list:
                     pass
-
-
