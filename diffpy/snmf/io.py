@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse
 
 
-def get_variables(data_input, component_amount, data_type, sparsity=1, smoothness=1e18):
+def initialize_variables(data_input, component_amount, data_type, sparsity=1, smoothness=1e18):
     """Determines the variables and initial values used in the SNMF algorithm.
 
     Parameters
