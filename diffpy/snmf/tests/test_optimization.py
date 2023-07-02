@@ -14,7 +14,7 @@ tm = [
 
 
 @pytest.mark.parametrize('tm', tm)
-def test_mkr_box(tm):
+def test_get_weights(tm):
     expected = tm[1]
     actual = get_weights(tm[0][0], tm[0][1], tm[0][2], tm[0][3])
     assert (actual == pytest.approx(expected))
