@@ -88,15 +88,20 @@ def load_input_signals(file_path=None):
     else:
         directory_path = Path(file_path)
 
+    values_list_to_array = []
+    grid_list_to_array = []
     for pattern_path in directory_path.glob('*'):
 
         if pattern_path.is_file():
             with pattern_path.open() as in_file:
                 data_list = [line.strip().split() for line in in_file]
-                values_list = []
-                grid_list = []
-                values_array = np.empty((len(data_list)))
-                grid_points = np.empty((len(data_list)))
 
-                for point in data_list:
-                    pass
+                values_list = [point[1] for point in data_list if point]
+                values_list = [float(element) for element in values_list if element.replace('.', '', 1).isdigit()]
+                values_list_to_array.append(values_list)
+
+                grid_list = [point[0] for point in data_list if point]
+                grid_list = [float(element) for element in grid_list if element.replace('.', '', 1).isdigit()]
+                grid_list_to_array.append(grid_list)
+
+    return np.array(grid_list_to_array).transpose(), np.array(values_list_to_array).transpose()
