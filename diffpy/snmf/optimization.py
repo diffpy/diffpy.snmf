@@ -47,7 +47,6 @@ def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound
                                                                          stretched_component_gram_matrix))
     constraints = [lower_bound <= solution_variable, solution_variable <= upper_bound]
 
-    problem = cvxpy.Problem(objective, constraints)
-    problem.solve()
+    cvxpy.Problem(objective, constraints).solve()
 
     return solution_variable.value
