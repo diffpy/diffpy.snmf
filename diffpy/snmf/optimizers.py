@@ -25,7 +25,7 @@ def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound
 
     upper_bound: 1d array like
       The upper bound on the values of the output weights. Has the same dimensions of the function output. Each element
-      in 'upper_bound' determines the maxiumum value the corresponding element in the function output may take. 
+      in 'upper_bound' determines the maximum value the corresponding element in the function output may take.
 
     Returns
     -------

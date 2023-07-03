@@ -1,5 +1,5 @@
 import pytest
-from diffpy.snmf.optimization import get_weights
+from diffpy.snmf.optimizers import get_weights
 
 tm = [
     ([[[1, 0], [0, 1]], [1, 1], 0, 1], [0, 0]),
