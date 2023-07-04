@@ -35,7 +35,8 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
       /XRD patterns, the length of each pattern, the type of the data, the number of components the user would like to
       decompose the data into, an initial guess for the component matrix, and initial guess for the weight factor matrix
       ,an initial guess for the stretching factor matrix, a parameter controlling smoothness of the solution, a
-      parameter controlling sparseness of the solution,
+      parameter controlling sparseness of the solution, the matrix representing a sparsity term, and a matrix used to
+      construct a hessian matrix.
 
     """
     signal_length = data_input.shape[0]
@@ -49,6 +50,10 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
     diagonals = [np.ones(moment_amount - 2), -2 * np.ones(moment_amount - 2), np.ones(moment_amount - 2)]
     sparsity_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(moment_amount - 2, moment_amount))
 
+    hessian_helper_matrix = scipy.sparse.block_diag([sparsity_term.T @ sparsity_term]*component_amount)
+    sequence = np.arange(moment_amount*component_amount).reshape(component_amount, moment_amount).T.flatten()
+    hessian_helper_matrix = hessian_helper_matrix[sequence, :][:, sequence]
+
     return {
         "signal_length": signal_length,
         "moment_amount": moment_amount,
@@ -59,8 +64,8 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
         "data_type": data_type,
         "smoothness": smoothness,
         "sparsity": sparsity,
-        "sparsity_term": sparsity_term
-
+        "sparsity_term": sparsity_term,
+        "hessian_helper_matrix": hessian_helper_matrix
     }
 
 
