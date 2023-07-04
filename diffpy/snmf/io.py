@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse
 from pathlib import Path
+from diffpy.utils.parsers.loaddata import loadData
 
 
 def initialize_variables(data_input, component_amount, data_type, sparsity=1, smoothness=1e18):
@@ -67,19 +68,21 @@ def load_input_signals(file_path=None):
     """Processes a directory of a series of PDF/XRD patterns into a usable format.
 
     Constructs a 2d array out of a directory of PDF/XRD patterns containing each files dependent variable column in a
-    new column. Constructs a 1d array containing the independent variable values.
+    new column. Constructs a 1d array containing the grid values.
 
     Parameters
     ----------
     file_path: str or Path object, optional
-      The path to the directory containing the input data. If no path is specified, defaults to the current working
-      directory.  Accepts a string or a pathlib.Path object.
+      The path to the directory containing the input XRD/PDF data. If no path is specified, defaults to the current
+      working directory. Accepts a string or a pathlib.Path object. Input data not on the same grid as the first file
+      read will be ignored.
 
     Returns
     -------
     tuple
-      The output containing a 2d array containing a PDF/XRD pattern as each of its columns and a 1d array containing the
-      independent variable values of the PDF/XRD pattern series.
+      The tuple whose first element is an R x M 2d array made of PDF/XRD patterns as each column; R is the length of the
+      signal and M is the number of patterns. The tuple contains a 1d array containing the values of the grid points as
+      its second element; Has length R.
 
     """
 
@@ -88,20 +91,20 @@ def load_input_signals(file_path=None):
     else:
         directory_path = Path(file_path)
 
-    values_list_to_array = []
-    grid_list_to_array = []
-    for pattern_path in directory_path.glob('*'):
+    values_list = []
+    grid_list = []
+    current_grid = []
+    for item in directory_path.iterdir():
+        if item.is_file():
+            if current_grid and current_grid != loadData(item.resolve())[:, 0].tolist():
+                print(f"{item.name} was ignored as it is not on a compatible grid.")
+                continue
+            else:
+                grid_list.append(loadData(item.resolve())[:, 0])
+                current_grid = grid_list[-1].tolist()
+                values_list.append(loadData(item.resolve())[:, 1])
 
-        if pattern_path.is_file():
-            with pattern_path.open() as in_file:
-                data_list = [line.strip().split() for line in in_file]
-
-                values_list = [point[1] for point in data_list if point]
-                values_list = [float(element) for element in values_list if element.replace('.', '', 1).isdigit()]
-                values_list_to_array.append(values_list)
-
-                grid_list = [point[0] for point in data_list if point]
-                grid_list = [float(element) for element in grid_list if element.replace('.', '', 1).isdigit()]
-                grid_list_to_array.append(grid_list)
-
-    return np.array(grid_list_to_array).transpose(), np.array(values_list_to_array).transpose()
+    grid_array = np.column_stack(grid_list)
+    grid_vector = np.unique(grid_array, axis=1)
+    values_array = np.column_stack(values_list)
+    return grid_vector, values_array
