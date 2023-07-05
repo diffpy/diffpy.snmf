@@ -52,7 +52,4 @@ jobs:
           conda activate test
           coverage run run_tests.py
           coverage report -m
-          codecov
-
-
-
+          codecov -t ${CODECOV_TOKEN}
