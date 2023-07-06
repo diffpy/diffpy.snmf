@@ -12,7 +12,7 @@
 # psize:
 #   ZnSe: 0.0
 #   BaTiO3_c: 0.0
-#   mix___ZnSe-w_0.4___BaTiO3_c-w_0.6:
+# mix___ZnSe-w_0.4___BaTiO3_c-w_0.6:
 #   - 0.0
 #   - 0.0
 # lattice_strain: {'a': 0.16, 'b': 0.16, 'c': 0.16, 'w': [0.4, 0.6]}
