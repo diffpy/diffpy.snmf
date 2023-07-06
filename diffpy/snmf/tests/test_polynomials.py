@@ -1,8 +1,10 @@
 import pytest
+import numpy as np
 from diffpy.snmf.polynomials import rooth
 
 tr = [
     ([0, 0], 0),
+    ([-99.99, 12.50], 9.936397678254531),
     ([-4, 0], 2),
     ([10, 0], 0),
     ([-7, -7], 3.04891734),
@@ -11,9 +13,9 @@ tr = [
     ([0, -7], 0),
     ([-9, 0], 3),
     ([-9, 3], 2.8169),
-    ([[2, 2], [2]], [0, 0]),
-    ([[[2, 2], [2, 2]], 2], [0, 0]),
-    ([[[[3,2],[-2,-2],[100,0]]],2],None)
+    ([[2, 2], 2], [0, 0]),
+    ([[[2, 2], [2, 2]], 2], [[0, 0], [0, 0]]),
+    ([[[[3, 2], [-2, -2], [100, 0]]], 2], [[[0, 0], [0, 0], [0, 0]]])
 ]
 
 
@@ -21,4 +23,4 @@ tr = [
 def test_rooth(tr):
     actual = rooth(tr[0][0], tr[0][1])
     expected = tr[1]
-    assert (actual == expected).all()
+    np.testing.assert_allclose(actual, expected, rtol=1e-4)
