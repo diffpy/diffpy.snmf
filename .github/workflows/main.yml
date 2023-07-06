@@ -47,11 +47,9 @@ jobs:
           pip install .
 
       - name: Validate diffpy.snmf
-        with:
-            token: ${{ secrets.CODECOV_TOKEN }}
         shell: bash -l {0}
         run: |
           conda activate test
           coverage run run_tests.py
           coverage report -m
-          codecov 
+          codecov -t ${{ secrets.CODECOV_TOKEN }}
