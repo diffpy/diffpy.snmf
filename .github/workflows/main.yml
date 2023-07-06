@@ -52,4 +52,8 @@ jobs:
           conda activate test
           coverage run run_tests.py
           coverage report -m
-          codecov
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+#        with:
+#          token: ${{ secrets.CODECOV_TOKEN }}
