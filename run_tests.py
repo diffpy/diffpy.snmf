@@ -15,3 +15,4 @@ if __name__ == '__main__':
     # travis will fail correctly if tests fail
     exit_res = pytest.main(args)
     sys.exit(exit_res)
+
