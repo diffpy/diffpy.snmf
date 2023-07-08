@@ -6,7 +6,10 @@ import numpy as np
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
                        sparsity):
-    """Defines the objective function of the algorithm and returns its value
+    """Defines the objective function of the algorithm and returns its value.
+
+    Calculates the value of '(||residual_matrix||_F) ** 2 + smoothness * (||smoothness_term *
+    stretching_factor_matrix.T||)**2 + sparsity * sum(component_matrix ** .5)' and returns its value.
 
     Parameters
     ----------
