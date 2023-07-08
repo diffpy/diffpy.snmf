@@ -50,8 +50,8 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
     diagonals = [np.ones(moment_amount - 2), -2 * np.ones(moment_amount - 2), np.ones(moment_amount - 2)]
     smoothness_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(moment_amount - 2, moment_amount))
 
-    hessian_helper_matrix = scipy.sparse.block_diag([smoothness_term.T @ smoothness_term]*component_amount)
-    sequence = np.arange(moment_amount*component_amount).reshape(component_amount, moment_amount).T.flatten()
+    hessian_helper_matrix = scipy.sparse.block_diag([smoothness_term.T @ smoothness_term] * component_amount)
+    sequence = np.arange(moment_amount * component_amount).reshape(component_amount, moment_amount).T.flatten()
     hessian_helper_matrix = hessian_helper_matrix[sequence, :][:, sequence]
 
     return {
@@ -101,13 +101,14 @@ def load_input_signals(file_path=None):
     current_grid = []
     for item in directory_path.iterdir():
         if item.is_file():
-            if current_grid and current_grid != loadData(item.resolve())[:, 0].tolist():
+            data = loadData(item.resolve())
+            if current_grid and current_grid != data[:, 0]:
                 print(f"{item.name} was ignored as it is not on a compatible grid.")
                 continue
             else:
-                grid_list.append(loadData(item.resolve())[:, 0])
-                current_grid = grid_list[-1].tolist()
-                values_list.append(loadData(item.resolve())[:, 1])
+                grid_list.append(data[:, 0])
+                current_grid = grid_list[-1]
+                values_list.append(data[:, 1])
 
     grid_array = np.column_stack(grid_list)
     grid_vector = np.unique(grid_array, axis=1)
