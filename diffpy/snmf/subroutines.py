@@ -49,3 +49,7 @@ def objective_function(residual_matrix, stretching_factor_matrix, smoothness, sm
     component_matrix = np.asarray(component_matrix)
     return .5 * np.linalg.norm(residual_matrix, 'fro') ** 2 + .5 * smoothness * np.linalg.norm(
         smoothness_term @ stretching_factor_matrix.T, 'fro') ** 2 + sparsity * np.sum(np.sqrt(component_matrix))
+
+
+def get_stretched_component():
+    pass
