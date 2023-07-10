@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 
 
 # import scipy.interpolate
@@ -51,5 +52,33 @@ def objective_function(residual_matrix, stretching_factor_matrix, smoothness, sm
         smoothness_term @ stretching_factor_matrix.T, 'fro') ** 2 + sparsity * np.sum(np.sqrt(component_matrix))
 
 
-def get_stretched_component():
-    pass
+def get_stretched_component(stretching_factor, component, signal_length):
+    """Approximates the
+
+    Approximates the values of a component signal at points in between its grid nodes using quadratic spline
+    interpolation. Uses a normalized grid of evenly spaced integers counting from 0 to signal_length (exclusive) to
+    approximate values in between grid nodes. Once this grid is stretched, values at grid nodes past the unstretched
+    signal's domain are set to zero.
+
+    Parameters
+    ----------
+    stretching_factor: float
+        The stretching factor of a component signal at a particular moment.
+    component: 1d array like
+        The calculated component signal without stretching or weighting. Has length N, the length of the signal.
+    signal_length: int
+        The length of the component signal.
+
+    Returns
+    -------
+    1d array of floats
+        The calculated component signal with stretching factors applied. Has length N, the length of the unstretched
+        component signal.
+
+    """
+    component = np.asarray(component)
+    normalized_grid = np.arange(0, signal_length)
+    spline = scipy.interpolate.UnivariateSpline(normalized_grid, component, k=2, ext=1)
+    stretched_grid = normalized_grid / stretching_factor
+    stretched_component = spline.__call__(stretched_grid, ext=1)
+    return stretched_component
