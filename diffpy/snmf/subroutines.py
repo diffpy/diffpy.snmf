@@ -77,7 +77,7 @@ def get_stretched_component(stretching_factor, component, signal_length):
 
     """
     component = np.asarray(component)
-    normalized_grid = np.arange(0, signal_length)
+    normalized_grid = np.arange(signal_length)
     spline = scipy.interpolate.UnivariateSpline(normalized_grid, component, k=2, ext=1)
     stretched_grid = normalized_grid / stretching_factor
     stretched_component = spline.__call__(stretched_grid, ext=1)

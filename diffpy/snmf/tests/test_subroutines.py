@@ -14,3 +14,12 @@ def test_objective_function(to):
     actual = objective_function(to[0][0], to[0][1], to[0][2], to[0][3], to[0][4], to[0][5])
     expected = to[1]
     assert actual == pytest.approx(expected)
+
+tgso = [
+
+]
+
+
+@pytest.mark.parametrize("tgso",tgso)
+def test_get_stretched_component(tgso):
+    assert False
