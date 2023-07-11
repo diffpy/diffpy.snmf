@@ -78,7 +78,7 @@ def get_stretched_component(stretching_factor, component, signal_length):
     """
     component = np.asarray(component)
     normalized_grid = np.arange(signal_length)
-    spline = scipy.interpolate.CubicSpline(normalized_grid, component)
+    spline = scipy.interpolate.CubicSpline(normalized_grid, component, extrapolate=False)
     stretched_grid = normalized_grid / stretching_factor
-    stretched_component = spline.__call__(stretched_grid,extrapolate=False)
+    stretched_component = spline.__call__(stretched_grid)
     return np.nan_to_num(stretched_component)
