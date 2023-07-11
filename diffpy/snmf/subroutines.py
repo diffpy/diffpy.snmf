@@ -55,10 +55,10 @@ def objective_function(residual_matrix, stretching_factor_matrix, smoothness, sm
 def get_stretched_component(stretching_factor, component, signal_length):
     """Applies a stretching factor to a component signal.
 
-    Approximates the values of a component signal at points in between its grid nodes using quadratic spline
-    interpolation. Uses a normalized grid of evenly spaced integers counting from 0 to signal_length (exclusive) to
-    approximate values in between grid nodes. Once this grid is stretched, values at grid nodes past the unstretched
-    signal's domain are set to zero. Returns the approximate values of x(r/a) from x(r) where x is a component signal.
+    Computes a stretched signal and reinterpolates it onto the original grid of points. Uses a normalized grid of evenly
+    spaced integers counting from 0 to signal_length (exclusive) to approximate values in between grid nodes. Once this
+    grid is stretched, values at grid nodes past the unstretched signal's domain are set to zero. Returns the
+    approximate values of x(r/a) from x(r) where x is a component signal.
 
     Parameters
     ----------
