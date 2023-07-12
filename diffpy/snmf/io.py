@@ -120,13 +120,30 @@ def load_input_signals(file_path=None):
     return grid_vector, values_array
 
 
-def drawfig(component_amount):
+def drawfig(moment_amount, stretching_matrix, weight_matrix, grid_vector):
     plt.ion()
     fig = plt.figure()
-    grid = plt.GridSpec(component_amount, 3)
-    stretching_plot = fig.add_subplot(grid[0, 0])
-    weight_plot = fig.add_subplot(grid[1, 0])
+    grid = plt.GridSpec(4, 4)
+    stretching_plot = fig.add_subplot(grid[0:2, 0:2])
+    weight_plot = fig.add_subplot(grid[2:, 0:2])
+    component_plot = fig.add_subplot(grid[:, 2:])
 
-    stretching_plot.plot()
+    stretching_plot.plot(stretching_matrix.T)
+    stretching_plot.set_title("Component Stretching Factors")
+    stretching_plot.set_xlabel("Moment")
+    stretching_plot.set_ylabel("Stretching Factor")
+
+    weight_plot.plot(weight_matrix.T)
+    weight_plot.set_title("Component Weights")
+    weight_plot.set_ylabel("Weight")
+    weight_plot.set_xlabel("Moment")
+
+    component_plot.plot(grid_vector, component_plot)
+    component_plot.set_title("Component Signals")
+    component_plot.sex_ylabel("g(r)")
+    component_plot.set_xlabel("r")
+
     fig.canvas.draw()
+    fig.canvas.flush_events()
+    plt.tight_layout()
     plt.show()
