@@ -2,6 +2,10 @@ import numpy as np
 import scipy.sparse
 from pathlib import Path
 from diffpy.utils.parsers.loaddata import loadData
+import matplotlib.pyplot as plt
+from bg_mpl_stylesheet.bg_mpl_stylesheet import bg_mpl_style
+
+plt.style.use(bg_mpl_style)
 
 
 def initialize_variables(data_input, component_amount, data_type, sparsity=1, smoothness=1e18):
@@ -116,5 +120,13 @@ def load_input_signals(file_path=None):
     return grid_vector, values_array
 
 
-def drawfig():
-    pass
+def drawfig(component_amount):
+    plt.ion()
+    fig = plt.figure()
+    grid = plt.GridSpec(component_amount, 3)
+    stretching_plot = fig.add_subplot(grid[0, 0])
+    weight_plot = fig.add_subplot(grid[1, 0])
+
+    stretching_plot.plot()
+    fig.canvas.draw()
+    plt.show()
