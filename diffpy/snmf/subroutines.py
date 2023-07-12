@@ -1,8 +1,4 @@
 import numpy as np
-import scipy
-
-
-# import scipy.interpolate
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
