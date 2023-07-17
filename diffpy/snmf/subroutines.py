@@ -182,5 +182,45 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
     return residual_matrx
 
 
-def reconstruct_data():
-    pass
+def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, component_amount,
+                     moment_amount, signal_length):
+    """Reconstructs the experimental data from the component signals, stretching factors, and weights.
+
+    Parameters
+    ----------
+    stretching_factor_matrix: 2d array like
+      The matrix containing the stretching factors of the component signals.
+
+    component_matrix: 2d array like
+      The matrix containing the unstretched component signals
+
+    weight_matrix: 2d array like
+
+    component_amount: int
+
+    moment_amount: int
+
+    signal_length: int
+
+    Returns
+    -------
+    2d array like
+
+    """
+    stretched_component_series = []
+    for moment in range(moment_amount):
+        for component in range(component_amount):
+            stretched_component = get_stretched_component(stretching_factor_matrix[component, moment],
+                                                          component_matrix[:, component], signal_length)
+            stretched_component_series.append(stretched_component)
+    stretched_component_series = np.column_stack(stretched_component_series)
+
+    reconstructed_data = []
+    moment = 0
+    for block in range(0, moment_amount, component_amount):
+        component_block = stretched_component_series[:, block:block + component_amount]
+        for component in range(component_amount):
+            component_block[:, component] = component_block[:, component] * weight_matrix[component, moment]
+            reconstructed_data.append(np.sum(component_block, axis=0))
+        moment += 1
+    return np.column_stack(reconstructed_data)

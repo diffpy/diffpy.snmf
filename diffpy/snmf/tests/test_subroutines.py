@@ -47,3 +47,7 @@ def test_update_weights_matrix():
 
 def test_get_residual_matrix():
     assert False
+
+
+def test_reconstruct_data():
+    assert False
