@@ -39,3 +39,7 @@ def test_get_stretched_component(tgso):
     actual = get_stretched_component(tgso[0][0], tgso[0][1], tgso[0][2])
     expected = tgso[1]
     np.testing.assert_allclose(actual, expected, rtol=1e-03)
+
+
+def test_update_weights_matrix():
+    assert False

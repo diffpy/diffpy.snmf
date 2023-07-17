@@ -1,4 +1,6 @@
 import numpy as np
+from diffpy.snmf.optimizers import get_weights
+from diffpy.snmf.factorizers import lsqnonneg
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
@@ -76,11 +78,66 @@ def get_stretched_component(stretching_factor, component, signal_length):
     normalized_grid = np.arange(signal_length)
     return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
 
-def update_weights_matrix():
-    pass
+
+def update_weights_matrix(component_amount, signal_length, stretching_factor_matrix, component_matrix, data_input,
+                          moment_amount, weights_matrix, method):
+    """Update the weight factors matrix.
+
+    Parameters
+    ----------
+    component_amount: int
+      The number of component signals the user would like to determine from the experimental data.
+
+    signal_length: int
+      The length of the experimental signal patterns
+
+    stretching_factor_matrix: 2d array like
+      The matrx containing the stretching factors of the calculated component signals. Has dimensions K x M where K is
+      the number of component signals and M is the number of XRD/PDF patterns.
+
+    component_matrix: 2d array like
+      The matrix containing the unstretched calculated component signals. Has dimensions N x K where N is the length of
+      the signals and K is the number of component signals.
+
+    data_input: 2d array like
+      The experimental series of PDF/XRD patterns. Has dimensions N x M where N is the length of the PDF/XRD signals and
+      M is the number of PDF/XRD patterns.
+
+    moment_amount: int
+      The number of PDF/XRD patterns from the experimental data.
+
+    weights_matrix: 2d array like
+      The matrix containing the weights of the stretched component signals. Has dimensions K x M where K is the number
+      of component signals and M is the number of XRD/PDF patterns.
+
+    method: str
+      The string specifying the method for obtaining individual weights.
+
+    Returns
+    -------
+    2d array like
+      The matrix containing the new weight factors of the stretched component signals.
+
+    """
+    weight = np.zeros(component_amount)
+    for i in range(moment_amount):
+        stretched_components = np.zeros(signal_length, component_amount)
+        for n in range(component_amount):
+            stretched_components[:, n] = get_stretched_component(stretching_factor_matrix[n, i], component_matrix[:, n])
+            if method == 'align':
+                weight = lsqnonneg(stretched_components[0:signal_length, :], data_input[0:signal_length, i])
+            else:
+                weight = get_weights(
+                    stretched_components[0:signal_length, :].T @ stretched_components[0:signal_length, :],
+                    -1 * stretched_components[0:signal_length, :].T @ data_input[0:signal_length, i],
+                    np.zeros(component_amount), np.ones(component_amount))
+        weights_matrix[:, i] = weight
+    return weights_matrix
+
 
 def get_residual_matrix():
     pass
+
 
 def reconstruct_data():
     pass
