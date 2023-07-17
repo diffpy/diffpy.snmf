@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data
+from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -51,14 +51,23 @@ def test_get_stretched_component(tgso):
 #     assert False
 
 
-# tgrm = [()
-#
-# ]
-#
-#
-# @pytest.mark.parametrize(tgrm,'tgrm')
-# def test_get_residual_matrix(tgrm):
-#     assert False
+tgrm = [
+    ([[[1, 2], [3, 4]], [[.25], [.75]], [[.9], [.7]], [[11, 22], [33, 44]], 1, 2, 2], [[-9.25, -22], [-30.6190, -44]]),
+    ([[[1, 2], [3, 4]], [[1], [1]], [[1], [1]], [[11, 22], [33, 44]], 1, 2, 2], [[-8, -22], [-26, -44]])
+    # positive whole numbers
+    # negative whole numbers
+    # single component
+    # positive float
+    # negative floats
+
+]
+
+
+@pytest.mark.parametrize('tgrm', tgrm)
+def test_get_residual_matrix(tgrm):
+    actual = get_residual_matrix(tgrm[0][0], tgrm[0][1], tgrm[0][2], tgrm[0][3], tgrm[0][4], tgrm[0][5], tgrm[0][6])
+    expected = tgrm[1]
+    np.testing.assert_allclose(actual, expected)
 
 
 trd = [

@@ -136,7 +136,7 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
 
 
 def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, data_input, moment_amount,
-                        component_amount):
+                        component_amount, signal_length):
     """Obtains the residual matrix between the experimental data and calculated data
 
     Calculates the difference between the experimental data and the reconstructed experimental data created from the
@@ -166,18 +166,25 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
     component_amount: int
       The number of component signals that user would like to experimental data.
 
+    signal_length: int
+      The length of the signals.
+
 
     Returns
     -------
     2d array like
 
     """
+    component_matrix = np.asarray(component_matrix)
+    weights_matrix = np.asarray(weights_matrix)
+    stretching_matrix = np.asarray(stretching_matrix)
+    data_input = np.asarray(data_input)
     residual_matrx = -1 * data_input
     for m in range(moment_amount):
         residual = residual_matrx[:, m]
         for k in range(component_amount):
             residual = residual + weights_matrix[k, m] * get_stretched_component(stretching_matrix[k, m],
-                                                                                 component_matrix[:, k])
+                                                                                 component_matrix[:, k], signal_length)
         residual_matrx[:, m] = residual
     return residual_matrx
 
