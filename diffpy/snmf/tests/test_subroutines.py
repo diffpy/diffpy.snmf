@@ -41,29 +41,31 @@ def test_get_stretched_component(tgso):
     np.testing.assert_allclose(actual, expected, rtol=1e-03)
 
 
-tuwm = [
-
-]
-
-
-@pytest.mark.parametrize
-def test_update_weights_matrix(tuwm):
-    assert False
-
-
-tgrm = [
-
-]
+# tuwm = [()
+#
+# ]
+#
+#
+# @pytest.mark.parametrize(tuwm,'tuwm')
+# def test_update_weights_matrix(tuwm):
+#     assert False
 
 
-@pytest.mark.parametrize
-def test_get_residual_matrix(tgrm):
-    assert False
+# tgrm = [()
+#
+# ]
+#
+#
+# @pytest.mark.parametrize(tgrm,'tgrm')
+# def test_get_residual_matrix(tgrm):
+#     assert False
 
 
 trd = [
     ([np.array([[.5], [.5]]), np.array([[1, 2], [3, 4]]), np.array([[.25], [.75]]), 2, 1, 2],
-     np.array([[.25, 1.5], [0, 0]]))
+     np.array([[.25, 1.5], [0, 0]])),
+    ([[[.9], [.7]], [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]], [[.25], [.75]], 2, 1, 5],
+     [[.25, 1.5], [.8056, 3.6429], [1.3611, 5.7857], [1.9167, 5.3571], [1.25, 0]])
 
 ]
 

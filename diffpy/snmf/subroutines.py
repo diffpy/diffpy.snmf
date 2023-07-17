@@ -207,6 +207,9 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
     2d array like
 
     """
+    stretching_factor_matrix = np.asarray(stretching_factor_matrix)
+    component_matrix = np.asarray(component_matrix)
+    weight_matrix = np.asarray(weight_matrix)
     stretched_component_series = []
     for moment in range(moment_amount):
         for component in range(component_amount):
