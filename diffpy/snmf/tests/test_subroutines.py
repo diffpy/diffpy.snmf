@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from diffpy.snmf.subroutines import objective_function, get_stretched_component
+from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -41,13 +41,35 @@ def test_get_stretched_component(tgso):
     np.testing.assert_allclose(actual, expected, rtol=1e-03)
 
 
-def test_update_weights_matrix():
+tuwm = [
+
+]
+
+
+@pytest.mark.parametrize
+def test_update_weights_matrix(tuwm):
     assert False
 
 
-def test_get_residual_matrix():
+tgrm = [
+
+]
+
+
+@pytest.mark.parametrize
+def test_get_residual_matrix(tgrm):
     assert False
 
 
-def test_reconstruct_data():
-    assert False
+trd = [
+    ([np.array([[.5], [.5]]), np.array([[1, 2], [3, 4]]), np.array([[.25], [.75]]), 2, 1, 2],
+     np.array([[.25, 1.5], [0, 0]]))
+
+]
+
+
+@pytest.mark.parametrize('trd', trd)
+def test_reconstruct_data(trd):
+    actual = reconstruct_data(trd[0][0], trd[0][1], trd[0][2], trd[0][3], trd[0][4], trd[0][5])
+    expected = trd[1]
+    np.testing.assert_allclose(actual, expected)
