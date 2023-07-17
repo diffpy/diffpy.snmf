@@ -43,3 +43,7 @@ def test_get_stretched_component(tgso):
 
 def test_update_weights_matrix():
     assert False
+
+
+def test_get_residual_matrix():
+    assert False

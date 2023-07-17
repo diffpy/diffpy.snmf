@@ -135,8 +135,51 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
     return weights_matrix
 
 
-def get_residual_matrix():
-    pass
+def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, data_input, moment_amount,
+                        component_amount):
+    """Obtains the residual matrix between the experimental data and calculated data
+
+    Calculates the difference between the experimental data and the reconstructed experimental data created from the
+    calculated components, weights, and stretching factors.
+
+    Parameters
+    ----------
+    component_matrix: 2d array like
+      The matrix containing the calculated component signals. Has dimensions N x K where N is the length of the signal
+      and K is the number of calculated component signals.
+
+    weights_matrix: 2d array like
+      The matrix containing the calculated weights of the stretched component signals. Has dimensions K x M where K is
+      the number of components and M is the number of moments or experimental PDF/XRD patterns.
+
+    stretching_matrix: 2d array like
+      The matrix containing the calculated stretching factors of the calculated component signals. Has dimensions K x M
+      where K is the number of components and M is the number of moments or experimental PDF/XRD patterns.
+
+    data_input: 2d array like
+      The matrix containing the experimental PDF/XRD data. Has dimensions N x M where N is the length of the signals and
+      M is the number of signal patterns.
+
+    moment_amount: int
+      The number of PDF/XRD patterns.
+
+    component_amount: int
+      The number of component signals that user would like to experimental data.
+
+
+    Returns
+    -------
+    2d array like
+
+    """
+    residual_matrx = -1 * data_input
+    for m in range(moment_amount):
+        residual = residual_matrx[:, m]
+        for k in range(component_amount):
+            residual = residual + weights_matrix[k, m] * get_stretched_component(stretching_matrix[k, m],
+                                                                                 component_matrix[:, k])
+        residual_matrx[:, m] = residual
+    return residual_matrx
 
 
 def reconstruct_data():
