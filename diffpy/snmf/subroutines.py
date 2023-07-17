@@ -75,3 +75,12 @@ def get_stretched_component(stretching_factor, component, signal_length):
     component = np.asarray(component)
     normalized_grid = np.arange(signal_length)
     return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
+
+def update_weights_matrix():
+    pass
+
+def get_residual_matrix():
+    pass
+
+def reconstruct_data():
+    pass
