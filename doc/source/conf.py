@@ -17,9 +17,9 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'PDFmorph'
-copyright = '2009-2019, Trustees of Columbia University in the City of New York, all rights reserved.'
-author = 'Chris Farrow, Christopher J. Wright, Pavol Juhás, Chia-Hao (Timothy) Liu, S. Matthew Román, Simon J.L. Billinge'
+project = 'snmf'
+copyright = '2009-2023, Trustees of Columbia University in the City of New York, all rights reserved.'
+author = 'Ran Gu, Adeolu Ajayi, Qiang Du,  Simon J.L. Billinge'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
@@ -71,20 +71,20 @@ html_theme_options = {}
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-htmlhelp_basename = 'PDFmorphdoc'
+htmlhelp_basename = 'snmfdoc'
 
 latex_documents = [
-	(master_doc, 'pdfmorph.tex', 'PDFmorph Documentation', 
+	(master_doc, 'snmf.tex', 'Snmf Documentation',
 	'author', 'manual'),
 ]
 
 man_pages = [
-	(master_doc, 'pdfmorph', 'PDFmorph Documentation', [author], 1)
+	(master_doc, 'snmf', 'Snmf Documentation', [author], 1)
 ]
 
 texinfo_documents = [
-	(master_doc, 'PDFmorph', 'PDFmorph Documentation', author,
-	'PDFmorph', 'One line description of project.', 'Miscellaneous'),
+	(master_doc, 'snmf', 'Snmf Documentation', author,
+	'snmf', 'One line description of project.', 'Miscellaneous'),
 ]
 
 epub_title = project
