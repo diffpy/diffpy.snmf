@@ -228,9 +228,7 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
             stretched_component = get_stretched_component(stretching_factor_matrix[component, moment],
                                                           component_matrix[:, component], signal_length)
             stretched_component_series.append(stretched_component)
-            print(stretched_component)
     stretched_component_series = np.column_stack(stretched_component_series)
-    print(stretched_component_series)
 
     reconstructed_data = []
     moment = 0
@@ -240,4 +238,5 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
             block[:, component] = block[:, component] * weight_matrix[component, moment]
         reconstructed_data.append(block)
         moment += 1
+    print(np.column_stack(reconstructed_data))
     return np.column_stack(reconstructed_data)
