@@ -115,5 +115,6 @@ def load_input_signals(file_path=None):
     values_array = np.column_stack(values_list)
     return grid_vector, values_array
 
+
 def parser():
     pass
