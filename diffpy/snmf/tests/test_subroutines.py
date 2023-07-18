@@ -57,15 +57,17 @@ def test_update_weights_matrix(tuwm):
     actual = update_weights_matrix(tuwm[0][0], tuwm[0][1], tuwm[0][2], tuwm[0][3], tuwm[0][4], tuwm[0][5], tuwm[0][6],
                                    tuwm[0][7])
     expected = tuwm[1]
-    np.testing.assert_allclose(actual, expected,rtol=1e-03)
+    np.testing.assert_allclose(actual, expected, rtol=1e-03)
 
 
 tgrm = [
     ([[[1, 2], [3, 4]], [[.25], [.75]], [[.9], [.7]], [[11, 22], [33, 44]], 1, 2, 2], [[-9.25, -22], [-30.6190, -44]]),
-    ([[[1, 2], [3, 4]], [[1], [1]], [[1], [1]], [[11, 22], [33, 44]], 1, 2, 2], [[-8, -22], [-26, -44]])
+    ([[[1, 2], [3, 4]], [[1], [1]], [[1], [1]], [[11, 22], [33, 44]], 1, 2, 2], [[-8, -22], [-26, -44]]),
     # positive whole numbers
     # negative whole numbers
     # single component
+    ([[[1.1, 4.4], [1.2, 4.5], [14, 7.8]], [[.4, .6], [.75, .25]], [[.9, .89], [.98, .88]],
+      [[10, 20], [-10.5, -20.6], [0.6, .9]], 2, 2, 3], [[-6.26, -18.24], [14.9744, 23.5067], [-.6, -.9]]),
     # positive float
     # negative floats
 ]
@@ -75,7 +77,7 @@ tgrm = [
 def test_get_residual_matrix(tgrm):
     actual = get_residual_matrix(tgrm[0][0], tgrm[0][1], tgrm[0][2], tgrm[0][3], tgrm[0][4], tgrm[0][5], tgrm[0][6])
     expected = tgrm[1]
-    np.testing.assert_allclose(actual, expected)
+    np.testing.assert_allclose(actual, expected,rtol=1e-04)
 
 
 trd = [
@@ -92,4 +94,4 @@ trd = [
 def test_reconstruct_data(trd):
     actual = reconstruct_data(trd[0][0], trd[0][1], trd[0][2], trd[0][3], trd[0][4], trd[0][5])
     expected = trd[1]
-    np.testing.assert_allclose(actual, expected,rtol=1e-03)
+    np.testing.assert_allclose(actual, expected, rtol=1e-03)
