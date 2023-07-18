@@ -119,18 +119,23 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
       The matrix containing the new weight factors of the stretched component signals.
 
     """
+    stretching_factor_matrix = np.asarray(stretching_factor_matrix)
+    component_matrix = np.asarray(component_matrix)
+    data_input = np.asarray(data_input)
+    weights_matrix = np.asarray(weights_matrix)
     weight = np.zeros(component_amount)
     for i in range(moment_amount):
-        stretched_components = np.zeros(signal_length, component_amount)
+        stretched_components = np.zeros((signal_length, component_amount))
         for n in range(component_amount):
-            stretched_components[:, n] = get_stretched_component(stretching_factor_matrix[n, i], component_matrix[:, n])
-            if method == 'align':
-                weight = lsqnonneg(stretched_components[0:signal_length, :], data_input[0:signal_length, i])
-            else:
-                weight = get_weights(
-                    stretched_components[0:signal_length, :].T @ stretched_components[0:signal_length, :],
-                    -1 * stretched_components[0:signal_length, :].T @ data_input[0:signal_length, i],
-                    np.zeros(component_amount), np.ones(component_amount))
+            stretched_components[:, n] = get_stretched_component(stretching_factor_matrix[n, i], component_matrix[:, n],
+                                                                 signal_length)
+        if method == 'align':
+            weight = lsqnonneg(stretched_components[0:signal_length, :], data_input[0:signal_length, i])
+        else:
+            weight = get_weights(
+                stretched_components[0:signal_length, :].T @ stretched_components[0:signal_length, :],
+                -1 * stretched_components[0:signal_length, :].T @ data_input[0:signal_length, i],
+                np.zeros(component_amount), np.ones(component_amount))
         weights_matrix[:, i] = weight
     return weights_matrix
 

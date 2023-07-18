@@ -1,6 +1,7 @@
 import pytest
 import numpy as np
-from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix
+from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
+    update_weights_matrix
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -41,14 +42,18 @@ def test_get_stretched_component(tgso):
     np.testing.assert_allclose(actual, expected, rtol=1e-03)
 
 
-# tuwm = [()
-#
-# ]
-#
-#
-# @pytest.mark.parametrize(tuwm,'tuwm')
-# def test_update_weights_matrix(tuwm):
-#     assert False
+tuwm = [([2, 2, [[.5, .6], [.7, .8]], [[1, 2], [4, 8]], [[1.6, 2.8], [5, 8.8]], 2, [[.78, .12], [.5, .5]], None],
+         [[0, 1], [1, 1]])
+
+        ]
+
+
+@pytest.mark.parametrize('tuwm', tuwm)
+def test_update_weights_matrix(tuwm):
+    actual = update_weights_matrix(tuwm[0][0], tuwm[0][1], tuwm[0][2], tuwm[0][3], tuwm[0][4], tuwm[0][5], tuwm[0][6],
+                                   tuwm[0][7])
+    expected = tuwm[1]
+    np.testing.assert_allclose(actual, expected)
 
 
 tgrm = [
@@ -75,7 +80,8 @@ trd = [
      np.array([[.25, 1.5], [0, 0]])),
     ([[[.9], [.7]], [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]], [[.25], [.75]], 2, 1, 5],
      [[.25, 1.5], [.8056, 3.6429], [1.3611, 5.7857], [1.9167, 5.3571], [1.25, 0]]),
-    ([[[.5, .7], [.5, .8]], [[1.1, 2.2], [3.3, 4.4]], [[.25, .5], [.75, .5]], 2, 2, 2], [[.275, .55, 1.65, 1.1], [0, .9429, 0, 1.65]])
+    ([[[.5, .7], [.5, .8]], [[1.1, 2.2], [3.3, 4.4]], [[.25, .5], [.75, .5]], 2, 2, 2],
+     [[.275, .55, 1.65, 1.1], [0, .9429, 0, 1.65]])
 
 ]
 
