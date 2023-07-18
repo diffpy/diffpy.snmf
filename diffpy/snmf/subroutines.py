@@ -135,7 +135,7 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
             weight = get_weights(
                 stretched_components[0:signal_length, :].T @ stretched_components[0:signal_length, :],
                 -1 * stretched_components[0:signal_length, :].T @ data_input[0:signal_length, i],
-                np.zeros(component_amount), np.ones(component_amount))
+                0, 1)
         weights_matrix[:, i] = weight
     return weights_matrix
 
