@@ -44,7 +44,7 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
 
     component_matrix_guess = np.random.rand(signal_length, component_amount)
     weight_matrix_guess = np.random.rand(component_amount, moment_amount)
-    stretching_matrix_guess = np.ones(component_amount, moment_amount) + np.random.randn(component_amount,
+    stretching_matrix_guess = np.ones((component_amount, moment_amount)) + np.random.randn(component_amount,
                                                                                          moment_amount) * 1e-3
 
     diagonals = [np.ones(moment_amount - 2), -2 * np.ones(moment_amount - 2), np.ones(moment_amount - 2)]
@@ -52,6 +52,8 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
 
     hessian_helper_matrix = scipy.sparse.block_diag([smoothness_term.T @ smoothness_term] * component_amount)
     sequence = np.arange(moment_amount * component_amount).reshape(component_amount, moment_amount).T.flatten()
+
+    hessian_helper_matrix = hessian_helper_matrix.tocsr()
     hessian_helper_matrix = hessian_helper_matrix[sequence, :][:, sequence]
 
     return {
@@ -102,7 +104,7 @@ def load_input_signals(file_path=None):
     for item in directory_path.iterdir():
         if item.is_file():
             data = loadData(item.resolve())
-            if current_grid and current_grid != data[:, 0]:
+            if len(current_grid) != 0 and (current_grid != data[:, 0]).any():
                 print(f"{item.name} was ignored as it is not on a compatible grid.")
                 continue
             else:
