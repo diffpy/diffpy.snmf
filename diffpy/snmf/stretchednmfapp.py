@@ -1,26 +1,33 @@
 import numpy as np
+import argparse
 
 from diffpy.snmf.io import load_input_signals, initialize_variables
 
 
+def create_parser():
+    parser = argparse.ArgumentParser(
+        prog="stretched_nmf",
+        description="Stretched Nonnegative Matrix Factorization"
+    )
+    parser.add_argument('-v', '--version', action='version', help='Print the software version number')
+    parser.add_argument('-d', '--directory', type=str,
+                        help="Directory containing experimental data. Ensure it is in quotations or apostrophes.")
+
+    parser.add_argument('component_number', type=int,
+                        help="The number of component signals to obtain from experimental "
+                             "data. Must be an integer greater than 0.")
+    parser.add_argument('data_type', type=str, choices=['xrd', 'pdf'], help="The type of the experimental data.")
+    args = parser.parse_args()
+    return args
+
+
 def main():
-    directory_path = input("Specify Path (Optional. Press enter to skip):")
-    if not directory_path:
-        directory_path = None
+    args = create_parser()
 
-    data_type = input("Specify the data type ('xrd' or 'pdf'): ")
-    if data_type != 'xrd' and data_type != 'pdf':
-        raise ValueError("The data type must be 'xrd' or 'pdf'")
-
-    component_amount = input("\nEnter the amount of components to obtain:")
-    try:
-        component_amount = int(component_amount)
-    except TypeError:
-        raise TypeError("Please enter an integer greater than 0")
-
-    grid, data_input = load_input_signals(directory_path)
-    variables = initialize_variables(data_input, component_amount, data_type)
+    grid, data_input = load_input_signals(args.directory)
+    variables = initialize_variables(data_input, args.component_number, args.data_type)
     lifted_data = data_input - np.ndarray.min(data_input[:])
+    return lifted_data
 
 
 if __name__ == "__main__":
