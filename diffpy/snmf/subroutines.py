@@ -145,7 +145,8 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
     """Obtains the residual matrix between the experimental data and calculated data
 
     Calculates the difference between the experimental data and the reconstructed experimental data created from the
-    calculated components, weights, and stretching factors.
+    calculated components, weights, and stretching factors. For each experimental pattern, the stretched and weighted
+    components making up that pattern are subtracted.
 
     Parameters
     ----------
@@ -166,18 +167,22 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
       M is the number of signal patterns.
 
     moment_amount: int
-      The number of PDF/XRD patterns.
+      The number of patterns in the experimental data. Represents the number of moments in time in the data series
 
     component_amount: int
-      The number of component signals that user would like to experimental data.
+      The number of component signals the user would like to obtain from the experimental data.
 
     signal_length: int
-      The length of the signals.
+      The length of the signals in the experimental data.
 
 
     Returns
     -------
     2d array like
+      The matrix containing the residual between the experimental data and reconstructed data from calculated values.
+      Has dimensions N x M where N is the signal length and M is the number of moments. Each column contains the
+      difference between an experimental signal and a reconstruction of that signal from the calculated weights,
+      components, and stretching factors.
 
     """
     component_matrix = np.asarray(component_matrix)
@@ -198,25 +203,37 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
                      moment_amount, signal_length):
     """Reconstructs the experimental data from the component signals, stretching factors, and weights.
 
+    Calculates the stretched and weighted components at each moment.
+
     Parameters
     ----------
     stretching_factor_matrix: 2d array like
-      The matrix containing the stretching factors of the component signals.
+      The matrix containing the stretching factors of the component signals. Has dimensions K x M where K is the number
+      of components and M is the number of moments.
 
     component_matrix: 2d array like
-      The matrix containing the unstretched component signals
+      The matrix containing the unstretched component signals. Has dimensions N x K where N is the length of the signals
+      and K is the number of components.
 
     weight_matrix: 2d array like
+      The matrix containing the weights of the stretched component signals at each moment in time. Has dimensions
+      K x M where K is the number of components and M is the number of moments.
 
     component_amount: int
+      The number of component signals the user would like to obtain from the experimental data.
 
     moment_amount: int
+      The number of patterns in the experimental data. Represents the number of moments in time in the data series.
 
     signal_length: int
+      The length of the signals in the experimental data.
 
     Returns
     -------
     2d array like
+      The stretched and weighted component signals at each moment. Has dimensions N x (M * K) where N is the length of
+      the signals, M is the number of moments, and K is the number of components. The resulting matrix has M blocks
+      stacked horizontally where each block is the weighted and stretched components at each moment.
 
     """
     stretching_factor_matrix = np.asarray(stretching_factor_matrix)
