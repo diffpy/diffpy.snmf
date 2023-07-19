@@ -255,5 +255,4 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
             block[:, component] = block[:, component] * weight_matrix[component, moment]
         reconstructed_data.append(block)
         moment += 1
-    print(np.column_stack(reconstructed_data))
     return np.column_stack(reconstructed_data)
