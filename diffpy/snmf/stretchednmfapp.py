@@ -26,7 +26,9 @@ def main():
 
     grid, data_input = load_input_signals(args.directory)
     variables = initialize_variables(data_input, args.component_number, args.data_type)
-    lifted_data = data_input - np.ndarray.min(data_input[:])
+    if variables["data_type"] == 'pdf':
+        lifted_data = data_input - np.ndarray.min(data_input[:])
+    maxiter = 300
     return lifted_data
 
 
