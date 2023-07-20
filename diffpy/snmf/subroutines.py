@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.optimize
+
 from diffpy.snmf.optimizers import get_weights
 from diffpy.snmf.factorizers import lsqnonneg
 
@@ -257,5 +259,35 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
         moment += 1
     return np.column_stack(reconstructed_data)
 
-def update_stretching_matrix():
-    pass
+
+def update_stretching_matrix(stretching_factor_matrix, weight_matrix, component_matrix, data_input, moment_amount,
+                             component_amount, signal_length, smoothness, sparsity, smoothness_term):
+    """
+
+    Parameters
+    ----------
+    stretching_factor_matrix
+    weight_matrix
+    component_matrix
+    data_input
+    moment_amount
+    component_amount
+    signal_length
+    smoothness
+    sparsity
+    smoothness_term
+
+    Returns
+    -------
+
+    """
+    reconstructed_data = reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, component_amount,
+                                          moment_amount, signal_length)
+    reconstructed_data = reconstructed_data.reshape(-1, moment_amount, component_amount).sum(axis=1)
+    residual = reconstructed_data - data_input
+
+    func_to_optimize = lambda stretching_factor_matrix: objective_function(residual, stretching_factor_matrix,
+                                                                           smoothness, smoothness_term,
+                                                                           component_matrix, sparsity)
+    return scipy.optimize.minimize(func_to_optimize, stretching_factor_matrix,
+                                   bounds=(.1 * np.ones((component_amount, moment_amount)), None))

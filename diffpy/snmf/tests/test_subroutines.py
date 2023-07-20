@@ -115,6 +115,7 @@ def test_reconstruct_data(trd):
     expected = trd[1]
     np.testing.assert_allclose(actual, expected, rtol=1e-03)
 
-
-def test_update_stretching_matrix():
+tusm = []
+@pytest.mark.parametrize('tusm',tusm)
+def test_update_stretching_matrix(tusm):
     assert False
