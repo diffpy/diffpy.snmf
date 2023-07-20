@@ -101,8 +101,10 @@ def load_input_signals(file_path=None):
     values_list = []
     grid_list = []
     current_grid = []
+    file_extension = ""
     for item in directory_path.iterdir():
         if item.is_file():
+            file_extension = Path(item).suffix
             data = loadData(item.resolve())
             if len(current_grid) != 0 and (current_grid != data[:, 0]).any():
                 print(f"{item.name} was ignored as it is not on a compatible grid.")
@@ -115,4 +117,10 @@ def load_input_signals(file_path=None):
     grid_array = np.column_stack(grid_list)
     grid_vector = np.unique(grid_array, axis=1)
     values_array = np.column_stack(values_list)
-    return grid_vector, values_array
+    if file_extension in {'.gr','.chi'}:
+        data_type = 'pdf'
+    elif file_extension in {'iq','.xy','.xye','.xrd'}:
+        data_type = 'xrd'
+    else:
+        data_type = None
+    return grid_vector, values_array,data_type
