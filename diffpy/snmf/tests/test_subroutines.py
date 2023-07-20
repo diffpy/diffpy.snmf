@@ -114,3 +114,7 @@ def test_reconstruct_data(trd):
     actual = reconstruct_data(trd[0][0], trd[0][1], trd[0][2], trd[0][3], trd[0][4], trd[0][5])
     expected = trd[1]
     np.testing.assert_allclose(actual, expected, rtol=1e-03)
+
+
+def test_update_stretching_matrix():
+    assert False

@@ -256,3 +256,6 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
         reconstructed_data.append(block)
         moment += 1
     return np.column_stack(reconstructed_data)
+
+def update_stretching_matrix():
+    pass
