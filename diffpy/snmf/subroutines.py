@@ -289,5 +289,5 @@ def update_stretching_matrix(stretching_factor_matrix, weight_matrix, component_
     func_to_optimize = lambda stretching_factor_matrix: objective_function(residual, stretching_factor_matrix,
                                                                            smoothness, smoothness_term,
                                                                            component_matrix, sparsity)
-    return scipy.optimize.minimize(func_to_optimize, stretching_factor_matrix,
+    return scipy.optimize.minimize(func_to_optimize, stretching_factor_matrix, method="trust-ncg",
                                    bounds=(.1 * np.ones((component_amount, moment_amount)), None))
