@@ -2,6 +2,7 @@ import numpy as np
 import argparse
 
 from diffpy.snmf.io import load_input_signals, initialize_variables
+from diffpy.snmf.subroutines import *
 
 
 def create_parser():
