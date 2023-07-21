@@ -11,8 +11,8 @@ def create_parser():
         description="Stretched Nonnegative Matrix Factorization"
     )
     parser.add_argument('-v', '--version', action='version', help='Print the software version number')
-    parser.add_argument('-i', '--input-directory', type=str,
-                        help="Directory containing experimental data. Has a default value of None which sets the input as your current working directory.")
+    parser.add_argument('-i', '--input-directory', type=str, default=None,
+                        help="Directory containing experimental data. Default before will cause the program to use the current working directory as the input directory.")
     parser.add_argument('-o', '--output-directory', type=str,
                         help="The directory where the results will be dumped. Default behavior will create a new directory named 'smnf_results' inside the input directory.")
     parser.add_argument('-t', '--data-type', type=str, choices=['xrd', 'pdf'],
