@@ -2,7 +2,7 @@ import numpy as np
 import argparse
 
 from diffpy.snmf.io import load_input_signals, initialize_variables
-from diffpy.snmf.subroutines import *
+from diffpy.snmf.subroutines import update_weights_matrix, get_residual_matrix, objective_function
 
 
 def create_parser():
