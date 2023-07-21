@@ -35,8 +35,22 @@ def main():
 
     if variables["data_type"] == 'pdf':
         lifted_data = data_input - np.ndarray.min(data_input[:])
+
+    weights_matrix = variables["weight_matrix_guess"]
+    component_matrix = variables["component_matrix_guess"]
+    stretching_factor_matrix = variables["stretching_matrix_guess"]
     maxiter = 300
-    return lifted_data
+
+    for out_iter in range(maxiter):
+        weight_matrix = update_weights_matrix(variables["component_amount"], variables["signal_length"],
+                                              stretching_factor_matrix, component_matrix, lifted_data,
+                                              variables["moment_amount"], weights_matrix, None)
+        residual_matrix = get_residual_matrix(component_matrix, weights_matrix, stretching_factor_matrix, lifted_data,
+                                              variables["moment_amount"], variables["component_amount"],
+                                              variables["signal_length"])
+        fun = objective_function(residual_matrix, stretching_factor_matrix, variables["smoothness"],
+                                 variables["smoothness_term"], component_matrix, variables["sparsity"])
+        print(fun)
 
 
 if __name__ == "__main__":
