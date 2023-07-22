@@ -28,16 +28,29 @@ def lift_data(data_input, lift=1):
     return data_input - (np.min(data_input[:]) * lift)
 
 
-def initialize_arrays(number_of_components, number_of_arrays):
+def initialize_arrays(number_of_components, number_of_moments, signal_length):
     """
+
+    Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The initial
+    guess for the component matrix is a random (signal_length) x (number_of_components) matrix where each element is
+    between 0 and 1. The initial stretching factor matrix is a random (number_of_components) ẋ (number_of_moments)
+    matrix where each element is number slightly perturbed from 1. The initial weight matrix guess is a random
+    (number_of_components) ẋ (number_of_moments) matrix where each element is between 0 and 1.
 
     Parameters
     ----------
-    number_of_components
-    number_of_arrays
+    number_of_components: int
+      The number of component signals to obtain from the stretched nmf decomposition.
+    number_of_moments: int
+      The number of signals in the user provided dataset where each signal is at a different moment.
+    signal_length: int
+      The length of each signal in the user provided dataset.
 
     Returns
     -------
+    tuple of 2d arrays of floats
+      The tuple containing three elements: the initial component matrix guess, the initial stretching factor matrix
+      guess, and the initial weight factor matrix guess in that order.
 
     """
     pass
