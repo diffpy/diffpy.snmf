@@ -1,6 +1,7 @@
 import numpy as np
 from diffpy.snmf.optimizers import get_weights
 from diffpy.snmf.factorizers import lsqnonneg
+import numdifftools
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
@@ -69,14 +70,24 @@ def get_stretched_component(stretching_factor, component, signal_length):
 
     Returns
     -------
-    1d array of floats
+    tuple of 1d array of floats
       The calculated component signal with stretching factors applied. Has length N, the length of the unstretched
-      component signal.
+      component signal. Also returns the gradient and hessian of the stretching transformation.
 
     """
     component = np.asarray(component)
     normalized_grid = np.arange(signal_length)
-    return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
+
+    def stretched_component_func(stretching_factor):
+        return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
+    derivative_func = numdifftools.Derivative(stretched_component_func)
+    second_derivative_func = numdifftools.Derivative(derivative_func)
+
+    stretched_component = stretched_component_func(stretching_factor)
+    stretched_component_gra = derivative_func(stretching_factor)
+    stretched_component_hess = second_derivative_func(stretching_factor)
+
+    return np.asarray(stretched_component), np.asarray(stretched_component_gra), np.asarray(stretched_component_hess)
 
 
 def update_weights_matrix(component_amount, signal_length, stretching_factor_matrix, component_matrix, data_input,
@@ -128,7 +139,7 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
         stretched_components = np.zeros((signal_length, component_amount))
         for n in range(component_amount):
             stretched_components[:, n] = get_stretched_component(stretching_factor_matrix[n, i], component_matrix[:, n],
-                                                                 signal_length)
+                                                                 signal_length)[0]
         if method == 'align':
             weight = lsqnonneg(stretched_components[0:signal_length, :], data_input[0:signal_length, i])
         else:
@@ -194,7 +205,8 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
         residual = residual_matrx[:, m]
         for k in range(component_amount):
             residual = residual + weights_matrix[k, m] * get_stretched_component(stretching_matrix[k, m],
-                                                                                 component_matrix[:, k], signal_length)
+                                                                                 component_matrix[:, k], signal_length)[
+                0]
         residual_matrx[:, m] = residual
     return residual_matrx
 
@@ -230,29 +242,45 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
 
     Returns
     -------
-    2d array like
+    tuple of 2d array of floats
       The stretched and weighted component signals at each moment. Has dimensions N x (M * K) where N is the length of
       the signals, M is the number of moments, and K is the number of components. The resulting matrix has M blocks
-      stacked horizontally where each block is the weighted and stretched components at each moment.
+      stacked horizontally where each block is the weighted and stretched components at each moment. Also contains
+      the gradient and hessian matrices of the reconstructed data.
 
     """
     stretching_factor_matrix = np.asarray(stretching_factor_matrix)
     component_matrix = np.asarray(component_matrix)
     weight_matrix = np.asarray(weight_matrix)
     stretched_component_series = []
+    stretched_component_series_gra = []
+    stretched_component_series_hess = []
     for moment in range(moment_amount):
         for component in range(component_amount):
             stretched_component = get_stretched_component(stretching_factor_matrix[component, moment],
                                                           component_matrix[:, component], signal_length)
-            stretched_component_series.append(stretched_component)
+            stretched_component_series.append(stretched_component[0])
+            stretched_component_series_gra.append(stretched_component[1])
+            stretched_component_series_hess.append(stretched_component[2])
     stretched_component_series = np.column_stack(stretched_component_series)
+    stretched_component_series_gra = np.column_stack(stretched_component_series_gra)
+    stretched_component_series_hess = np.column_stack(stretched_component_series_hess)
 
     reconstructed_data = []
+    reconstructed_data_gra = []
+    reconstructed_data_hess = []
     moment = 0
     for s_component in range(0, moment_amount * component_amount, component_amount):
         block = stretched_component_series[:, s_component:s_component + component_amount]
+        block_gra = stretched_component_series_gra[:, s_component:s_component + component_amount]
+        block_hess = stretched_component_series_hess[:, s_component:s_component + component_amount]
         for component in range(component_amount):
             block[:, component] = block[:, component] * weight_matrix[component, moment]
+            block_gra[:, component] = block_gra[:, component] * weight_matrix[component, moment]
+            block_hess[:, component] = block_hess[:, component] * weight_matrix[component, moment]
         reconstructed_data.append(block)
+        reconstructed_data_gra.append(block_gra)
+        reconstructed_data_hess.append(block_hess)
         moment += 1
-    return np.column_stack(reconstructed_data)
+    return np.column_stack(reconstructed_data), np.column_stack(reconstructed_data_gra), np.column_stack(
+        reconstructed_data_hess)

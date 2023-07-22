@@ -2,4 +2,4 @@ numpy
 scipy
 cvxpy
 diffpy.utils
-
+numdifftools
