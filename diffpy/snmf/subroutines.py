@@ -1,6 +1,7 @@
 import numpy as np
 from diffpy.snmf.optimizers import get_weights
 from diffpy.snmf.factorizers import lsqnonneg
+import numdifftools
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
@@ -74,20 +75,23 @@ def get_stretched_component(stretching_factor, component, signal_length):
       component signal. Also returns the gradient and hessian of the stretching transformation.
 
     """
-    delta = 1e-5
     component = np.asarray(component)
     normalized_grid = np.arange(signal_length)
-    stretched_component = np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
 
-    stretched_component_plus_delta = np.interp(normalized_grid / (stretching_factor + delta), normalized_grid,
-                                               component, left=0, right=0)
-    stretched_component_minus_delta = np.interp(normalized_grid / (stretching_factor - delta), normalized_grid,
-                                                component, left=0, right=0)
-    stretched_component_gra = (stretched_component_plus_delta - stretched_component_minus_delta) / (2 * delta)
+    def stretched_component_func(stretching_factor):
+        return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
 
-    stretched_component_hess = (
-                                       stretched_component_plus_delta - 2 * stretched_component + stretched_component_minus_delta) / (
-                                       delta ** 2)
+    stretched_component = stretched_component_func(stretching_factor)
+
+    derivative_func = numdifftools.Derivative(stretched_component_func)
+    second_derivative_func = numdifftools.Derivative(derivative_func)
+
+    stretched_component_gra = derivative_func(stretching_factor)
+    stretched_component_gra = np.asarray(stretched_component_gra)
+
+    stretched_component_hess = second_derivative_func(stretching_factor)
+    stretched_component_hess = np.asarray(stretched_component_hess)
+
     return stretched_component, stretched_component_gra, stretched_component_hess
 
 
