@@ -81,13 +81,13 @@ def get_stretched_component(stretching_factor, component, signal_length):
     return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
 
 
-def update_weights_matrix(component_amount, signal_length, stretching_factor_matrix, component_matrix, data_input,
-                          moment_amount, weights_matrix, method):
+def update_weights_matrix(number_of_components, signal_length, stretching_factor_matrix, component_matrix, data_input,
+                          number_of_moments, weights_matrix, method):
     """Update the weight factors matrix.
 
     Parameters
     ----------
-    component_amount: int
+    number_of_components: int
       The number of component signals the user would like to determine from the experimental data.
 
     signal_length: int
@@ -105,7 +105,7 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
       The experimental series of PDF/XRD patterns. Has dimensions N x M where N is the length of the PDF/XRD signals and
       M is the number of PDF/XRD patterns.
 
-    moment_amount: int
+    number_of_moments: int
       The number of PDF/XRD patterns from the experimental data.
 
     weights_matrix: 2d array like
@@ -125,10 +125,10 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
     component_matrix = np.asarray(component_matrix)
     data_input = np.asarray(data_input)
     weights_matrix = np.asarray(weights_matrix)
-    weight = np.zeros(component_amount)
-    for i in range(moment_amount):
-        stretched_components = np.zeros((signal_length, component_amount))
-        for n in range(component_amount):
+    weight = np.zeros(number_of_components)
+    for i in range(number_of_moments):
+        stretched_components = np.zeros((signal_length, number_of_components))
+        for n in range(number_of_components):
             stretched_components[:, n] = get_stretched_component(stretching_factor_matrix[n, i], component_matrix[:, n],
                                                                  signal_length)
         if method == 'align':
@@ -142,8 +142,8 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
     return weights_matrix
 
 
-def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, data_input, moment_amount,
-                        component_amount, signal_length):
+def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, data_input, number_of_moments,
+                        number_of_components, signal_length):
     """Obtains the residual matrix between the experimental data and calculated data
 
     Calculates the difference between the experimental data and the reconstructed experimental data created from the
@@ -168,10 +168,10 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
       The matrix containing the experimental PDF/XRD data. Has dimensions N x M where N is the length of the signals and
       M is the number of signal patterns.
 
-    moment_amount: int
+    number_of_moments: int
       The number of patterns in the experimental data. Represents the number of moments in time in the data series
 
-    component_amount: int
+    number_of_components: int
       The number of component signals the user would like to obtain from the experimental data.
 
     signal_length: int
@@ -192,17 +192,17 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
     stretching_matrix = np.asarray(stretching_matrix)
     data_input = np.asarray(data_input)
     residual_matrx = -1 * data_input
-    for m in range(moment_amount):
+    for m in range(number_of_moments):
         residual = residual_matrx[:, m]
-        for k in range(component_amount):
+        for k in range(number_of_components):
             residual = residual + weights_matrix[k, m] * get_stretched_component(stretching_matrix[k, m],
                                                                                  component_matrix[:, k], signal_length)
         residual_matrx[:, m] = residual
     return residual_matrx
 
 
-def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, component_amount,
-                     moment_amount, signal_length):
+def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, number_of_components,
+                     number_of_moments, signal_length):
     """Reconstructs the experimental data from the component signals, stretching factors, and weights.
 
     Calculates the stretched and weighted components at each moment.
@@ -221,10 +221,10 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
       The matrix containing the weights of the stretched component signals at each moment in time. Has dimensions
       K x M where K is the number of components and M is the number of moments.
 
-    component_amount: int
+    number_of_components: int
       The number of component signals the user would like to obtain from the experimental data.
 
-    moment_amount: int
+    number_of_moments: int
       The number of patterns in the experimental data. Represents the number of moments in time in the data series.
 
     signal_length: int
@@ -242,8 +242,8 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
     component_matrix = np.asarray(component_matrix)
     weight_matrix = np.asarray(weight_matrix)
     stretched_component_series = []
-    for moment in range(moment_amount):
-        for component in range(component_amount):
+    for moment in range(number_of_moments):
+        for component in range(number_of_components):
             stretched_component = get_stretched_component(stretching_factor_matrix[component, moment],
                                                           component_matrix[:, component], signal_length)
             stretched_component_series.append(stretched_component)
@@ -251,43 +251,60 @@ def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, 
 
     reconstructed_data = []
     moment = 0
-    for s_component in range(0, moment_amount * component_amount, component_amount):
-        block = stretched_component_series[:, s_component:s_component + component_amount]
-        for component in range(component_amount):
+    for s_component in range(0, number_of_moments * number_of_components, number_of_components):
+        block = stretched_component_series[:, s_component:s_component + number_of_components]
+        for component in range(number_of_components):
             block[:, component] = block[:, component] * weight_matrix[component, moment]
         reconstructed_data.append(block)
         moment += 1
     return np.column_stack(reconstructed_data)
 
 
-def update_stretching_matrix(stretching_factor_matrix, weight_matrix, component_matrix, data_input, moment_amount,
-                             component_amount, signal_length, smoothness, sparsity, smoothness_term):
-    """
+def update_stretching_matrix(stretching_factor_matrix, weight_matrix, component_matrix, data_input, number_of_moments,
+                             number_of_components, signal_length, smoothness, sparsity, smoothness_term):
+    """Updates the stretching factor matrix
+
+    Calculates a new stretching factor matrix by finding the argument (stretching factor matrix) that minimizes
+    objective function.
 
     Parameters
     ----------
-    stretching_factor_matrix
-    weight_matrix
-    component_matrix
-    data_input
-    moment_amount
-    component_amount
-    signal_length
-    smoothness
-    sparsity
-    smoothness_term
+    stretching_factor_matrix: 2d array like
+      The current stretching factor matrix.
+
+    weight_matrix: 2d array like
+      The matrix containing the weightings of the component signals.
+
+    component_matrix: 2d array like
+      The matrix containing the calculated component signals.
+
+    data_input: 2d array like
+      
+    number_of_moments: int
+
+    number_of_components: int
+
+    signal_length: int
+
+    smoothness: float
+
+    sparsity: float
+
+    smoothness_term: 2d array like
 
     Returns
     -------
+    2d array like
+      The matrix containing the newly calculated stretching factors.
 
     """
-    reconstructed_data = reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, component_amount,
-                                          moment_amount, signal_length)
-    reconstructed_data = reconstructed_data.reshape(-1, moment_amount, component_amount).sum(axis=1)
+    reconstructed_data = reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, number_of_components,
+                                          number_of_moments, signal_length)
+    reconstructed_data = reconstructed_data.reshape(-1, number_of_moments, number_of_components).sum(axis=1)
     residual = reconstructed_data - data_input
 
     func_to_optimize = lambda stretching_factor_matrix: objective_function(residual, stretching_factor_matrix,
                                                                            smoothness, smoothness_term,
                                                                            component_matrix, sparsity)
     return scipy.optimize.minimize(func_to_optimize, stretching_factor_matrix, method="trust-ncg",
-                                   bounds=(.1 * np.ones((component_amount, moment_amount)), None))
+                                   bounds=(.1 * np.ones((number_of_components, number_of_moments)), None))
