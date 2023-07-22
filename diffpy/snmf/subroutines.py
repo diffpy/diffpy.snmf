@@ -3,19 +3,30 @@ from diffpy.snmf.optimizers import get_weights
 from diffpy.snmf.factorizers import lsqnonneg
 import numdifftools
 
-def lift_data(data_input, lift):
-    """
+
+def lift_data(data_input, lift=1):
+    """Lifts values of data_input
+
+    Adds 'lift' * the minimum value in data_input to data_input element-wise.
 
     Parameters
     ----------
-    data_input
-    lift
+    data_input: 2d array like
+      The matrix containing a series of signals to be decomposed. Has dimensions N x M where N is the length of each
+      signal and M is the number of signals.
+
+    lift: float
+      The factor representing how much to lift 'data_input'.
 
     Returns
     -------
+    2d array like
+      The matrix that contains data_input - (min(data_input) * lift).
 
     """
-    pass
+    data_input = np.asarray(data_input)
+    return data_input - (np.min(data_input[:]) * lift)
+
 
 def initialize_arrays(number_of_components, number_of_arrays):
     """
@@ -30,6 +41,7 @@ def initialize_arrays(number_of_components, number_of_arrays):
 
     """
     pass
+
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
                        sparsity):
@@ -107,6 +119,7 @@ def get_stretched_component(stretching_factor, component, signal_length):
 
     def stretched_component_func(stretching_factor):
         return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
+
     derivative_func = numdifftools.Derivative(stretched_component_func)
     second_derivative_func = numdifftools.Derivative(derivative_func)
 
