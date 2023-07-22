@@ -41,8 +41,10 @@ def initialize_arrays(number_of_components, number_of_moments, signal_length):
     ----------
     number_of_components: int
       The number of component signals to obtain from the stretched nmf decomposition.
+
     number_of_moments: int
       The number of signals in the user provided dataset where each signal is at a different moment.
+
     signal_length: int
       The length of each signal in the user provided dataset.
 
