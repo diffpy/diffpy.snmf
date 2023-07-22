@@ -80,19 +80,14 @@ def get_stretched_component(stretching_factor, component, signal_length):
 
     def stretched_component_func(stretching_factor):
         return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
-
-    stretched_component = stretched_component_func(stretching_factor)
-
     derivative_func = numdifftools.Derivative(stretched_component_func)
     second_derivative_func = numdifftools.Derivative(derivative_func)
 
+    stretched_component = stretched_component_func(stretching_factor)
     stretched_component_gra = derivative_func(stretching_factor)
-    stretched_component_gra = np.asarray(stretched_component_gra)
-
     stretched_component_hess = second_derivative_func(stretching_factor)
-    stretched_component_hess = np.asarray(stretched_component_hess)
 
-    return stretched_component, stretched_component_gra, stretched_component_hess
+    return np.asarray(stretched_component), np.asarray(stretched_component_gra), np.asarray(stretched_component_hess)
 
 
 def update_weights_matrix(component_amount, signal_length, stretching_factor_matrix, component_matrix, data_input,
