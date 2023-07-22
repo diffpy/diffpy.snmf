@@ -3,6 +3,33 @@ from diffpy.snmf.optimizers import get_weights
 from diffpy.snmf.factorizers import lsqnonneg
 import numdifftools
 
+def lift_data(data_input, lift):
+    """
+
+    Parameters
+    ----------
+    data_input
+    lift
+
+    Returns
+    -------
+
+    """
+    pass
+
+def initialize_arrays(number_of_components, number_of_arrays):
+    """
+
+    Parameters
+    ----------
+    number_of_components
+    number_of_arrays
+
+    Returns
+    -------
+
+    """
+    pass
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
                        sparsity):
