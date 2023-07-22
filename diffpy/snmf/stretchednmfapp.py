@@ -1,5 +1,6 @@
 import numpy as np
 import argparse
+from pathlib import Path
 
 from diffpy.snmf.io import load_input_signals, initialize_variables
 from diffpy.snmf.subroutines import update_weights_matrix, get_residual_matrix, objective_function
@@ -10,22 +11,24 @@ def create_parser():
         prog="stretched_nmf",
         description="Stretched Nonnegative Matrix Factorization"
     )
-    parser.add_argument('-v', '--version', action='version', help='Print the software version number')
+
     parser.add_argument('-i', '--input-directory', type=str, default=None,
-                        help="Directory containing experimental data. Default before will cause the program to use the current working directory as the input directory.")
+                        help="Directory containing experimental data. Defaults to current working directory.")
     parser.add_argument('-o', '--output-directory', type=str,
-                        help="The directory where the results will be dumped. Default behavior will create a new directory named 'smnf_results' inside the input directory.")
+                        help="The directory where the results will be written.  Defaults to '<input_directory>/snmf_results'.")
     parser.add_argument('-t', '--data-type', type=str, choices=['xrd', 'pdf'],
                         help="The type of the experimental data.")
     parser.add_argument('components', type=int,
-                        help="The number of component signals to obtain from experimental "
-                             "data. Must be an integer greater than 0.")
+                        help="The number of component signals for the NMF decomposition. Must be an integer greater than 0.")
+    parser.add_argument('-v', '--version', action='version', help='Print the software version number')
     args = parser.parse_args()
     return args
 
 
 def main():
     args = create_parser()
+    if args.input_directory is None:
+        args.input_directory = Path.cwd()
 
     grid, data_input, data_type = load_input_signals(args.input_directory)
     if args.data_type is not None:

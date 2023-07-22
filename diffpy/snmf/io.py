@@ -45,7 +45,7 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
     component_matrix_guess = np.random.rand(signal_length, component_amount)
     weight_matrix_guess = np.random.rand(component_amount, moment_amount)
     stretching_matrix_guess = np.ones((component_amount, moment_amount)) + np.random.randn(component_amount,
-                                                                                         moment_amount) * 1e-3
+                                                                                           moment_amount) * 1e-3
 
     diagonals = [np.ones(moment_amount - 2), -2 * np.ones(moment_amount - 2), np.ones(moment_amount - 2)]
     smoothness_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(moment_amount - 2, moment_amount))
@@ -93,10 +93,7 @@ def load_input_signals(file_path=None):
 
     """
 
-    if file_path is None:
-        directory_path = Path.cwd()
-    else:
-        directory_path = Path(file_path)
+    directory_path = Path(file_path)
 
     values_list = []
     grid_list = []
@@ -117,10 +114,10 @@ def load_input_signals(file_path=None):
     grid_array = np.column_stack(grid_list)
     grid_vector = np.unique(grid_array, axis=1)
     values_array = np.column_stack(values_list)
-    if file_extension in {'.gr','.chi'}:
+    if file_extension in {'.gr', '.chi'}:
         data_type = 'pdf'
-    elif file_extension in {'iq','.xy','.xye','.xrd'}:
+    elif file_extension in {'iq', '.xy', '.xye', '.xrd'}:
         data_type = 'xrd'
     else:
         data_type = None
-    return grid_vector, values_array,data_type
+    return grid_vector, values_array, data_type
