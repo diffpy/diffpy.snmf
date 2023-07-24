@@ -29,7 +29,7 @@ def lift_data(data_input, lift=1):
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
-    """
+    """Generates the initial guesses for the weight, stretching, and component matrices
 
     Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The initial
     guess for the component matrix is a random (signal_length) x (number_of_components) matrix where each element is
