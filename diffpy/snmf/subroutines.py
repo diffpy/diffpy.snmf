@@ -55,7 +55,11 @@ def initialize_arrays(number_of_components, number_of_moments, signal_length):
       guess, and the initial weight factor matrix guess in that order.
 
     """
-    pass
+    component_matrix_guess = np.random.rand(signal_length, number_of_components)
+    weight_matrix_guess = np.random.rand(number_of_components, number_of_moments)
+    stretching_matrix_guess = np.ones(number_of_components, number_of_moments) + np.random.randn(number_of_components,
+                                                                                                 number_of_moments) * 1e-3
+    return component_matrix_guess, weight_matrix_guess, stretching_matrix_guess
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
