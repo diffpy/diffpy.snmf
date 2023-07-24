@@ -60,9 +60,9 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
     return {
         "signal_length": signal_length,
         "number_of_moments": number_of_moments,
-        "component_matrix_guess": component_matrix_guess,
-        "weight_matrix_guess": weight_matrix_guess,
-        "stretching_matrix_guess": stretching_matrix_guess,
+        "component_matrix": component_matrix_guess,
+        "weights_matrix": weight_matrix_guess,
+        "stretching_factor_matrix": stretching_matrix_guess,
         "number_of_components": number_of_components,
         "data_type": data_type,
         "smoothness": smoothness,
