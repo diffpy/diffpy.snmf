@@ -33,9 +33,9 @@ def initialize_arrays(number_of_components, number_of_moments, signal_length):
 
     Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The initial
     guess for the component matrix is a random (signal_length) x (number_of_components) matrix where each element is
-    between 0 and 1. The initial stretching factor matrix is a random (number_of_components) ẋ (number_of_moments)
+    between 0 and 1. The initial stretching factor matrix is a random (number_of_components) x (number_of_moments)
     matrix where each element is number slightly perturbed from 1. The initial weight matrix guess is a random
-    (number_of_components) ẋ (number_of_moments) matrix where each element is between 0 and 1.
+    (number_of_components) x (number_of_moments) matrix where each element is between 0 and 1.
 
     Parameters
     ----------
