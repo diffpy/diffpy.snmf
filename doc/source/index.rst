@@ -1,51 +1,56 @@
-Welcome to PDFmorph's Documentation!
+Welcome to SNMF's Documentation!
 ====================================
 
-``PDFmorph``: An easy way to compare PDFs.
+``SNMF``: This library implements the stretched non negative matrix factorization (sNMF) and sparse stretched NMF
+(ssNMF) algorithms described in ...
+
+This algorithm is designed to do an NMF factorization on a set of signals ignoring any uniform stretching of the signal
+on the independent variable axis. For example, for powder diffraction data taken from samples containing multiple
+chemical phases where the measurements were done at different temperatures and the materials were undergoing thermal
+expansion.
 
 Introduction
 ++++++++++++
 
-``PDFmorph`` is a Python package that increases the insight 
-researchers can obtain from measured atomic pair distribution functions 
-(PDFs) in a model-independent way. It was designed to help a 
-researcher answer the question: "Has my material undergone a phase 
-transition between these two measurements?"
+``snmf`` is a Python package that increases the insight one can obtain from a measured series time-dependent signals
+through applying the stretched nonnegative matrix factorization and spare stretched nonnegative matrix factorization
+algorithms. The package seeks to answer the question: "What are the structural signals composing my measured signal at
+each moment in time?"
 
-One approach is to compare the two PDFs in a plot and view the 
-difference curve underneath. However, significant signal can be seen in 
-the difference curve from benign effects such as thermal expansion (peak 
-shifts) and increased thermal motion (peak broadening) or a change in 
-scale due to differences in incident flux, for example. ``PDFmorph`` will 
-do its best to correct for these benign effects before computing and 
-plotting the difference curve. One measured PDF (typically that 
-collected under higher temperature) is identified as the target PDF and 
-the second PDF is then morphed by "stretching" (changing the r-axis to
-simulate a uniform lattice expansion), "smearing" (broadening peaks 
-through a uniform convolution to simulate increased thermal motion), and 
-"scaling" (self-explanatory). PDFmorph will vary the amplitude of the 
-morphing transformations to obtain the best fit between the morphed and 
-the target PDFs, then plot them on top of each other with the difference 
-plotted below.
+One approach is to take the conventional nonnegative matrix factorization model and extend it by introducing a
+stretching factor matrix that accounts for isotropic stretching of measured signals and returns components that explain
+variability beyond this stretching. Conventional nonnegative matrix factorization (nmf) obtains component signals and
+the weightings of the component signals at each moment in time from a series of data. However, this model assumes the
+components themselves are constant in time, making this model unable to capture the changing of the components
+themselves.
 
-There are also a few other morphing transformations in the program.
-If no morphing transformation is specified, ``PDFmorph`` will return just
-the plotted PDFs.
+``snmf`` consider components that change with time by introducing a stretching factor for each component at each moment
+in time that isotropically stretches the component signals.The algorithm will attempt to find three matrices, a
+"component" matrix that stores the component signals, a "stretching factor" matrix that stores the stretching factors of
+the components at each moment in time, and a "weights" matrix that stores the weights of each component at each moment
+in time. ``snmf`` will then plot the components, stretching factors, and weights.
 
-Finally, we note that though ``PDFmorph`` should work on other spectra 
-that are not PDFs, it has not been extensively tested beyond the PDF.
+One import use case of ``snmf`` is for powder diffraction data taken from samples containing multiple
+chemical phases where the measurements were done at different temperatures and the materials were undergoing thermal
+expansion. The key advantage of ``snmf`` is that it accurately reflects the isotropic change of the atomic distances
+within the chemical phases through its addition of stretching factors.
 
+It is important to note that the user must specify the number of component signals to obtain from the experimental data.
+Non-physical results may be obtained if the number of anticipated component signals is too high.
 
 Authors
 -------
 
-``PDFmorph`` is developed by members of the Billinge Group at 
-Columbia University and Brookhaven National Laboratory including 
-Christopher L. Farrow, Christopher J. Wright, Pavol Juhás, Chia-Hao
-(Timothy) Liu, S. Matthew Román, and Simon J. L. Billinge.
+``snmf`` implements the algorithms described in ...., developed by members of the Billinge Group at
+Columbia University, Brookhaven National Laboratory, Stony Brook University, Nankai University, and Colorado State
+University including Ran Gu, Yevgeny Rakita, Ling Lan, Zach Thatcher, Gabrielle E. Kamm, Daniel O'Nolan, Brennan Mcbride,
+Jame R. Neilson, Karena W. Chapman, Qiang Du, and Simon J. L. Billinge.
+
+This software implementation was developed by members of the Billinge Group at Columbia University and Brookhaven
+National Laboratory including Ran Gu, Adeolu Ajayi, Qiang Du, and Simon J. L. Billinge.
 
 For a detailed list of contributors, check `here 
-<https://github.com/diffpy/diffpy.pdfmorph/graphs/contributors>`_.
+<https://github.com/diffpy/diffpy.snmf/graphs/contributors>`_.
 
 To get started, please go to :ref:`quick_start`
 
