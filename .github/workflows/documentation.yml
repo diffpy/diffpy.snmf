@@ -1,4 +1,4 @@
-docname: Documentation
+name: Documentation
 on:
   push:
     branches: [ main ]
