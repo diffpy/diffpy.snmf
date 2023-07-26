@@ -18,6 +18,7 @@ jobs:
       - name: Install requirements
         run: |
           conda install -n build -c conda-forge --file requirements/docs.txt --quiet --yes
+          apt-get install python3-sphinx
 
       - name: Install the package
         run: python -m pip install .
