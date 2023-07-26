@@ -1,5 +1,5 @@
-sphinx-build
+make
 sphinx
 sphinx_rtd_theme
 m2r
-doctr
+
