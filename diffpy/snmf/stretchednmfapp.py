@@ -18,6 +18,8 @@ def create_parser():
                         help="The directory where the results will be written. Defaults to '<input_directory>/snmf_results'.")
     parser.add_argument('-t', '--data-type', type=str, choices=['powder_diffraction', 'pdf'],
                         help="The type of the experimental data.")
+    parser.add_argument('-l', '--lift', type=float, default=1,
+                        help="The factor that determines how much the data is lifted. By default, the data will be vertically translated to make the minimum value 0.")
     parser.add_argument('components', type=int,
                         help="The number of component signals for the NMF decomposition. Must be an integer greater than 0.")
     parser.add_argument('-v', '--version', action='version', help='Print the software version number')
@@ -36,17 +38,17 @@ def main():
     variables = initialize_variables(data_input, args.components, data_type)
 
     if variables["data_type"] == 'pdf':
-        lifted_data = data_input - np.ndarray.min(data_input[:])  # Will later use to function in subroutines
+        lifted_data = data_input - np.ndarray.min(data_input[:])  # Will later use the lift_data function in subroutines
 
     maxiter = 300
 
     for out_iter in range(maxiter):
         variables["weights_matrix"] = update_weights_matrix(variables["number_of_components"],
-                                                           variables["signal_length"],
-                                                           variables["stretching_factor_matrix"],
-                                                           variables["component_matrix"], lifted_data,
-                                                           variables["number_of_moments"], variables["weights_matrix"],
-                                                           None)
+                                                            variables["signal_length"],
+                                                            variables["stretching_factor_matrix"],
+                                                            variables["component_matrix"], lifted_data,
+                                                            variables["number_of_moments"], variables["weights_matrix"],
+                                                            None)
 
         residual_matrix = get_residual_matrix(variables["component_matrix"], variables["weights_matrix"],
                                               variables["stretching_factor_matrix"], lifted_data,
