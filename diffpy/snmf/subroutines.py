@@ -25,7 +25,7 @@ def lift_data(data_input, lift=1):
 
     """
     data_input = np.asarray(data_input)
-    return data_input - (np.min(data_input[:]) * lift)
+    return data_input - (np.min(data_input) * lift)
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
