@@ -66,7 +66,6 @@ To get started, please go to :ref:`quick_start`
 
    license
    release
-   package
 
 .. include:: ../../CHANGELOG.rst
 
