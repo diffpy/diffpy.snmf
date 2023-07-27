@@ -1,12 +1,8 @@
 import numpy as np
-from factorizers import lsqnonneg
 import scipy.optimize
+from scipy.sparse import spdiags
 from optimizers import get_weights
 from datapoint import ComponentSignal
-
-number_of_signals = 2
-number_of_components = 2
-signal_length = 3
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
@@ -56,7 +52,7 @@ def objective_function(residual_matrix, stretching_factor_matrix, smoothness, sm
         smoothness_term @ stretching_factor_matrix.T, 'fro') ** 2 + sparsity * np.sum(np.sqrt(component_matrix))
 
 
-def construct_stretching_matrix(components):
+def construct_stretching_matrix(components, number_of_signal, number_of_components, number_of_signals):
     """Constructs the stretching factor matrix
 
     Constructs a K x M matrix where K is the number of components and M is the number of signals. Each element is the
@@ -78,7 +74,7 @@ def construct_stretching_matrix(components):
     return stretching_factor_matrix
 
 
-def construct_component_matrix(components):
+def construct_component_matrix(components, signal_length, number_of_components):
     """Constructs the component matrix
 
     Constructs an N x K matrix where N is the length of the signals and K is the number of components. Each column
@@ -99,7 +95,7 @@ def construct_component_matrix(components):
     return component_matrix
 
 
-def construct_weight_matrix(components):
+def construct_weight_matrix(components, number_of_components, number_of_signals):
     """Constructs the weights matrix
 
     Constructs a K x M matrix where K is the number of components and M is the number of signals. Each element is the
@@ -120,7 +116,7 @@ def construct_weight_matrix(components):
     return weights_matrix
 
 
-def update_weights(components, method, data_input):
+def update_weights(components, method, data_input, signal_length, number_of_signals, number_of_components):
     """Updates the 'weights' attribute for all ComponentSignal objects.
 
     Parameters
@@ -155,7 +151,7 @@ def update_weights(components, method, data_input):
 #     for column in residual_matrix.T:
 
 
-def reconstruct_signal(components, moment):
+def reconstruct_signal(components, moment, signal_length):
     """Reconstruction a signal from its weighted and stretched components
 
     Parameters
@@ -163,6 +159,7 @@ def reconstruct_signal(components, moment):
     components: tuple of ComponentSignal objects
       The tuple containing the ComponentSignal objects
     moment: The index of the specific signal to be reconstructed
+    signal_length: int
 
     Returns
     -------
@@ -172,19 +169,19 @@ def reconstruct_signal(components, moment):
     reconstruction = np.zeros(signal_length)
     for c in components:
         stretched = c.apply_stretch(moment)[0]
-        stretched_and_weighted = c.apply_weight(moment, stretched)
+        stretched_and_weighted = c.apply_weights(moment, stretched)
         reconstruction += stretched_and_weighted
     return reconstruction
 
 
-def reconstruct_data(components, data_input):
+def reconstruct_data(components, data_input, signal_length, number_of_signals):
     data_reconstruction = np.zeros((signal_length, number_of_signals))
     for i in range(number_of_signals):
-        data_reconstruction[:, i] = reconstruct_signal()
+        data_reconstruction[:, i] = reconstruct_signal(components, i) #To be completed
     return data_reconstruction
 
 
-def stretching_operation_gra(components, residual):
+def stretching_operation_gra(components, residual, number_of_signals):
     stretching_operation_gra = []
 
     for c in components:
@@ -196,22 +193,24 @@ def stretching_operation_gra(components, residual):
     return np.column_stack(stretching_operation_gra)
 
 
-def update_stretching_factors(components, data_input, stretching_factor_matrix, smoothness, smoothness_term):
+def update_stretching_factors(components, data_input, stretching_factor_matrix, smoothness, smoothness_term,
+                              number_of_components, number_of_signals):
     def opt(stretching_factor_matrix):
         # Reshape at the beginning
-        residual = reconstruct_data() - data_input
-        fun_value = objective_function(residual)
+        stretching_factor_matrix.reshape(number_of_components, number_of_signals)
+        residual = reconstruct_data(components, data_input) - data_input
+        fun_value = objective_function(residual, stretching_factor_matrix, smoothness,
+                                       smoothness_term)  # To be completed
 
-        Tx = stretching_operation_gra(components, residual)
+        Tx = stretching_operation_gra(components, residual, 2)
         fun_gra = np.sum(Tx * np.repeat(residual, number_of_components, axis=1), axis=0).reshape(number_of_components,
                                                                                                  number_of_signals)
         fun_gra += smoothness * stretching_factor_matrix @ smoothness_term.T @ smoothness_term
 
+        # hess = np.zeros((number_of_components*number_of_signals,number_of_components*number_of_signals ))
+        return fun_value, fun_gra.flatten()
 
-        return fun_value, fun_gra
-        pass
-
-    return scipy.optimize.minimize(opt, stretching_factor_matrix, jac=True)
+    return scipy.optimize.minimize(opt, x0=stretching_factor_matrix.flatten(), jac=True)
 
 
 def update_components():

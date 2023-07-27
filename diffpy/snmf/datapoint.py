@@ -24,8 +24,8 @@ class ComponentSignal:
         return np.asarray(stretched_component), np.asarray(stretched_component_gra), np.asarray(
             stretched_component_hess)
 
-    def apply_weights(self, m, *args):
-        if len(args) == 0:
+    def apply_weights(self, m, stretched_component=None):
+        if stretched_component is None:
             return self.iq * self.weights[m]
-        if len(args) == 1:
-            return args[0] * self.weights[m]
+        else:
+            return stretched_component * self.weights[m]
