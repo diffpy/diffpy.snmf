@@ -57,6 +57,21 @@ def objective_function(residual_matrix, stretching_factor_matrix, smoothness, sm
 
 
 def construct_stretching_matrix(components):
+    """Constructs the stretching factor matrix
+
+    Constructs a K x M matrix where K is the number of components and M is the number of signals. Each element is the
+    stretching factor for a specific component signal for a specific signal from the data input.
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+
+    Returns
+    -------
+    2d array
+      The stretching factor matrix
+
+    """
     stretching_factor_matrix = np.zeros((number_of_components, number_of_signals))
     for c in components:
         stretching_factor_matrix[c.id, :] = c.stretching_factors
@@ -64,6 +79,20 @@ def construct_stretching_matrix(components):
 
 
 def construct_component_matrix(components):
+    """Constructs the component matrix
+
+    Constructs an N x K matrix where N is the length of the signals and K is the number of components. Each column
+    is a component signal.
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+
+    Returns
+    -------
+    2d array
+
+    """
     component_matrix = np.zeros((signal_length, number_of_components))
     for c in components:
         component_matrix[:, c.id] = c.ig
@@ -71,6 +100,20 @@ def construct_component_matrix(components):
 
 
 def construct_weight_matrix(components):
+    """Constructs the weights matrix
+
+    Constructs a K x M matrix where K is the number of components and M is the number of signals. Each element is the
+    stretching factor for a specific weight for a specific signal from the data input.
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+
+    Returns
+    -------
+    2d array like
+
+    """
     weights_matrix = np.zeros((number_of_components, number_of_signals))
     for c in components:
         weights_matrix[c.id, :] = c.weights
@@ -78,6 +121,18 @@ def construct_weight_matrix(components):
 
 
 def update_weights(components, method, data_input):
+    """Updates the 'weights' attribute for all ComponentSignal objects.
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+    method: str
+    data_input: 2d array
+
+    Returns
+    -------
+
+    """
     for m in range(number_of_signals):
         stretched_components = np.zeros((signal_length, number_of_components))
 
