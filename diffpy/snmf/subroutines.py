@@ -29,30 +29,35 @@ def lift_data(data_input, lift=1):
     return data_input + np.abs(np.min(data_input) * lift)
 
 
-def create_components(number_of_components, grid_vector, number_of_signals, signal_length):
+def create_components(number_of_components, grid_vector, number_of_signals, signal_length, perturbation=1e-3):
     """Creates the ComponentSignal objects
 
     Parameters
     ----------
     number_of_components: int
-      The number specifying the number of components signals.
+      the number of component signals in the NMF decomposition
     grid_vector: 1d array
-      The 1d array containing the grid of the signals.
+      The 1d array containing the grid of the signals provided by the user.
     number_of_signals: int
-      The number of signals in the data input.
+      The number of signals in the data input provided by the user.
     signal_length: int
       The number specifying the length of the signals' grid.
+    perturbation: float
+      The number used in creating the stretching factor guess. Specifies how much the elements should be perturbed
+      from one.
+
 
     Returns
     -------
     tuple of ComponentSignal objects
+      The tuple containing a series of ComponentSignals
 
     """
     component_list = []
     for c in range(number_of_components):
         iq_guess = np.random.rand(signal_length)
         weights_guess = np.random.rand(number_of_signals)
-        stretching_factors_guess = np.ones(number_of_signals) + np.random.randn(number_of_signals) * 1e-3
+        stretching_factors_guess = np.ones(number_of_signals) + np.random.randn(number_of_signals) * perturbation
         comp = ComponentSignal(grid_vector, iq_guess, weights_guess, stretching_factors_guess, c)
         component_list.append(comp)
     return tuple(component_list)
