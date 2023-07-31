@@ -1,6 +1,7 @@
 import numpy as np
 from diffpy.snmf.optimizers import get_weights
 from diffpy.snmf.factorizers import lsqnonneg
+from diffpy.snmf.containers import ComponentSignal
 import numdifftools
 
 
@@ -28,38 +29,33 @@ def lift_data(data_input, lift=1):
     return data_input + np.abs(np.min(data_input) * lift)
 
 
-def initialize_arrays(number_of_components, number_of_moments, signal_length):
-    """Generates the initial guesses for the weight, stretching, and component matrices
-
-    Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The initial
-    guess for the component matrix is a random (signal_length) x (number_of_components) matrix where each element is
-    between 0 and 1. The initial stretching factor matrix is a random (number_of_components) x (number_of_moments)
-    matrix where each element is number slightly perturbed from 1. The initial weight matrix guess is a random
-    (number_of_components) x (number_of_moments) matrix where each element is between 0 and 1.
+def create_components(number_of_components, grid_vector, number_of_signals, signal_length):
+    """Creates the ComponentSignal objects
 
     Parameters
     ----------
     number_of_components: int
-      The number of component signals to obtain from the stretched nmf decomposition.
-
-    number_of_moments: int
-      The number of signals in the user provided dataset where each signal is at a different moment.
-
+      The number specifying the number of components signals.
+    grid_vector: 1d array
+      The 1d array containing the grid of the signals.
+    number_of_signals: int
+      The number of signals in the data input.
     signal_length: int
-      The length of each signal in the user provided dataset.
+      The number specifying the length of the signals' grid.
 
     Returns
     -------
-    tuple of 2d arrays of floats
-      The tuple containing three elements: the initial component matrix guess, the initial stretching factor matrix
-      guess, and the initial weight factor matrix guess in that order.
+    tuple of ComponentSignal objects
 
     """
-    component_matrix_guess = np.random.rand(signal_length, number_of_components)
-    weight_matrix_guess = np.random.rand(number_of_components, number_of_moments)
-    stretching_matrix_guess = np.ones(number_of_components, number_of_moments) + np.random.randn(number_of_components,
-                                                                                                 number_of_moments) * 1e-3
-    return component_matrix_guess, weight_matrix_guess, stretching_matrix_guess
+    component_list = []
+    for c in range(number_of_components):
+        iq_guess = np.random.rand(signal_length)
+        weights_guess = np.random.rand(number_of_signals)
+        stretching_factors_guess = np.ones(number_of_signals) + np.random.randn(number_of_signals) * 1e-3
+        comp = ComponentSignal(grid_vector, iq_guess, weights_guess, stretching_factors_guess, c)
+        component_list.append(comp)
+    return tuple(component_list)
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
@@ -146,7 +142,7 @@ def construct_component_matrix(components, number_of_components, signal_length):
     number_of_components: int
       The number specifying the number of components signals.
     signal_length: int
-      THe number specifying the length of the signals' grid.
+      The number specifying the length of the signals' grid.
     Returns
     -------
     2d array
