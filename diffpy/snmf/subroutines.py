@@ -4,6 +4,64 @@ from diffpy.snmf.factorizers import lsqnonneg
 import numdifftools
 
 
+def lift_data(data_input, lift=1):
+    """Lifts values of data_input
+
+    Adds 'lift' * the minimum value in data_input to data_input element-wise.
+
+    Parameters
+    ----------
+    data_input: 2d array like
+      The matrix containing a series of signals to be decomposed. Has dimensions N x M where N is the length of each
+      signal and M is the number of signals.
+
+    lift: float
+      The factor representing how much to lift 'data_input'.
+
+    Returns
+    -------
+    2d array like
+      The matrix that contains data_input - (min(data_input) * lift).
+
+    """
+    data_input = np.asarray(data_input)
+    return data_input + np.abs(np.min(data_input) * lift)
+
+
+def initialize_arrays(number_of_components, number_of_moments, signal_length):
+    """Generates the initial guesses for the weight, stretching, and component matrices
+
+    Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The initial
+    guess for the component matrix is a random (signal_length) x (number_of_components) matrix where each element is
+    between 0 and 1. The initial stretching factor matrix is a random (number_of_components) x (number_of_moments)
+    matrix where each element is number slightly perturbed from 1. The initial weight matrix guess is a random
+    (number_of_components) x (number_of_moments) matrix where each element is between 0 and 1.
+
+    Parameters
+    ----------
+    number_of_components: int
+      The number of component signals to obtain from the stretched nmf decomposition.
+
+    number_of_moments: int
+      The number of signals in the user provided dataset where each signal is at a different moment.
+
+    signal_length: int
+      The length of each signal in the user provided dataset.
+
+    Returns
+    -------
+    tuple of 2d arrays of floats
+      The tuple containing three elements: the initial component matrix guess, the initial stretching factor matrix
+      guess, and the initial weight factor matrix guess in that order.
+
+    """
+    component_matrix_guess = np.random.rand(signal_length, number_of_components)
+    weight_matrix_guess = np.random.rand(number_of_components, number_of_moments)
+    stretching_matrix_guess = np.ones(number_of_components, number_of_moments) + np.random.randn(number_of_components,
+                                                                                                 number_of_moments) * 1e-3
+    return component_matrix_guess, weight_matrix_guess, stretching_matrix_guess
+
+
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
                        sparsity):
     """Defines the objective function of the algorithm and returns its value.
@@ -80,6 +138,7 @@ def get_stretched_component(stretching_factor, component, signal_length):
 
     def stretched_component_func(stretching_factor):
         return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
+
     derivative_func = numdifftools.Derivative(stretched_component_func)
     second_derivative_func = numdifftools.Derivative(derivative_func)
 

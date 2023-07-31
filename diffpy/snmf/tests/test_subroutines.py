@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
-    update_weights_matrix
+    update_weights_matrix, initialize_arrays, lift_data
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -134,3 +134,18 @@ def test_reconstruct_data(trd):
     actual = reconstruct_data(trd[0][0], trd[0][1], trd[0][2], trd[0][3], trd[0][4], trd[0][5])
     expected = trd[1]
     np.testing.assert_allclose(actual, expected, rtol=1e-03)
+
+
+tld = [(([[[1, -1, 1], [0, 0, 0], [2, 10, -3]], 1]), ([[4, 2, 4], [3, 3, 3], [5, 13, 0]])),
+       (([[[1, -1, 1], [0, 0, 0], [2, 10, -3]], 0]), ([[1, -1, 1], [0, 0, 0], [2, 10, -3]])),
+       (([[[1, -1, 1], [0, 0, 0], [2, 10, -3]], .5]), ([[2.5, .5, 2.5], [1.5, 1.5, 1.5], [3.5, 11.5, -1.5]])),
+       (([[[1, -1, 1], [0, 0, 0], [2, 10, -3]], -1]), ([[4, 2, 4], [3, 3, 3], [5, 13, 0]])),
+       (([[[0, 0, 0], [0, 0, 0], [0, 0, 0]], 100]), ([[0, 0, 0], [0, 0, 0], [0, 0, 0]])),
+       (([[[1.5, 2], [10.5, 1], [0.5, 2]], 1]), ([[2, 2.5], [11, 1.5], [1, 2.5]])),
+       (([[[-10, -10.5], [-12.2, -12.2], [0, 0]], 1]), ([[2.2, 1.7], [0, 0], [12.2, 12.2]])),
+       ]
+@pytest.mark.parametrize('tld', tld)
+def test_lift_data(tld):
+    actual = lift_data(tld[0][0], tld[0][1])
+    expected = tld[1]
+    np.testing.assert_allclose(actual, expected)
