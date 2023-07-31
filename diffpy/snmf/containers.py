@@ -7,15 +7,15 @@ class ComponentSignal:
     Attributes
     ----------
     grid: 1d array of floats
-      The vector containing the grid points of the component
+      The vector containing the grid points of the component.
     iq: 1d array of floats
-      The intensity/g(r) values of the component
+      The intensity/g(r) values of the component.
     weights: 1d array of floats
-      The vector containing the weight of the component signal for each signal
+      The vector containing the weight of the component signal for each signal.
     stretching_factors: 1d array of floats
-      The vector containing the stretching factor for the component signal for each signal
+      The vector containing the stretching factor for the component signal for each signal.
     id: int
-      The component number.
+      The number identifying the component.
     """
 
     def __init__(self, grid, number_of_signals, id_number, perturbation=1e-3):
@@ -27,10 +27,12 @@ class ComponentSignal:
 
     def apply_stretch(self, m):
         """Applies a stretching factor to a component
+
         Parameters
         ----------
         m: int
           The index specifying which stretching factor to apply
+
         Returns
         -------
         tuple of 1d arrays
@@ -59,6 +61,7 @@ class ComponentSignal:
           The index specifying with weight to apply
         stretched_component: 1d array
           The 1d array containing a stretched component.
+
         Returns
         -------
         1d array
