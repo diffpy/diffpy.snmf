@@ -1,8 +1,8 @@
 import numpy as np
 import scipy.optimize
 from scipy.sparse import spdiags
-from optimizers import get_weights
-from datapoint import ComponentSignal
+from diffpy.snmf.optimizers import get_weights
+from diffpy.snmf.datapoint import ComponentSignal
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
@@ -52,7 +52,7 @@ def objective_function(residual_matrix, stretching_factor_matrix, smoothness, sm
         smoothness_term @ stretching_factor_matrix.T, 'fro') ** 2 + sparsity * np.sum(np.sqrt(component_matrix))
 
 
-def construct_stretching_matrix(components, number_of_signal, number_of_components, number_of_signals):
+def construct_stretching_matrix(components, number_of_components, number_of_signals):
     """Constructs the stretching factor matrix
 
     Constructs a K x M matrix where K is the number of components and M is the number of signals. Each element is the
@@ -74,7 +74,7 @@ def construct_stretching_matrix(components, number_of_signal, number_of_componen
     return stretching_factor_matrix
 
 
-def construct_component_matrix(components, signal_length, number_of_components):
+def construct_component_matrix(components, number_of_components, signal_length, ):
     """Constructs the component matrix
 
     Constructs an N x K matrix where N is the length of the signals and K is the number of components. Each column
@@ -91,7 +91,7 @@ def construct_component_matrix(components, signal_length, number_of_components):
     """
     component_matrix = np.zeros((signal_length, number_of_components))
     for c in components:
-        component_matrix[:, c.id] = c.ig
+        component_matrix[:, c.id] = c.iq
     return component_matrix
 
 
@@ -176,8 +176,8 @@ def reconstruct_signal(components, moment, signal_length):
 
 def reconstruct_data(components, data_input, signal_length, number_of_signals):
     data_reconstruction = np.zeros((signal_length, number_of_signals))
-    for i in range(number_of_signals):
-        data_reconstruction[:, i] = reconstruct_signal(components, i) #To be completed
+    for m in range(number_of_signals):
+        data_reconstruction[:, m] = reconstruct_signal(components, m, signal_length)  # To be completed
     return data_reconstruction
 
 
@@ -187,31 +187,72 @@ def stretching_operation_gra(components, residual, number_of_signals):
     for c in components:
         for m in range(number_of_signals):
             stretched_gra = c.apply_stretch(m)[1]
-            stretched_and_weighted_gra = c.apply_weight(m, stretched_gra)
+            stretched_and_weighted_gra = c.apply_weights(m, stretched_gra)
             stretching_operation_gra.append(stretched_and_weighted_gra)
 
     return np.column_stack(stretching_operation_gra)
 
 
-def update_stretching_factors(components, data_input, stretching_factor_matrix, smoothness, smoothness_term,
-                              number_of_components, number_of_signals):
-    def opt(stretching_factor_matrix):
-        # Reshape at the beginning
-        stretching_factor_matrix.reshape(number_of_components, number_of_signals)
-        residual = reconstruct_data(components, data_input) - data_input
-        fun_value = objective_function(residual, stretching_factor_matrix, smoothness,
-                                       smoothness_term)  # To be completed
+def stretching_operation_hess(components, residual, number_of_signals):
+    stretching_operation_hess = []
+    for c in components:
+        for m in range(number_of_signals):
+            stretched_hess = c.apply_stretch(m)[2]
+            stretched_and_weighted_hess = c.apply_weights(m, stretched_hess)
+            stretching_operation_hess.append(stretched_and_weighted_hess)
 
-        Tx = stretching_operation_gra(components, residual, 2)
-        fun_gra = np.sum(Tx * np.repeat(residual, number_of_components, axis=1), axis=0).reshape(number_of_components,
+    return np.column_stack(stretching_operation_hess)
+
+
+def update_stretching_factors(components, data_input, stretching_factor_matrix, smoothness, smoothness_term,
+                              number_of_components, number_of_signals, signal_length, component_matrix, sparsity,
+                              hessian_helper):
+    data_input = np.asarray(data_input)
+    stretching_factor_matrix = np.asarray(stretching_factor_matrix)
+    component_matrix = np.asarray(component_matrix)
+
+    def fun_value(stretching_factor_matrix):
+        stretching_factor_matrix = stretching_factor_matrix.reshape(number_of_components, number_of_signals)
+        residual = reconstruct_data(components, data_input, signal_length, number_of_signals) - data_input
+        return objective_function(residual, stretching_factor_matrix, smoothness,
+                                  smoothness_term, component_matrix, sparsity)
+
+    def fun_gra(stretching_factor_matrix):
+        stretching_factor_matrix = stretching_factor_matrix.reshape(number_of_components, number_of_signals)
+        residual = reconstruct_data(components, data_input, signal_length, number_of_signals) - data_input
+        tx = stretching_operation_gra(components, residual, number_of_signals)
+        fun_gra = np.sum(tx * np.repeat(residual, number_of_components, axis=1), axis=0).reshape(number_of_components,
                                                                                                  number_of_signals)
         fun_gra += smoothness * stretching_factor_matrix @ smoothness_term.T @ smoothness_term
+        return fun_gra.flatten()
 
-        # hess = np.zeros((number_of_components*number_of_signals,number_of_components*number_of_signals ))
-        return fun_value, fun_gra.flatten()
+    def fun_hess(stretching_factor_matrix):
+        stretching_factor_matrix = stretching_factor_matrix.reshape(number_of_components, number_of_signals)
+        residual = reconstruct_data(components, data_input, signal_length, number_of_signals) - data_input
+        tx = stretching_operation_gra(components, residual, number_of_signals)
+        hx = stretching_operation_hess(components, residual, number_of_signals)
+        blocks = []
+        for signal in range(number_of_signals):
+            block = tx[:, signal*number_of_signals::number_of_signals]
+            blocks.append(block.T @ block)
 
-    return scipy.optimize.minimize(opt, x0=stretching_factor_matrix.flatten(), jac=True)
+        fun_hess = scipy.linalg.block_diag(*blocks)
+
+        residual_repeated = np.tile(residual,(1,number_of_components))
+        product = hx * residual_repeated
+        sum_result = np.sum(product,axis=0)
+        reshaped_result = np.reshape(sum_result, (number_of_signals, number_of_components))
+        reshaped_result = reshaped_result.T
+        reshaped_result = reshaped_result.reshape(number_of_signals * number_of_components, 1)
+        sparse_diag_matrix = spdiags(reshaped_result, [0] * reshaped_result.shape[0], (number_of_signals * number_of_components, number_of_signals * number_of_components))
+        return fun_hess + sparse_diag_matrix + smoothness
+
+    bounds = scipy.optimize.Bounds([.1] * number_of_components * number_of_signals,
+                                   [np.inf] * number_of_components * number_of_signals)
+    return scipy.optimize.minimize(fun_value, x0=stretching_factor_matrix.flatten(), jac=fun_gra, hess=fun_hess,
+                                   method='trust-ncg',
+                                   bounds=bounds)
 
 
-def update_components():
+def update_components(stretc):
     pass
