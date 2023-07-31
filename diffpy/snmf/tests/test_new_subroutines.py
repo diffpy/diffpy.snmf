@@ -3,7 +3,7 @@ import numpy as np
 from diffpy.snmf.componentsignal import ComponentSignal
 from diffpy.snmf.subroutines import objective_function
 from diffpy.snmf.new_subroutines import construct_stretching_matrix, construct_component_matrix, \
-    construct_weight_matrix, reconstruct_signal, update_stretching_factors
+    construct_weight_matrix, reconstruct_signal, update_stretching_factors, create_components
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -89,3 +89,21 @@ def test_update_stretching_factors(tusf):
     print(actual)
     expected = tusf[1]
     np.testing.assert_allclose(actual, expected)
+
+
+tcc = [(2, [0, .5, 1, 1.5], 3, 3),
+       (3,[0,10,20,30],10,15),
+       (0,[0],11,30),
+       (5,[1,1,1,1,1,1],10000,40000),
+       (3,np.arange(stop=125,step=.05),20,2500),
+       ]
+@pytest.mark.parametrize('tcc', tcc)
+def test_create_components(tcc):
+    actual = create_components(tcc[0], tcc[1], tcc[2], tcc[3])
+    print(actual)
+    assert len(actual) == tcc[0]
+    for c in actual:
+        assert len(c.iq) == tcc[3]
+        assert len(c.weights) == tcc[2]
+        assert len(c.stretching_factors) == tcc[2]
+        assert (c.grid == tcc[1]).all()
