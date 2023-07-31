@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from diffpy.snmf.datapoint import ComponentSignal
+from diffpy.snmf.componentsignal import ComponentSignal
 from diffpy.snmf.subroutines import objective_function
 from diffpy.snmf.new_subroutines import construct_stretching_matrix, construct_component_matrix, \
     construct_weight_matrix, reconstruct_signal, update_stretching_factors

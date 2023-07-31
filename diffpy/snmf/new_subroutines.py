@@ -2,7 +2,7 @@ import numpy as np
 import scipy.optimize
 from scipy.sparse import spdiags
 from diffpy.snmf.optimizers import get_weights
-from diffpy.snmf.datapoint import ComponentSignal
+from diffpy.snmf.componentsignal import ComponentSignal
 
 
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
