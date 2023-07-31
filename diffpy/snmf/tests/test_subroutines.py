@@ -170,7 +170,6 @@ tcc = [(2, [0, .5, 1, 1.5], 3, 3),
 @pytest.mark.parametrize('tcc', tcc)
 def test_create_components(tcc):
     actual = create_components(tcc[0], tcc[1], tcc[2], tcc[3])
-    print(actual)
     assert len(actual) == tcc[0]
     for c in actual:
         assert len(c.iq) == tcc[3]
