@@ -5,6 +5,17 @@ from diffpy.snmf.optimizers import get_weights
 from diffpy.snmf.componentsignal import ComponentSignal
 
 
+def create_components(number_of_components, grid_vector, number_of_signals, signal_length):
+    component_list = []
+    for c in number_of_components:
+        iq_guess = np.random.rand(signal_length)
+        weights_guess = np.random.rand(number_of_signals)
+        stretching_factors_guess = np.ones(number_of_signals) + np.random.randn(number_of_signals) * 1e-3
+        comp = ComponentSignal(grid_vector, iq_guess, weights_guess, stretching_factors_guess, c)
+        component_list.append(comp)
+    return tuple(component_list)
+
+
 def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
                        sparsity):
     """Defines the objective function of the algorithm and returns its value.
@@ -124,6 +135,9 @@ def update_weights(components, method, data_input, signal_length, number_of_sign
     components: tuple of ComponentSignal objects
     method: str
     data_input: 2d array
+    signal_length: int
+    number_of_signals: int
+    number_of_components: int
 
     Returns
     -------
@@ -233,18 +247,19 @@ def update_stretching_factors(components, data_input, stretching_factor_matrix, 
         hx = stretching_operation_hess(components, residual, number_of_signals)
         blocks = []
         for signal in range(number_of_signals):
-            block = tx[:, signal*number_of_signals::number_of_signals]
+            block = tx[:, signal * number_of_signals::number_of_signals]
             blocks.append(block.T @ block)
 
         fun_hess = scipy.linalg.block_diag(*blocks)
 
-        residual_repeated = np.tile(residual,(1,number_of_components))
+        residual_repeated = np.tile(residual, (1, number_of_components))
         product = hx * residual_repeated
-        sum_result = np.sum(product,axis=0)
+        sum_result = np.sum(product, axis=0)
         reshaped_result = np.reshape(sum_result, (number_of_signals, number_of_components))
         reshaped_result = reshaped_result.T
         reshaped_result = reshaped_result.reshape(number_of_signals * number_of_components, 1)
-        sparse_diag_matrix = spdiags(reshaped_result, [0] * reshaped_result.shape[0], (number_of_signals * number_of_components, number_of_signals * number_of_components))
+        sparse_diag_matrix = spdiags(reshaped_result, [0] * reshaped_result.shape[0], (
+        number_of_signals * number_of_components, number_of_signals * number_of_components))
         return fun_hess + sparse_diag_matrix + smoothness
 
     bounds = scipy.optimize.Bounds([.1] * number_of_components * number_of_signals,
