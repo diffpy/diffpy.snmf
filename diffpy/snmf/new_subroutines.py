@@ -6,8 +6,22 @@ from diffpy.snmf.componentsignal import ComponentSignal
 
 
 def create_components(number_of_components, grid_vector, number_of_signals, signal_length):
+    """Creates the ComponentSignal objects
+
+    Parameters
+    ----------
+    number_of_components: int
+    grid_vector: 1d array
+    number_of_signals: int
+    signal_length: int
+
+    Returns
+    -------
+    tuple of ComponentSignal objects
+
+    """
     component_list = []
-    for c in number_of_components:
+    for c in range(number_of_components):
         iq_guess = np.random.rand(signal_length)
         weights_guess = np.random.rand(number_of_signals)
         stretching_factors_guess = np.ones(number_of_signals) + np.random.randn(number_of_signals) * 1e-3
@@ -221,6 +235,33 @@ def stretching_operation_hess(components, residual, number_of_signals):
 def update_stretching_factors(components, data_input, stretching_factor_matrix, smoothness, smoothness_term,
                               number_of_components, number_of_signals, signal_length, component_matrix, sparsity,
                               hessian_helper):
+    """Updates the stretching factor matrix.
+
+    Calculates a new stretching factor matrix by minimizing ObjectiveFunction with respect to
+    `stretching_factor_matrix`. Uses `scipy.optimize.minimize` which calls the value of the objective function from
+    `fun_value`, the value of the objective functions gradient in `fun_gra`, and the value of the objective functions
+    hessian in `fun_hess.` A lower bound of .1 is set on the values of the stretching factors in the stretching factor
+    matrix.
+
+
+    Parameters
+    ----------
+    components
+    data_input
+    stretching_factor_matrix
+    smoothness
+    smoothness_term
+    number_of_components
+    number_of_signals
+    signal_length
+    component_matrix
+    sparsity
+    hessian_helper
+
+    Returns
+    -------
+
+    """
     data_input = np.asarray(data_input)
     stretching_factor_matrix = np.asarray(stretching_factor_matrix)
     component_matrix = np.asarray(component_matrix)
@@ -260,12 +301,11 @@ def update_stretching_factors(components, data_input, stretching_factor_matrix, 
         reshaped_result = reshaped_result.reshape(number_of_signals * number_of_components, 1)
         sparse_diag_matrix = spdiags(reshaped_result, [0] * reshaped_result.shape[0], (
         number_of_signals * number_of_components, number_of_signals * number_of_components))
-        return fun_hess + sparse_diag_matrix + smoothness
+        return fun_hess + sparse_diag_matrix + smoothness * hessian_helper
 
     bounds = scipy.optimize.Bounds([.1] * number_of_components * number_of_signals,
                                    [np.inf] * number_of_components * number_of_signals)
     return scipy.optimize.minimize(fun_value, x0=stretching_factor_matrix.flatten(), jac=fun_gra, hess=fun_hess,
-                                   method='trust-ncg',
                                    bounds=bounds)
 
 
