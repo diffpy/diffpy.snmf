@@ -1,7 +1,33 @@
 import numpy as np
 from diffpy.snmf.optimizers import get_weights
 from diffpy.snmf.factorizers import lsqnonneg
+from diffpy.snmf.containers import ComponentSignal
 import numdifftools
+
+
+def initialize_components(number_of_components, number_of_signals, grid_vector):
+    """Initializes ComponentSignals for each of the components in the decomposition
+
+    Parameters
+    ----------
+    number_of_components: int
+      The number of component signals in the NMF decomposition
+    number_of_signals: int
+    grid_vector: 1d array
+      The grid of the user provided signals.
+
+    Returns
+    -------
+    tuple of ComponentSignal objects
+      The tuple containing `number_of_components` of initialized ComponentSignal objects.
+    """
+    if number_of_components <= 0:
+        raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1.")
+    components = list()
+    for component in range(number_of_components):
+        component = ComponentSignal(grid_vector,number_of_signals,component)
+        components.append(component)
+    return tuple(components)
 
 
 def lift_data(data_input, lift=1):

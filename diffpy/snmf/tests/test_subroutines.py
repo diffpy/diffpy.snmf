@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
-    update_weights_matrix, initialize_arrays, lift_data
+    update_weights_matrix, initialize_arrays, lift_data, initialize_components
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -144,8 +144,20 @@ tld = [(([[[1, -1, 1], [0, 0, 0], [2, 10, -3]], 1]), ([[4, 2, 4], [3, 3, 3], [5,
        (([[[1.5, 2], [10.5, 1], [0.5, 2]], 1]), ([[2, 2.5], [11, 1.5], [1, 2.5]])),
        (([[[-10, -10.5], [-12.2, -12.2], [0, 0]], 1]), ([[2.2, 1.7], [0, 0], [12.2, 12.2]])),
        ]
+
+
 @pytest.mark.parametrize('tld', tld)
 def test_lift_data(tld):
     actual = lift_data(tld[0][0], tld[0][1])
     expected = tld[1]
     np.testing.assert_allclose(actual, expected)
+
+tcc = [(2, 3,[0, .5, 1, 1.5]), # Regular usage
+       #(0, 3,[0, .5, 1, 1.5]), # Zero components raise an exception. Not tested
+       ]
+@pytest.mark.parametrize('tcc', tcc)
+def test_initialize_components(tcc):
+    actual = initialize_components(tcc[0], tcc[1], tcc[2])
+    assert len(actual) == tcc[0]
+    assert len(actual[0].weights) == tcc[1]
+    assert (actual[0].grid == np.array(tcc[2])).all()
