@@ -161,3 +161,7 @@ def test_initialize_components(tcc):
     assert len(actual) == tcc[0]
     assert len(actual[0].weights) == tcc[1]
     assert (actual[0].grid == np.array(tcc[2])).all()
+
+tcso =[]
+def test_construct_stretching_matrix():
+    assert False

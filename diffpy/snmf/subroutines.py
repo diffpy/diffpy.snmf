@@ -25,7 +25,7 @@ def initialize_components(number_of_components, number_of_signals, grid_vector):
         raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1.")
     components = list()
     for component in range(number_of_components):
-        component = ComponentSignal(grid_vector,number_of_signals,component)
+        component = ComponentSignal(grid_vector, number_of_signals, component)
         components.append(component)
     return tuple(components)
 
@@ -52,6 +52,27 @@ def lift_data(data_input, lift=1):
     """
     data_input = np.asarray(data_input)
     return data_input + np.abs(np.min(data_input) * lift)
+
+
+def construct_stretching_matrix(components, number_of_components, number_of_signals):
+    """Constructs the stretching factor matrix
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+       The tuple containing the component signals in ComponentSignal objects.
+    number_of_components: int
+      The number of component signals in the NMF decomposition
+    number_of_signals: int
+      The number of signals in the data provided by the user.
+
+    Returns
+    -------
+    2d array
+      The matrix containing the stretching factors for the component signals for each of the signals in the raw data.
+      Has dimensions `component_signal` x `number_of_signals`
+
+    """
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
