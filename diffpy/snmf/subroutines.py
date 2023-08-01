@@ -5,8 +5,8 @@ from diffpy.snmf.containers import ComponentSignal
 import numdifftools
 
 
-def create_components(number_of_components, number_of_signals, grid_vector):
-    """Creates the ComponentSignal objects
+def initialize_components(number_of_components, number_of_signals, grid_vector):
+    """Initializes ComponentSignals for each of the components in the decomposition
 
     Parameters
     ----------
@@ -21,10 +21,12 @@ def create_components(number_of_components, number_of_signals, grid_vector):
     tuple of ComponentSignal objects
       The tuple containing `number_of_components` of initialized ComponentSignal objects.
     """
+    if number_of_components <= 0:
+        raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1.")
     components = list()
-    for c in range(number_of_components):
-        c = ComponentSignal(grid_vector,number_of_signals,c)
-        components.append(c)
+    for component in range(number_of_components):
+        component = ComponentSignal(grid_vector,number_of_signals,component)
+        components.append(component)
     return tuple(components)
 
 

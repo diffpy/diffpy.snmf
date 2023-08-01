@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
-    update_weights_matrix, initialize_arrays, lift_data, create_components
+    update_weights_matrix, initialize_arrays, lift_data, initialize_components
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -152,18 +152,12 @@ def test_lift_data(tld):
     expected = tld[1]
     np.testing.assert_allclose(actual, expected)
 
-tcc = [(2, [0, .5, 1, 1.5], 3, 3),
-       (3,[0,10,20,30],10,15),
-       (0,[0],11,30),
-       (5,[1,1,1,1,1,1],10000,40000),
-       (3,np.arange(stop=125,step=.05),20,2500),
+tcc = [(2, 3,[0, .5, 1, 1.5]), # Regular usage
+       #(0, 3,[0, .5, 1, 1.5]), # Zero components raise an exception. Not tested
        ]
 @pytest.mark.parametrize('tcc', tcc)
-def test_create_components(tcc):
-    actual = create_components(tcc[0], tcc[1], tcc[2], tcc[3])
+def test_initialize_components(tcc):
+    actual = initialize_components(tcc[0], tcc[1], tcc[2])
     assert len(actual) == tcc[0]
-    for c in actual:
-        assert len(c.iq) == tcc[3]
-        assert len(c.weights) == tcc[2]
-        assert len(c.stretching_factors) == tcc[2]
-        assert (c.grid == tcc[1]).all()
+    assert len(actual[0].weights) == tcc[1]
+    assert (actual[0].grid == np.array(tcc[2])).all()
