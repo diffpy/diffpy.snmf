@@ -1,7 +1,8 @@
 import pytest
 import numpy as np
+from diffpy.snmf.containers import ComponentSignal
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
-    update_weights_matrix, initialize_arrays, lift_data, initialize_components
+    update_weights_matrix, initialize_arrays, lift_data, initialize_components, construct_stretching_matrix
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -162,6 +163,25 @@ def test_initialize_components(tcc):
     assert len(actual[0].weights) == tcc[1]
     assert (actual[0].grid == np.array(tcc[2])).all()
 
-tcso =[]
-def test_construct_stretching_matrix():
-    assert False
+tcso =[([ComponentSignal([0,.5,1,1.5],20,0)],1,20),
+       ([ComponentSignal([0,.5,1,1.5],20,0)],4,20),
+       ([ComponentSignal([0,.5,1,1.5],20,0)],0,20),
+       ([ComponentSignal([0,.5,1,1.5],20,0)],-2,20),
+       ([ComponentSignal([0,.5,1,1.5],20,0)],1,0),
+       ([ComponentSignal([0,.5,1,1.5],20,0)],1,-3),
+       ([ComponentSignal([0,.5,1,1.5],20,0),ComponentSignal([0,.5,1,1.5],20,1)],1,20),
+       ([ComponentSignal([0,.5,1,1.5],20,0),ComponentSignal([0,.5,1,21.5],20,1)],1,20),
+       ([ComponentSignal([0,1,1.5],20,0),ComponentSignal([0,.5,1,21.5],20,1)],1,20),
+       ([ComponentSignal([0,.5,1,1.5],20,0),ComponentSignal([0,.5,1,1.5],20,1)],1,-3),
+       ([],1,20),
+       ([],-1,20),
+       ([],0,20),
+       ([],1,0),
+       ([],-1,-2),
+
+]
+@pytest.mark.parametrize('tcso',tcso)
+def test_construct_stretching_matrix(tcso):
+    actual = construct_stretching_matrix(tcso[0],tcso[1],tcso[2])
+    for component in tcso[0]:
+        assert actual[component.id, :] == component.stretching_factors
