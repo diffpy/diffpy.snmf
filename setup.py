@@ -28,7 +28,7 @@ setup(
     entry_points={
         # define console_scripts here, see setuptools docs for details.
         'console_scripts': [
-            'stretched_nmf = diffpy.snmf.stretchednmfapp:main',
+            'snmf = diffpy.snmf.stretchednmfapp:main',
         ],
     },
     test_suite='tests',
