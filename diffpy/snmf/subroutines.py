@@ -61,8 +61,6 @@ def construct_stretching_matrix(components, number_of_components, number_of_sign
     ----------
     components: tuple of ComponentSignal objects
        The tuple containing the component signals in ComponentSignal objects.
-    number_of_components: int
-      The number of component signals in the NMF decomposition
     number_of_signals: int
       The number of signals in the data provided by the user.
 
@@ -73,13 +71,16 @@ def construct_stretching_matrix(components, number_of_components, number_of_sign
       Has dimensions `component_signal` x `number_of_signals`
 
     """
-    if (number_of_components <= 0) or (len(components)) == 0:
+    if (len(components)) == 0:
         raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1.")
+    number_of_components = len(components)
+    
     if number_of_signals <= 0:
         raise ValueError(f"Number of signals = {number_of_signals}. Number_of_signals must be >= 1.")
+        
     stretching_factor_matrix = np.zeros((number_of_components, number_of_signals))
     for i, component in enumerate(components):
-        stretching_factor_matrix[i, :] = component.stretching_factors
+        stretching_factor_matrix[i] = component.stretching_factors
     return stretching_factor_matrix
 
 
