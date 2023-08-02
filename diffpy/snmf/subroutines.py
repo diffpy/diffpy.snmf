@@ -73,13 +73,13 @@ def construct_stretching_matrix(components, number_of_components, number_of_sign
       Has dimensions `component_signal` x `number_of_signals`
 
     """
-    if number_of_components == 0:
+    if (number_of_components <= 0) or (len(components)) == 0:
         raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1.")
-    if number_of_signals == 0:
+    if number_of_signals <= 0:
         raise ValueError(f"Number of signals = {number_of_signals}. Number_of_signals must be >= 1.")
     stretching_factor_matrix = np.zeros((number_of_components, number_of_signals))
-    for c in components:
-        stretching_factor_matrix[c.id, :] = c.stretching_factors
+    for i, component in enumerate(components):
+        stretching_factor_matrix[i, :] = component.stretching_factors
     return stretching_factor_matrix
 
 
