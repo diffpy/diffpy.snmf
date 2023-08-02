@@ -42,11 +42,6 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
     signal_length = data_input.shape[0]
     moment_amount = data_input.shape[1]
 
-    component_matrix_guess = np.random.rand(signal_length, component_amount)
-    weight_matrix_guess = np.random.rand(component_amount, moment_amount)
-    stretching_matrix_guess = np.ones(component_amount, moment_amount) + np.random.randn(component_amount,
-                                                                                         moment_amount) * 1e-3
-
     diagonals = [np.ones(moment_amount - 2), -2 * np.ones(moment_amount - 2), np.ones(moment_amount - 2)]
     smoothness_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(moment_amount - 2, moment_amount))
 
@@ -57,9 +52,6 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
     return {
         "signal_length": signal_length,
         "moment_amount": moment_amount,
-        "component_matrix_guess": component_matrix_guess,
-        "weight_matrix_guess": weight_matrix_guess,
-        "stretching_matrix_guess": stretching_matrix_guess,
         "component_amount": component_amount,
         "data_type": data_type,
         "smoothness": smoothness,
