@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Installation script for diffpy.pdfmorph
+# Installation script for diffpy.snmf
 
 """diffpy.snmf - a package implementing the stretched NMF algorithm.
 
@@ -28,7 +28,7 @@ setup(
     entry_points={
         # define console_scripts here, see setuptools docs for details.
         'console_scripts': [
-            'pdfmorph = diffpy.pdfmorph.pdfmorphapp:main',
+            'stretched_nmf = diffpy.snmf.stretchednmfapp:main',
         ],
     },
     test_suite='tests',

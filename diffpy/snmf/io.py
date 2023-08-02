@@ -4,7 +4,7 @@ from pathlib import Path
 from diffpy.utils.parsers.loaddata import loadData
 
 
-def initialize_variables(data_input, component_amount, data_type, sparsity=1, smoothness=1e18):
+def initialize_variables(data_input, number_of_components, data_type, sparsity=1, smoothness=1e18):
     """Determines the variables and initial values used in the SNMF algorithm.
 
     Parameters
@@ -13,7 +13,7 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
       The observed or simulated PDF or XRD data provided by the user. Has dimensions R x N where R is the signal length
       and N is the number of PDF/XRD signals.
 
-    component_amount: int
+    number_of_components: int
       The number of component signals the user would like to decompose 'data_input' into.
 
     data_type: str
@@ -40,27 +40,30 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
 
     """
     signal_length = data_input.shape[0]
-    moment_amount = data_input.shape[1]
+    number_of_moments = data_input.shape[1]
 
-    component_matrix_guess = np.random.rand(signal_length, component_amount)
-    weight_matrix_guess = np.random.rand(component_amount, moment_amount)
-    stretching_matrix_guess = np.ones(component_amount, moment_amount) + np.random.randn(component_amount,
-                                                                                         moment_amount) * 1e-3
+    component_matrix_guess = np.random.rand(signal_length, number_of_components)
+    weight_matrix_guess = np.random.rand(number_of_components, number_of_moments)
+    stretching_matrix_guess = np.ones((number_of_components, number_of_moments)) + np.random.randn(number_of_components,
+                                                                                                   number_of_moments) * 1e-3
 
-    diagonals = [np.ones(moment_amount - 2), -2 * np.ones(moment_amount - 2), np.ones(moment_amount - 2)]
-    smoothness_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(moment_amount - 2, moment_amount))
+    diagonals = [np.ones(number_of_moments - 2), -2 * np.ones(number_of_moments - 2), np.ones(number_of_moments - 2)]
+    smoothness_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(number_of_moments - 2, number_of_moments))
 
-    hessian_helper_matrix = scipy.sparse.block_diag([smoothness_term.T @ smoothness_term] * component_amount)
-    sequence = np.arange(moment_amount * component_amount).reshape(component_amount, moment_amount).T.flatten()
+    hessian_helper_matrix = scipy.sparse.block_diag([smoothness_term.T @ smoothness_term] * number_of_components)
+    sequence = np.arange(number_of_moments * number_of_components).reshape(number_of_components,
+                                                                           number_of_moments).T.flatten()
+
+    hessian_helper_matrix = hessian_helper_matrix.tocsr()
     hessian_helper_matrix = hessian_helper_matrix[sequence, :][:, sequence]
 
     return {
         "signal_length": signal_length,
-        "moment_amount": moment_amount,
-        "component_matrix_guess": component_matrix_guess,
-        "weight_matrix_guess": weight_matrix_guess,
-        "stretching_matrix_guess": stretching_matrix_guess,
-        "component_amount": component_amount,
+        "number_of_moments": number_of_moments,
+        "component_matrix": component_matrix_guess,
+        "weights_matrix": weight_matrix_guess,
+        "stretching_factor_matrix": stretching_matrix_guess,
+        "number_of_components": number_of_components,
         "data_type": data_type,
         "smoothness": smoothness,
         "sparsity": sparsity,
@@ -91,18 +94,17 @@ def load_input_signals(file_path=None):
 
     """
 
-    if file_path is None:
-        directory_path = Path.cwd()
-    else:
-        directory_path = Path(file_path)
+    directory_path = Path(file_path)
 
     values_list = []
     grid_list = []
     current_grid = []
+    file_extension = ""
     for item in directory_path.iterdir():
         if item.is_file():
+            file_extension = Path(item).suffix
             data = loadData(item.resolve())
-            if current_grid and current_grid != data[:, 0]:
+            if len(current_grid) != 0 and (current_grid != data[:, 0]).any():
                 print(f"{item.name} was ignored as it is not on a compatible grid.")
                 continue
             else:
@@ -113,4 +115,10 @@ def load_input_signals(file_path=None):
     grid_array = np.column_stack(grid_list)
     grid_vector = np.unique(grid_array, axis=1)
     values_array = np.column_stack(values_list)
-    return grid_vector, values_array
+    if file_extension in {'.gr', '.chi'}:
+        data_type = 'pdf'
+    elif file_extension in {'iq', '.xy', '.xye', '.xrd'}:
+        data_type = 'xrd'
+    else:
+        data_type = None
+    return grid_vector, values_array, data_type
