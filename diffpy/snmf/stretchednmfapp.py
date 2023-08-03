@@ -1,6 +1,9 @@
 import numpy as np
 import argparse
 from pathlib import Path
+from diffpy.snmf.subroutines import lift_data, initialize_components
+from diffpy.snmf.containers import ComponentSignal
+from diffpy.snmf.io import load_input_signals, initialize_variables
 
 ALLOWED_DATA_TYPES = ['powder_diffraction', 'pd', 'pair_distribution_function', 'pdf']
 
@@ -26,4 +29,11 @@ def create_parser():
 
 
 def main():
-    pass
+    args = create_parser()
+    if args.input_directory is None:
+        args.input_directory = Path.cwd()
+    grid, data_input = load_input_signals(args.input_directory)
+    lifed_data_input = lift_data(data_input, args.lift_factor)
+    variables = initialize_variables(lifed_data_input,args.number_of_components,data_type='pdf')
+    components = initialize_components(variables['number_of_components'],variables['number_of_signals'],grid)
+    return 0
