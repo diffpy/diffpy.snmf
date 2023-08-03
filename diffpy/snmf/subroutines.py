@@ -83,6 +83,26 @@ def construct_stretching_matrix(components, number_of_components, number_of_sign
         stretching_factor_matrix[i] = component.stretching_factors
     return stretching_factor_matrix
 
+def construct_component_matrix(components, number_of_components, signal_length):
+    """Constructs the component matrix
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+      The tuple containing the component signals in ComponentSignal objects.
+    number_of_components: int
+      The number of component signals to obtain from the stretched nmf decomposition.
+    signal_length: int
+      The number of signals in the data provided by the user.
+
+    Returns
+    -------
+    2d array
+      The matrix containing the component signal values. Has dimensions `signal_length` x `number_of_components`.
+
+    """
+    pass
+
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
     """Generates the initial guesses for the weight, stretching, and component matrices

@@ -186,3 +186,8 @@ def test_construct_stretching_matrix(tcso):
     for component in tcso[0]:
         np.testing.assert_allclose(actual[component.id,:], component.stretching_factors)
         #assert actual[component.id, :] == component.stretching_factors
+
+tccm = []
+@pytest.mark.parametrize('tccm',tccm)
+def test_construct_component_matrix(tccm):
+    assert False
