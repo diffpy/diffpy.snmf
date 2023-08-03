@@ -1,7 +1,8 @@
 import pytest
 import numpy as np
+from diffpy.snmf.containers import ComponentSignal
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
-    update_weights_matrix, initialize_arrays, lift_data, initialize_components
+    update_weights_matrix, initialize_arrays, lift_data, initialize_components, construct_stretching_matrix
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -161,3 +162,27 @@ def test_initialize_components(tcc):
     assert len(actual) == tcc[0]
     assert len(actual[0].weights) == tcc[1]
     assert (actual[0].grid == np.array(tcc[2])).all()
+
+tcso =[([ComponentSignal([0,.5,1,1.5],20,0)],1,20),
+       ([ComponentSignal([0,.5,1,1.5],20,0)],4,20),
+       # ([ComponentSignal([0,.5,1,1.5],20,0)],0,20), # Raises an exception
+       # ([ComponentSignal([0,.5,1,1.5],20,0)],-2,20), # Raises an exception
+       # ([ComponentSignal([0,.5,1,1.5],20,0)],1,0), # Raises an Exception
+       # ([ComponentSignal([0,.5,1,1.5],20,0)],1,-3), # Raises an exception
+       ([ComponentSignal([0,.5,1,1.5],20,0),ComponentSignal([0,.5,1,1.5],20,1)],2,20),
+       ([ComponentSignal([0,.5,1,1.5],20,0),ComponentSignal([0,.5,1,21.5],20,1)],2,20),
+       ([ComponentSignal([0,1,1.5],20,0),ComponentSignal([0,.5,1,21.5],20,1)],2,20),
+       # ([ComponentSignal([0,.5,1,1.5],20,0),ComponentSignal([0,.5,1,1.5],20,1)],1,-3), # Negative signal length. Raises an exception
+       #([],1,20), # Empty components. Raises an Exception
+       #([],-1,20), # Empty components with negative number of components. Raises an exception
+       #([],0,20), # Empty components with zero number of components. Raises an exception
+       #([],1,0), # Empty components with zero signal length. Raises an exception.
+       #([],-1,-2), # Empty components with negative number of components and signal length Raises an exception.
+
+]
+@pytest.mark.parametrize('tcso',tcso)
+def test_construct_stretching_matrix(tcso):
+    actual = construct_stretching_matrix(tcso[0],tcso[1],tcso[2])
+    for component in tcso[0]:
+        np.testing.assert_allclose(actual[component.id,:], component.stretching_factors)
+        #assert actual[component.id, :] == component.stretching_factors

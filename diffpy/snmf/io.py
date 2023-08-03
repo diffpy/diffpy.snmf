@@ -4,7 +4,7 @@ from pathlib import Path
 from diffpy.utils.parsers.loaddata import loadData
 
 
-def initialize_variables(data_input, component_amount, data_type, sparsity=1, smoothness=1e18):
+def initialize_variables(data_input, number_of_components, data_type, sparsity=1, smoothness=1e18):
     """Determines the variables and initial values used in the SNMF algorithm.
 
     Parameters
@@ -13,7 +13,7 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
       The observed or simulated PDF or XRD data provided by the user. Has dimensions R x N where R is the signal length
       and N is the number of PDF/XRD signals.
 
-    component_amount: int
+    number_of_components: int
       The number of component signals the user would like to decompose 'data_input' into.
 
     data_type: str
@@ -40,27 +40,19 @@ def initialize_variables(data_input, component_amount, data_type, sparsity=1, sm
 
     """
     signal_length = data_input.shape[0]
-    moment_amount = data_input.shape[1]
+    number_of_signals = data_input.shape[1]
 
-    component_matrix_guess = np.random.rand(signal_length, component_amount)
-    weight_matrix_guess = np.random.rand(component_amount, moment_amount)
-    stretching_matrix_guess = np.ones(component_amount, moment_amount) + np.random.randn(component_amount,
-                                                                                         moment_amount) * 1e-3
+    diagonals = [np.ones(number_of_signals - 2), -2 * np.ones(number_of_signals - 2), np.ones(number_of_signals - 2)]
+    smoothness_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(number_of_signals - 2, number_of_signals))
 
-    diagonals = [np.ones(moment_amount - 2), -2 * np.ones(moment_amount - 2), np.ones(moment_amount - 2)]
-    smoothness_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(moment_amount - 2, moment_amount))
-
-    hessian_helper_matrix = scipy.sparse.block_diag([smoothness_term.T @ smoothness_term] * component_amount)
-    sequence = np.arange(moment_amount * component_amount).reshape(component_amount, moment_amount).T.flatten()
+    hessian_helper_matrix = scipy.sparse.block_diag([smoothness_term.T @ smoothness_term] * number_of_components)
+    sequence = np.arange(number_of_signals * number_of_components).reshape(number_of_components, number_of_signals).T.flatten()
     hessian_helper_matrix = hessian_helper_matrix[sequence, :][:, sequence]
 
     return {
         "signal_length": signal_length,
-        "moment_amount": moment_amount,
-        "component_matrix_guess": component_matrix_guess,
-        "weight_matrix_guess": weight_matrix_guess,
-        "stretching_matrix_guess": stretching_matrix_guess,
-        "component_amount": component_amount,
+        "number_of_signals": number_of_signals,
+        "number_of_components": number_of_components,
         "data_type": data_type,
         "smoothness": smoothness,
         "sparsity": sparsity,
