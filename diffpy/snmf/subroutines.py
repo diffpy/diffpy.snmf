@@ -83,6 +83,7 @@ def construct_stretching_matrix(components, number_of_components, number_of_sign
         stretching_factor_matrix[i] = component.stretching_factors
     return stretching_factor_matrix
 
+
 def construct_component_matrix(components, number_of_components, signal_length):
     """Constructs the component matrix
 
@@ -101,7 +102,15 @@ def construct_component_matrix(components, number_of_components, signal_length):
       The matrix containing the component signal values. Has dimensions `signal_length` x `number_of_components`.
 
     """
-    pass
+    if signal_length <= 0:
+        raise ValueError(f"Signal length = {signal_length}. Signal length must be >= 1")
+    if (number_of_components <= 0) or (len(components) <= 0):
+        raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1")
+
+    component_matrix = np.zeros((signal_length, number_of_components))
+    for i, component in enumerate(components):
+        component_matrix[:, i] = component.iq
+    return component_matrix
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
