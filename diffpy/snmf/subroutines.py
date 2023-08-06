@@ -107,7 +107,7 @@ def construct_component_matrix(components, signal_length):
 
     component_matrix = np.zeros((signal_length, len(components)))
     for i, component in enumerate(components):
-        component_matrix[:, i] = component.iq
+        component_matrix[i] = component.iq
     return component_matrix
 
 
