@@ -188,7 +188,7 @@ def test_construct_stretching_matrix(tcso):
         #assert actual[component.id, :] == component.stretching_factors
 
 tccm = [ # (ComponentSignal([0,.25,.5,.75,1],20,0),1,5), # Expected to fail
-        ([ComponentSignal([0,.25,.5,.75,1],20,0)],1,5),
+        ([ComponentSignal([0,.25,.5,.75,1],20,0)],5),
         # ([ComponentSignal([0,.25,.5,.75,1],20,2)],1,5), # Expected to fail
         # ([ComponentSignal([0,.25,.5,.75,1],20,0)],1,2), # Expected to fail
         # ([ComponentSignal([0,.25,.5,.75,1],20,0)],1,5.5), # Expected to fail
@@ -203,14 +203,14 @@ tccm = [ # (ComponentSignal([0,.25,.5,.75,1],20,0),1,5), # Expected to fail
         # ([ComponentSignal([0,.25,.5,.75,1],20,0)],[],5), # Expected to fail
         # ([ComponentSignal([0,.25,.5,.75,1],-20,0)],1,5), # Expected to fail
         # ([ComponentSignal([0,.25,.5,.75,1],20.2,0)],1,5), # Expected to fail
-        ([ComponentSignal([0,.25,.5,.75,1],0,0)],1,5),
-        ([ComponentSignal([0,.25,.5,.75,1],20,0),ComponentSignal([0,.25,.5,.75,1],20,1),ComponentSignal([0,.25,.5,.75,1],20,2)],3,5),
+        ([ComponentSignal([0,.25,.5,.75,1],0,0)],5),
+        ([ComponentSignal([0,.25,.5,.75,1],20,0),ComponentSignal([0,.25,.5,.75,1],20,1),ComponentSignal([0,.25,.5,.75,1],20,2)],5),
         ([ComponentSignal([0, .25, .5, .75, 1], 20, 0), ComponentSignal([0, .25, .5, .75, 1], 20, 1),
-          ComponentSignal([0, .25, .5, .75, 1], 20, 2)], 3, 5),
+          ComponentSignal([0, .25, .5, .75, 1], 20, 2)],5),
         ([ComponentSignal([0, .25, .5, .75, 1], 20, 0), ComponentSignal([0, .25, .5, 2.75, 1], 20, 1),
-          ComponentSignal([0, .25, .5, .75, 1], 20, 2)], 3, 5),
+          ComponentSignal([0, .25, .5, .75, 1], 20, 2)], 5),
         ([ComponentSignal([ .25], 20, 0), ComponentSignal([.25], 20, 1),
-          ComponentSignal([.25], 20, 2)], 3, 1),
+          ComponentSignal([.25], 20, 2)], 1),
         # ([ComponentSignal([0, .25, .5, .75, 1], 20, 0), ComponentSignal([0, .25, .5, .75, 1], 20, 1),
         # ComponentSignal([], 20, 2)], 1, 5), # Expected to fail
         # ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 4, 1),
@@ -222,6 +222,6 @@ tccm = [ # (ComponentSignal([0,.25,.5,.75,1],20,0),1,5), # Expected to fail
         ]
 @pytest.mark.parametrize('tccm',tccm)
 def test_construct_component_matrix(tccm):
-    actual = construct_component_matrix(tccm[0],tccm[1],tccm[2])
+    actual = construct_component_matrix(tccm[0],tccm[1])
     for component in tccm[0]:
         np.testing.assert_allclose(actual[:,component.id], component.iq)
