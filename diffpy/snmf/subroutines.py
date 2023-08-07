@@ -74,25 +74,23 @@ def construct_stretching_matrix(components, number_of_components, number_of_sign
     if (len(components)) == 0:
         raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1.")
     number_of_components = len(components)
-    
+
     if number_of_signals <= 0:
         raise ValueError(f"Number of signals = {number_of_signals}. Number_of_signals must be >= 1.")
-        
+
     stretching_factor_matrix = np.zeros((number_of_components, number_of_signals))
     for i, component in enumerate(components):
         stretching_factor_matrix[i] = component.stretching_factors
     return stretching_factor_matrix
 
 
-def construct_component_matrix(components, signal_length):
+def construct_component_matrix(components):
     """Constructs the component matrix
 
     Parameters
     ----------
     components: tuple of ComponentSignal objects
       The tuple containing the component signals in ComponentSignal objects.
-    signal_length: int
-      The number of signals in the data provided by the user.
 
     Returns
     -------
@@ -100,12 +98,14 @@ def construct_component_matrix(components, signal_length):
       The matrix containing the component signal values. Has dimensions `signal_length` x `number_of_components`.
 
     """
-    if signal_length <= 0:
+    signal_length = len(components[0].iq)
+    number_of_components = len(components)
+    if signal_length == 0:
         raise ValueError(f"Signal length = {signal_length}. Signal length must be >= 1")
-    if len(components) <= 0:
-        raise ValueError(f"Number of components = {len(components)}. Number_of_components must be >= 1")
+    if number_of_components == 0:
+        raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1")
 
-    component_matrix = np.zeros((signal_length, len(components))).T
+    component_matrix = np.zeros((number_of_components, signal_length))
     for i, component in enumerate(components):
         component_matrix[i] = component.iq
     return component_matrix.T
