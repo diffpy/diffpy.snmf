@@ -108,7 +108,7 @@ def construct_component_matrix(components):
     component_matrix = np.zeros((number_of_components, signal_length))
     for i, component in enumerate(components):
         component_matrix[i] = component.iq
-    return component_matrix.T
+    return component_matrix
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
