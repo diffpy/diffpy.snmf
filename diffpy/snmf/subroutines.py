@@ -105,10 +105,10 @@ def construct_component_matrix(components, signal_length):
     if len(components) <= 0:
         raise ValueError(f"Number of components = {len(components)}. Number_of_components must be >= 1")
 
-    component_matrix = np.zeros((signal_length, len(components)))
+    component_matrix = np.zeros((signal_length, len(components))).T
     for i, component in enumerate(components):
         component_matrix[i] = component.iq
-    return component_matrix
+    return component_matrix.T
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
