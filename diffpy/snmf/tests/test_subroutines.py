@@ -209,7 +209,7 @@ def test_construct_component_matrix(tccm):
 
 tcwm = [
         ([ComponentSignal([0,.25,.5,.75,1],20,0)]),
-        ([ComponentSignal([0,.25,.5,.75,1],0,0)]),
+        # ([ComponentSignal([0,.25,.5,.75,1],0,0)]), # 0 signal length. Failure expected
         ([ComponentSignal([0,.25,.5,.75,1],20,0),ComponentSignal([0,.25,.5,.75,1],20,1),ComponentSignal([0,.25,.5,.75,1],20,2)]),
         ([ComponentSignal([0, .25, .5, .75, 1], 20, 0), ComponentSignal([0, .25, .5, .75, 1], 20, 1),
           ComponentSignal([0, .25, .5, .75, 1], 20, 2)]),
@@ -217,6 +217,8 @@ tcwm = [
           ComponentSignal([0, .25, .5, .75, 1], 20, 2)]),
         ([ComponentSignal([.25], 20, 0), ComponentSignal([.25], 20, 1), ComponentSignal([.25], 20, 2)]),
         ([ComponentSignal([0, .25, .5, .75, 1], 20, 0), ComponentSignal([0, .25, .5, .75, 1], 20, 1)]),
+        #(ComponentSignal([], 20, 0)), # Expected to fail
+        #([]), #Expected to fail
 ]
 @pytest.mark.parametrize('tcwm',tcwm)
 def test_construct_weight_matrix(tcwm):

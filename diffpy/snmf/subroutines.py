@@ -128,7 +128,16 @@ def construct_weight_matrix(components):
     2d array like
       The 2d array containing the weightings for each component for each signal.
     """
-
+    number_of_components = len(components)
+    number_of_signals = len(components[0].weights)
+    if number_of_components == 0:
+        raise ValueError(f"Number of components = {number_of_components}. Number of components must be >= 1")
+    if number_of_signals == 0:
+        raise ValueError(f"Number of signals = {number_of_signals}. Number_of_signals must be >= 1.")
+    weights_matrix = np.zeros((number_of_components,number_of_signals))
+    for i, component in enumerate(components):
+        weights_matrix[i] = component.weights
+    return weights_matrix
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
     """Generates the initial guesses for the weight, stretching, and component matrices
