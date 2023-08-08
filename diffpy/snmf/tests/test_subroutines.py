@@ -206,3 +206,7 @@ def test_construct_component_matrix(tccm):
     actual = construct_component_matrix(tccm)
     for component in tccm:
         np.testing.assert_allclose(actual[component.id], component.iq)
+
+
+def test_construct_weight_matrix():
+    assert False

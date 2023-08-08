@@ -110,6 +110,24 @@ def construct_component_matrix(components):
         component_matrix[i] = component.iq
     return component_matrix
 
+def construct_weight_matrix(components):
+    """Constructs the weights matrix
+
+    Constructs a Ķ x M matrix where K is the number of components and M is the
+    number of signals. Each element is the stretching factor for a specific
+    weights for a specific signal from the data input.
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+      The tuple containing the component signals.
+
+    Returns
+    -------
+    2d array like
+      The 2d array containing the weightings for each component for each signal.
+    """
+
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
     """Generates the initial guesses for the weight, stretching, and component matrices
