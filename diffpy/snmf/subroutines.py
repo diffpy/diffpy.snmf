@@ -110,6 +110,7 @@ def construct_component_matrix(components):
         component_matrix[i] = component.iq
     return component_matrix
 
+
 def construct_weight_matrix(components):
     """Constructs the weights matrix
 
