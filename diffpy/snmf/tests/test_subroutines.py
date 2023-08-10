@@ -2,7 +2,8 @@ import pytest
 import numpy as np
 from diffpy.snmf.containers import ComponentSignal
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
-    update_weights_matrix, initialize_arrays, lift_data, initialize_components, construct_stretching_matrix, construct_component_matrix, construct_weight_matrix
+    update_weights_matrix, initialize_arrays, lift_data, initialize_components, construct_stretching_matrix, \
+    construct_component_matrix, construct_weight_matrix
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -207,6 +208,7 @@ def test_construct_component_matrix(tccm):
     for component in tccm:
         np.testing.assert_allclose(actual[component.id], component.iq)
 
+
 tcwm = [
         ([ComponentSignal([0,.25,.5,.75,1],20,0)]),
         # ([ComponentSignal([0,.25,.5,.75,1],0,0)]), # 0 signal length. Failure expected
@@ -225,3 +227,8 @@ def test_construct_weight_matrix(tcwm):
     actual = construct_weight_matrix(tcwm)
     for component in tcwm:
         np.testing.assert_allclose(actual[component.id], component.weights)
+
+tuw = []
+@pytest.mark.parametrize('tuw',tuw)
+def test_update_weights(tuw):
+    assert False

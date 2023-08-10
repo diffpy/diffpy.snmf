@@ -134,10 +134,34 @@ def construct_weight_matrix(components):
         raise ValueError(f"Number of components = {number_of_components}. Number of components must be >= 1")
     if number_of_signals == 0:
         raise ValueError(f"Number of signals = {number_of_signals}. Number_of_signals must be >= 1.")
-    weights_matrix = np.zeros((number_of_components,number_of_signals))
+    weights_matrix = np.zeros((number_of_components, number_of_signals))
     for i, component in enumerate(components):
         weights_matrix[i] = component.weights
     return weights_matrix
+
+
+def update_weights(components, data_input, method=None):
+    """Updates the weights matrix.
+
+    Updates the weights matrix and the weights vector for each ComponentSignal object.
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+      The tuple containing the component signals.
+    method: str
+      The string specifying which method should be used to find a new weight matrix: non-negative least squares or a
+      quadratic program.
+    data_input: 2d array
+      The 2d array containing the user-provided signals.
+
+    Returns
+    -------
+    2d array
+      The 2d array containing the weight factors for each component for each signal from `data_input`. Has dimensions
+      K x M where K is the number of components and M is the number of signals in `data_input.`
+    """
+
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
     """Generates the initial guesses for the weight, stretching, and component matrices
