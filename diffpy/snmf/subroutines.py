@@ -161,6 +161,22 @@ def update_weights(components, data_input, method=None):
       The 2d array containing the weight factors for each component for each signal from `data_input`. Has dimensions
       K x M where K is the number of components and M is the number of signals in `data_input.`
     """
+    data_input = np.asarray(data_input)
+    weight_matrix = construct_weight_matrix(components)
+    number_of_signals = len(components[0].weights)
+    number_of_components = len(components)
+    signal_length = len(components[0].grid)
+    for signal in range(number_of_signals):
+        stretched_components = np.zeros((signal_length, number_of_components))
+        for i, component in enumerate(components):
+            stretched_components[:, i] = component.apply_stretch(signal)[0]
+        if method == 'align':
+            weights = lsqnonneg(stretched_components, data_input[:,signal])
+        else:
+            weights = get_weights(stretched_components.T @ stretched_components,
+                                  -stretched_components.T @ data_input[:, signal], 0, 1)
+            weight_matrix[:, signal] = weights
+    return weight_matrix
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):

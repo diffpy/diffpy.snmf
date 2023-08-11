@@ -3,7 +3,7 @@ import numpy as np
 from diffpy.snmf.containers import ComponentSignal
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
     update_weights_matrix, initialize_arrays, lift_data, initialize_components, construct_stretching_matrix, \
-    construct_component_matrix, construct_weight_matrix
+    construct_component_matrix, construct_weight_matrix, update_weights
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -228,7 +228,23 @@ def test_construct_weight_matrix(tcwm):
     for component in tcwm:
         np.testing.assert_allclose(actual[component.id], component.weights)
 
-tuw = []
-@pytest.mark.parametrize('tuw',tuw)
+
+tuw = [([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [[1, 1], [1.2, 1.3], [1.3, 1.4], [1.4, 1.5], [2, 2.1]], None),
+       ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [[1, 1], [1.2, 1.3], [1.3, 1.4], [1.4, 1.5], [2, 2.1]], "align"),
+       ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]], None),
+       ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]], "align"),
+       ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [[-.5, 1], [1.2, -1.3], [1.1, -1], [0, -1.5], [0, .1]], None),
+       ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [[-.5, 1], [1.2, -1.3], [1.1, -1], [0, -1.5], [0, .1]], "align"),
+       ]
+@pytest.mark.parametrize('tuw', tuw)
 def test_update_weights(tuw):
-    assert False
+    for component in tuw[0]:
+        print(component.weights)
+    actual = update_weights(tuw[0], tuw[1], tuw[2])
+    assert np.shape(actual) == (len(tuw[0]), len(tuw[0][0].weights))
