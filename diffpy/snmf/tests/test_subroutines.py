@@ -241,10 +241,14 @@ tuw = [([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .
          ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [[-.5, 1], [1.2, -1.3], [1.1, -1], [0, -1.5], [0, .1]], None),
        ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
          ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [[-.5, 1], [1.2, -1.3], [1.1, -1], [0, -1.5], [0, .1]], "align"),
+       # ([ComponentSignal([0, .25, .5, .75, 1], 0, 0), ComponentSignal([0, .25, .5, .75, 1], 0, 1),
+         # ComponentSignal([0, .25, .5, .75, 1], 0, 2)], [[1, 1], [1.2, 1.3], [1.3, 1.4], [1.4, 1.5], [2, 2.1]], None),
+       # ([ComponentSignal([0, .25, .5, .75, 1], 0, 0), ComponentSignal([0, .25, .5, .75, 1], 0, 1),
+         # ComponentSignal([0, .25, .5, .75, 1], 0, 2)], [], None),
+       # ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         # ComponentSignal([0, .25, .5, .75, 1], 2, 2)], [], 170),
        ]
 @pytest.mark.parametrize('tuw', tuw)
 def test_update_weights(tuw):
-    for component in tuw[0]:
-        print(component.weights)
     actual = update_weights(tuw[0], tuw[1], tuw[2])
     assert np.shape(actual) == (len(tuw[0]), len(tuw[0][0].weights))
