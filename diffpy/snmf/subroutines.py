@@ -180,7 +180,10 @@ def update_weights(components, data_input, method=None):
 
 
 def reconstruct_signal(components, signal_idx):
-    """Reconstructs a specific signal from its weighted and stretched components
+    """Reconstructs a specific signal from its weighted and stretched components.
+
+    Calculates the linear combination of stretched components where each term is the stretched component multiplied
+    by its weight factor.
 
     Parameters
     ----------
