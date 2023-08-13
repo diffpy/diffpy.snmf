@@ -187,7 +187,7 @@ def reconstruct_signal(components, signal_idx):
     components: tuple of ComponentSignal objects
       The tuple containing the ComponentSignal objects
     signal_idx: int
-     The index of the specific signal to be reconstructed
+     The index of the specific signal in the input data to be reconstructed
 
     Returns
     -------
@@ -195,7 +195,13 @@ def reconstruct_signal(components, signal_idx):
       The reconstruction of a signal from calculated weights, stretching factors, and iq values.
 
     """
-    pass
+    signal_length = len(components[0].grid)
+    reconstruction = np.zeros(signal_length)
+    for component in components:
+        stretched = component.apply_stretch(signal_idx)[0]
+        stretched_and_weighted = component.apply_weight(signal_idx, stretched)
+        reconstruction += stretched_and_weighted
+    return reconstruction
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):

@@ -252,7 +252,17 @@ tuw = [([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .
 def test_update_weights(tuw):
     actual = update_weights(tuw[0], tuw[1], tuw[2])
     assert np.shape(actual) == (len(tuw[0]), len(tuw[0][0].weights))
-trs = []
+
+trs = [([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], 1),
+       ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], 0),
+       ([ComponentSignal([0, .25, .5, .75, 1], 3, 0), ComponentSignal([0, .25, .5, .75, 1], 3, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 3, 2)], 2),
+       # ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+        # ComponentSignal([0, .25, .5, .75, 1], 2, 2)], -1),
+]
 @pytest.mark.parametrize('trs',trs)
 def test_reconstruct_signal(trs):
-    assert False
+    actual = reconstruct_signal(trs[0], trs[1])
+    assert len(actual) == len(trs[0][0].grid)
