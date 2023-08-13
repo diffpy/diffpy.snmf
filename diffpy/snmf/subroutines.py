@@ -171,12 +171,31 @@ def update_weights(components, data_input, method=None):
         for i, component in enumerate(components):
             stretched_components[:, i] = component.apply_stretch(signal)[0]
         if method == 'align':
-            weights = lsqnonneg(stretched_components, data_input[:,signal])
+            weights = lsqnonneg(stretched_components, data_input[:, signal])
         else:
             weights = get_weights(stretched_components.T @ stretched_components,
                                   -stretched_components.T @ data_input[:, signal], 0, 1)
             weight_matrix[:, signal] = weights
     return weight_matrix
+
+
+def reconstruct_signal(components, signal_idx):
+    """Reconstructs a specific signal from its weighted and stretched components
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+      The tuple containing the ComponentSignal objects
+    signal_idx: int
+     The index of the specific signal to be reconstructed
+
+    Returns
+    -------
+    1d array like
+      The reconstruction of a signal from calculated weights, stretching factors, and iq values.
+
+    """
+    pass
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):

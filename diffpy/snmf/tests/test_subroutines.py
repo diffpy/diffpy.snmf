@@ -3,7 +3,7 @@ import numpy as np
 from diffpy.snmf.containers import ComponentSignal
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
     update_weights_matrix, initialize_arrays, lift_data, initialize_components, construct_stretching_matrix, \
-    construct_component_matrix, construct_weight_matrix, update_weights
+    construct_component_matrix, construct_weight_matrix, update_weights, reconstruct_signal
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -252,3 +252,7 @@ tuw = [([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .
 def test_update_weights(tuw):
     actual = update_weights(tuw[0], tuw[1], tuw[2])
     assert np.shape(actual) == (len(tuw[0]), len(tuw[0][0].weights))
+trs = []
+@pytest.mark.parametrize('trs',trs)
+def test_reconstruct_signal(trs):
+    assert False
