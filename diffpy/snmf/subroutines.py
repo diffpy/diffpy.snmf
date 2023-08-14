@@ -449,7 +449,7 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
     return residual_matrx
 
 
-def reconstruct_data(components, input_data):
+def reconstruct_data(components):
     """Reconstructs the `input_data` matrix
 
     Reconstructs the `input_data` matrix from calculated component signals, weights, and stretching factors.
@@ -458,8 +458,6 @@ def reconstruct_data(components, input_data):
     ----------
     components: tuple of ComponentSignal objects
       The tuple containing the component signals.
-    input_data: 2d array
-      The 2d array containing the user provided signals.
 
     Returns
     -------
@@ -467,4 +465,9 @@ def reconstruct_data(components, input_data):
       The 2d array containing the reconstruction of input_data.
 
     """
-    pass
+    signal_length = len(components[0].iq)
+    number_of_signal = len(components[0].weights)
+    data_reconstruction = np.zeros((signal_length, number_of_signal))
+    for signal in range(number_of_signal):
+        data_reconstruction[:, signal] = reconstruct_signal(components, signal)
+    return data_reconstruction

@@ -108,13 +108,22 @@ def test_get_residual_matrix(tgrm):
 
 
 trd = [
+    ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+     ComponentSignal([0, .25, .5, .75, 1], 2, 2)]),
+    ([ComponentSignal([0, .25, .5, .75, 1], 2, 0)]),
+    ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+     ComponentSignal([0, .25, .5, .75, 1], 2, 2), ComponentSignal([0, .25, .5, .75, 1], 2, 3),
+      ComponentSignal([0, .25, .5, .75, 1], 2, 4)]),
+    #([]) # Exception expected
 
 ]
 
 
 @pytest.mark.parametrize('trd', trd)
 def test_reconstruct_data(trd):
-    assert False
+    actual = reconstruct_data(trd)
+    assert actual.shape == (len(trd[0].iq),len(trd[0].weights))
+    print(actual)
 
 
 tld = [(([[[1, -1, 1], [0, 0, 0], [2, 10, -3]], 1]), ([[4, 2, 4], [3, 3, 3], [5, 13, 0]])),
