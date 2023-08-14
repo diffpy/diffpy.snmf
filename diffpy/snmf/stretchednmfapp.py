@@ -32,8 +32,8 @@ def main():
     args = create_parser()
     if args.input_directory is None:
         args.input_directory = Path.cwd()
-    grid, data_input = load_input_signals(args.input_directory)
-    lifted_data_input = lift_data(data_input, args.lift_factor)
-    variables = initialize_variables(lifted_data_input,args.number_of_components,args.data_type)
-    components = initialize_components(variables['number_of_components'],variables['number_of_signals'],grid)
+    grid, input_data = load_input_signals(args.input_directory)
+    lifted_input_data = lift_data(input_data, args.lift_factor)
+    variables = initialize_variables(lifted_input_data, args.number_of_components, args.data_type)
+    components = initialize_components(variables['number_of_components'], variables['number_of_signals'], grid)
     return components
