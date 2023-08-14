@@ -449,76 +449,22 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
     return residual_matrx
 
 
-def reconstruct_data(stretching_factor_matrix, component_matrix, weight_matrix, component_amount,
-                     moment_amount, signal_length):
-    """Reconstructs the experimental data from the component signals, stretching factors, and weights.
+def reconstruct_data(components, input_data):
+    """Reconstructs the `input_data` matrix
 
-    Calculates the stretched and weighted components at each moment.
+    Reconstructs the `input_data` matrix from calculated component signals, weights, and stretching factors.
 
     Parameters
     ----------
-    stretching_factor_matrix: 2d array like
-      The matrix containing the stretching factors of the component signals. Has dimensions K x M where K is the number
-      of components and M is the number of moments.
-
-    component_matrix: 2d array like
-      The matrix containing the unstretched component signals. Has dimensions N x K where N is the length of the signals
-      and K is the number of components.
-
-    weight_matrix: 2d array like
-      The matrix containing the weights of the stretched component signals at each moment in time. Has dimensions
-      K x M where K is the number of components and M is the number of moments.
-
-    component_amount: int
-      The number of component signals the user would like to obtain from the experimental data.
-
-    moment_amount: int
-      The number of patterns in the experimental data. Represents the number of moments in time in the data series.
-
-    signal_length: int
-      The length of the signals in the experimental data.
+    components: tuple of ComponentSignal objects
+      The tuple containing the component signals.
+    input_data: 2d array
+      The 2d array containing the user provided signals.
 
     Returns
     -------
-    tuple of 2d array of floats
-      The stretched and weighted component signals at each moment. Has dimensions N x (M * K) where N is the length of
-      the signals, M is the number of moments, and K is the number of components. The resulting matrix has M blocks
-      stacked horizontally where each block is the weighted and stretched components at each moment. Also contains
-      the gradient and hessian matrices of the reconstructed data.
+    2d array
+      The 2d array containing the reconstruction of input_data.
 
     """
-    stretching_factor_matrix = np.asarray(stretching_factor_matrix)
-    component_matrix = np.asarray(component_matrix)
-    weight_matrix = np.asarray(weight_matrix)
-    stretched_component_series = []
-    stretched_component_series_gra = []
-    stretched_component_series_hess = []
-    for moment in range(moment_amount):
-        for component in range(component_amount):
-            stretched_component = get_stretched_component(stretching_factor_matrix[component, moment],
-                                                          component_matrix[:, component], signal_length)
-            stretched_component_series.append(stretched_component[0])
-            stretched_component_series_gra.append(stretched_component[1])
-            stretched_component_series_hess.append(stretched_component[2])
-    stretched_component_series = np.column_stack(stretched_component_series)
-    stretched_component_series_gra = np.column_stack(stretched_component_series_gra)
-    stretched_component_series_hess = np.column_stack(stretched_component_series_hess)
-
-    reconstructed_data = []
-    reconstructed_data_gra = []
-    reconstructed_data_hess = []
-    moment = 0
-    for s_component in range(0, moment_amount * component_amount, component_amount):
-        block = stretched_component_series[:, s_component:s_component + component_amount]
-        block_gra = stretched_component_series_gra[:, s_component:s_component + component_amount]
-        block_hess = stretched_component_series_hess[:, s_component:s_component + component_amount]
-        for component in range(component_amount):
-            block[:, component] = block[:, component] * weight_matrix[component, moment]
-            block_gra[:, component] = block_gra[:, component] * weight_matrix[component, moment]
-            block_hess[:, component] = block_hess[:, component] * weight_matrix[component, moment]
-        reconstructed_data.append(block)
-        reconstructed_data_gra.append(block_gra)
-        reconstructed_data_hess.append(block_hess)
-        moment += 1
-    return np.column_stack(reconstructed_data), np.column_stack(reconstructed_data_gra), np.column_stack(
-        reconstructed_data_hess)
+    pass
