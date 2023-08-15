@@ -115,10 +115,7 @@ trd = [
      ComponentSignal([0, .25, .5, .75, 1], 2, 2), ComponentSignal([0, .25, .5, .75, 1], 2, 3),
       ComponentSignal([0, .25, .5, .75, 1], 2, 4)]),
     #([]) # Exception expected
-
 ]
-
-
 @pytest.mark.parametrize('trd', trd)
 def test_reconstruct_data(trd):
     actual = reconstruct_data(trd)

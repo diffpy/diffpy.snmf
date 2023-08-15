@@ -466,8 +466,8 @@ def reconstruct_data(components):
 
     """
     signal_length = len(components[0].iq)
-    number_of_signal = len(components[0].weights)
-    data_reconstruction = np.zeros((signal_length, number_of_signal))
-    for signal in range(number_of_signal):
+    number_of_signals = len(components[0].weights)
+    data_reconstruction = np.zeros((signal_length, number_of_signals))
+    for signal in range(number_of_signals):
         data_reconstruction[:, signal] = reconstruct_signal(components, signal)
     return data_reconstruction
