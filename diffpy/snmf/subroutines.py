@@ -205,6 +205,25 @@ def reconstruct_signal(components, signal_idx):
         stretched_and_weighted = component.apply_weight(signal_idx, stretched)
         reconstruction += stretched_and_weighted
     return reconstruction
+def reconstructed_signal_gra(components, signal_idx):
+    """Reconstruts a specific signal's gradient from its weighted and stretched components.
+
+    Calculates the linear combination of stretched components' gradients where each is the strethced component's
+    gradient multiplied by its weight factor.
+
+    Parameters
+    ----------
+    components: tuple of Componentsignal objects
+      The tuple containing the ComponentSignal objects
+    signal_idx: int
+      The index of the specified signal in the input data to be reconstructed
+
+    Returns
+    -------
+    1d array like
+      The reconstruction of a signal from calculated weights, stretching factors, and iq values.
+    """
+
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
