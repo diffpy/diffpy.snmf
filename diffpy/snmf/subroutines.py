@@ -224,7 +224,13 @@ def reconstruct_signal_hess(components, signal_idx):
     1d array like
       The reconstruction of a signal's hessian from calculated weights, stretching factors, and iq values
     """
-    return 0
+    signal_length = len(components[0].grid)
+    reconstruction = np.zeros(signal_length)
+    for component in components:
+        stretched = component.apply_stretch(signal_idx)[2]
+        stretched_and_weighted = component.apply_weight(signal_idx, stretched)
+        reconstruction += stretched_and_weighted
+    return reconstruction
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
     """Generates the initial guesses for the weight, stretching, and component matrices
 
