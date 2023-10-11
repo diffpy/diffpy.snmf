@@ -3,7 +3,7 @@ import numpy as np
 from diffpy.snmf.containers import ComponentSignal
 from diffpy.snmf.subroutines import objective_function, get_stretched_component, reconstruct_data, get_residual_matrix, \
     update_weights_matrix, initialize_arrays, lift_data, initialize_components, construct_stretching_matrix, \
-    construct_component_matrix, construct_weight_matrix, update_weights, reconstruct_signal
+    construct_component_matrix, construct_weight_matrix, update_weights, reconstruct_signal, reconstruct_signal_hess
 
 to = [
     ([[[1, 2], [3, 4]], [[5, 6], [7, 8]], 1e11, [[1, 2], [3, 4]], [[1, 2], [3, 4]], 1], 2.574e14),
@@ -251,3 +251,17 @@ trs = [([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .
 def test_reconstruct_signal(trs):
     actual = reconstruct_signal(trs[0], trs[1])
     assert len(actual) == len(trs[0][0].grid)
+
+trsh = [([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], 1),
+       ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 2, 2)], 0),
+       ([ComponentSignal([0, .25, .5, .75, 1], 3, 0), ComponentSignal([0, .25, .5, .75, 1], 3, 1),
+         ComponentSignal([0, .25, .5, .75, 1], 3, 2)], 2),
+       # ([ComponentSignal([0, .25, .5, .75, 1], 2, 0), ComponentSignal([0, .25, .5, .75, 1], 2, 1),
+        # ComponentSignal([0, .25, .5, .75, 1], 2, 2)], -1),
+]
+@pytest.mark.parametrize('trsh', trsh)
+def test_reconstruct_signal_hess(trsh):
+    actual = reconstruct_signal(trsh[0], trsh[1])
+    assert len(actual) == len(trsh[0][0].grid)

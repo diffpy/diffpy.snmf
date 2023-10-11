@@ -206,7 +206,31 @@ def reconstruct_signal(components, signal_idx):
         reconstruction += stretched_and_weighted
     return reconstruction
 
+def reconstruct_signal_hess(components, signal_idx):
+    """Reconstruct a specific signal's hessian (second derivative) from its weighted and stretched components.
 
+    Calculates the linear combination of stretched components' hessians where each term is a stretched component's
+    hessian mulitplied by its weight factor.
+
+    Parameters
+    ----------
+    components: tuple of ComponentSignal objects
+      The tuple containing the ComponentSignal objects
+    signal_idx: int
+      The index of the specific signal in the input data to be reconstructed.
+
+    Returns
+    -------
+    1d array like
+      The reconstruction of a signal's hessian from calculated weights, stretching factors, and iq values
+    """
+    signal_length = len(components[0].grid)
+    reconstruction = np.zeros(signal_length)
+    for component in components:
+        stretched = component.apply_stretch(signal_idx)[2]
+        stretched_and_weighted = component.apply_weight(signal_idx, stretched)
+        reconstruction += stretched_and_weighted
+    return reconstruction
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
     """Generates the initial guesses for the weight, stretching, and component matrices
 
