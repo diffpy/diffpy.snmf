@@ -3,6 +3,9 @@ import scipy.sparse
 from pathlib import Path
 from diffpy.utils.parsers.loaddata import loadData
 
+PDF_FILE_EXTENSIONS = {'.gr', '.cgr'}
+DIFFRACTION_FILE_EXTENSIONS = {'.chi', 'iq', 'xye', '.xrd', '.xy'}
+
 
 def initialize_variables(data_input, number_of_components, data_type, sparsity=1, smoothness=1e18):
     """Determines the variables and initial values used in the SNMF algorithm.
@@ -83,18 +86,18 @@ def load_input_signals(file_path=None):
 
     """
 
-    if file_path is None:
-        directory_path = Path.cwd()
-    else:
-        directory_path = Path(file_path)
+    directory_path = Path(file_path)
 
     values_list = []
     grid_list = []
     current_grid = []
+    file_extension = ""
+    data_type = ""
     for item in directory_path.iterdir():
         if item.is_file():
+            file_extension = Path(item).suffix
             data = loadData(item.resolve())
-            if current_grid and current_grid != data[:, 0]:
+            if len(current_grid) != 0 and (current_grid != data[:, 0]).any():
                 print(f"{item.name} was ignored as it is not on a compatible grid.")
                 continue
             else:
