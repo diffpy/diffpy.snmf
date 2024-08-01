@@ -42,11 +42,21 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
     signal_length = data_input.shape[0]
     number_of_signals = data_input.shape[1]
 
-    diagonals = [np.ones(number_of_signals - 2), -2 * np.ones(number_of_signals - 2), np.ones(number_of_signals - 2)]
-    smoothness_term = .25 * scipy.sparse.diags(diagonals, [0, 1, 2], shape=(number_of_signals - 2, number_of_signals))
+    diagonals = [
+        np.ones(number_of_signals - 2),
+        -2 * np.ones(number_of_signals - 2),
+        np.ones(number_of_signals - 2),
+    ]
+    smoothness_term = 0.25 * scipy.sparse.diags(
+        diagonals, [0, 1, 2], shape=(number_of_signals - 2, number_of_signals)
+    )
 
     hessian_helper_matrix = scipy.sparse.block_diag([smoothness_term.T @ smoothness_term] * number_of_components)
-    sequence = np.arange(number_of_signals * number_of_components).reshape(number_of_components, number_of_signals).T.flatten()
+    sequence = (
+        np.arange(number_of_signals * number_of_components)
+        .reshape(number_of_components, number_of_signals)
+        .T.flatten()
+    )
     hessian_helper_matrix = hessian_helper_matrix[sequence, :][:, sequence]
 
     return {
@@ -57,7 +67,7 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
         "smoothness": smoothness,
         "sparsity": sparsity,
         "smoothness_term": smoothness_term,
-        "hessian_helper_matrix": hessian_helper_matrix
+        "hessian_helper_matrix": hessian_helper_matrix,
     }
 
 
