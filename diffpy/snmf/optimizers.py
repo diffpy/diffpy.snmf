@@ -20,7 +20,7 @@ def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound
       Has length C.
 
     lower_bound: 1d array like
-      The lower bound on the values of the output weights. Has the same dimensions of the function output. Each 
+      The lower bound on the values of the output weights. Has the same dimensions of the function output. Each
       element in 'lower_bound' determines the minimum value the corresponding element in the function output may take.
 
     upper_bound: 1d array like
@@ -43,8 +43,9 @@ def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound
     solution_variable = cvxpy.Variable(problem_size)
 
     objective = cvxpy.Minimize(
-        linear_coefficient.T @ solution_variable + 0.5 * cvxpy.quad_form(solution_variable,
-                                                                         stretched_component_gram_matrix))
+        linear_coefficient.T @ solution_variable
+        + 0.5 * cvxpy.quad_form(solution_variable, stretched_component_gram_matrix)
+    )
     constraints = [lower_bound <= solution_variable, solution_variable <= upper_bound]
 
     cvxpy.Problem(objective, constraints).solve()

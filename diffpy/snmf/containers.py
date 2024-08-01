@@ -40,8 +40,9 @@ class ComponentSignal:
           stretching operation, and one vector is the second derivative of the stretching operation.
         """
         normalized_grid = np.arange(len(self.grid))
-        func = lambda stretching_factor: np.interp(normalized_grid / stretching_factor, normalized_grid, self.iq,
-                                                   left=0, right=0)
+        func = lambda stretching_factor: np.interp(
+            normalized_grid / stretching_factor, normalized_grid, self.iq, left=0, right=0
+        )
         derivative_func = numdifftools.Derivative(func)
         second_derivative_func = numdifftools.Derivative(derivative_func)
 
@@ -49,8 +50,11 @@ class ComponentSignal:
         stretched_component_gra = derivative_func(self.stretching_factors[m])
         stretched_component_hess = second_derivative_func(self.stretching_factors[m])
 
-        return np.asarray(stretched_component), np.asarray(stretched_component_gra), np.asarray(
-            stretched_component_hess)
+        return (
+            np.asarray(stretched_component),
+            np.asarray(stretched_component_gra),
+            np.asarray(stretched_component_hess),
+        )
 
     def apply_weight(self, m, stretched_component=None):
         """Applies as weight factor to a component signal.

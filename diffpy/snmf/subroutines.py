@@ -170,11 +170,15 @@ def update_weights(components, data_input, method=None):
         stretched_components = np.zeros((signal_length, number_of_components))
         for i, component in enumerate(components):
             stretched_components[:, i] = component.apply_stretch(signal)[0]
-        if method == 'align':
+        if method == "align":
             weights = lsqnonneg(stretched_components, data_input[:, signal])
         else:
-            weights = get_weights(stretched_components.T @ stretched_components,
-                                  -stretched_components.T @ data_input[:, signal], 0, 1)
+            weights = get_weights(
+                stretched_components.T @ stretched_components,
+                -stretched_components.T @ data_input[:, signal],
+                0,
+                1,
+            )
             weight_matrix[:, signal] = weights
     return weight_matrix
 
@@ -236,13 +240,16 @@ def initialize_arrays(number_of_components, number_of_moments, signal_length):
     """
     component_matrix_guess = np.random.rand(signal_length, number_of_components)
     weight_matrix_guess = np.random.rand(number_of_components, number_of_moments)
-    stretching_matrix_guess = np.ones(number_of_components, number_of_moments) + np.random.randn(number_of_components,
-                                                                                                 number_of_moments) * 1e-3
+    stretching_matrix_guess = (
+        np.ones(number_of_components, number_of_moments)
+        + np.random.randn(number_of_components, number_of_moments) * 1e-3
+    )
     return component_matrix_guess, weight_matrix_guess, stretching_matrix_guess
 
 
-def objective_function(residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix,
-                       sparsity):
+def objective_function(
+    residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix, sparsity
+):
     """Defines the objective function of the algorithm and returns its value.
 
     Calculates the value of '(||residual_matrix||_F) ** 2 + smoothness * (||smoothness_term *
@@ -284,8 +291,11 @@ def objective_function(residual_matrix, stretching_factor_matrix, smoothness, sm
     residual_matrix = np.asarray(residual_matrix)
     stretching_factor_matrix = np.asarray(stretching_factor_matrix)
     component_matrix = np.asarray(component_matrix)
-    return .5 * np.linalg.norm(residual_matrix, 'fro') ** 2 + .5 * smoothness * np.linalg.norm(
-        smoothness_term @ stretching_factor_matrix.T, 'fro') ** 2 + sparsity * np.sum(np.sqrt(component_matrix))
+    return (
+        0.5 * np.linalg.norm(residual_matrix, "fro") ** 2
+        + 0.5 * smoothness * np.linalg.norm(smoothness_term @ stretching_factor_matrix.T, "fro") ** 2
+        + sparsity * np.sum(np.sqrt(component_matrix))
+    )
 
 
 def get_stretched_component(stretching_factor, component, signal_length):
@@ -325,11 +335,23 @@ def get_stretched_component(stretching_factor, component, signal_length):
     stretched_component_gra = derivative_func(stretching_factor)
     stretched_component_hess = second_derivative_func(stretching_factor)
 
-    return np.asarray(stretched_component), np.asarray(stretched_component_gra), np.asarray(stretched_component_hess)
+    return (
+        np.asarray(stretched_component),
+        np.asarray(stretched_component_gra),
+        np.asarray(stretched_component_hess),
+    )
 
 
-def update_weights_matrix(component_amount, signal_length, stretching_factor_matrix, component_matrix, data_input,
-                          moment_amount, weights_matrix, method):
+def update_weights_matrix(
+    component_amount,
+    signal_length,
+    stretching_factor_matrix,
+    component_matrix,
+    data_input,
+    moment_amount,
+    weights_matrix,
+    method,
+):
     """Update the weight factors matrix.
 
     Parameters
@@ -376,21 +398,25 @@ def update_weights_matrix(component_amount, signal_length, stretching_factor_mat
     for i in range(moment_amount):
         stretched_components = np.zeros((signal_length, component_amount))
         for n in range(component_amount):
-            stretched_components[:, n] = get_stretched_component(stretching_factor_matrix[n, i], component_matrix[:, n],
-                                                                 signal_length)[0]
-        if method == 'align':
+            stretched_components[:, n] = get_stretched_component(
+                stretching_factor_matrix[n, i], component_matrix[:, n], signal_length
+            )[0]
+        if method == "align":
             weight = lsqnonneg(stretched_components[0:signal_length, :], data_input[0:signal_length, i])
         else:
             weight = get_weights(
                 stretched_components[0:signal_length, :].T @ stretched_components[0:signal_length, :],
                 -1 * stretched_components[0:signal_length, :].T @ data_input[0:signal_length, i],
-                0, 1)
+                0,
+                1,
+            )
         weights_matrix[:, i] = weight
     return weights_matrix
 
 
-def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, data_input, moment_amount,
-                        component_amount, signal_length):
+def get_residual_matrix(
+    component_matrix, weights_matrix, stretching_matrix, data_input, moment_amount, component_amount, signal_length
+):
     """Obtains the residual matrix between the experimental data and calculated data
 
     Calculates the difference between the experimental data and the reconstructed experimental data created from the
@@ -442,9 +468,11 @@ def get_residual_matrix(component_matrix, weights_matrix, stretching_matrix, dat
     for m in range(moment_amount):
         residual = residual_matrx[:, m]
         for k in range(component_amount):
-            residual = residual + weights_matrix[k, m] * get_stretched_component(stretching_matrix[k, m],
-                                                                                 component_matrix[:, k], signal_length)[
-                0]
+            residual = (
+                residual
+                + weights_matrix[k, m]
+                * get_stretched_component(stretching_matrix[k, m], component_matrix[:, k], signal_length)[0]
+            )
         residual_matrx[:, m] = residual
     return residual_matrx
 
