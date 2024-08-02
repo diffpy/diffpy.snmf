@@ -1,12 +1,13 @@
-import numpy as np
-from diffpy.snmf.optimizers import get_weights
-from diffpy.snmf.factorizers import lsqnonneg
-from diffpy.snmf.containers import ComponentSignal
 import numdifftools
+import numpy as np
+
+from diffpy.snmf.containers import ComponentSignal
+from diffpy.snmf.factorizers import lsqnonneg
+from diffpy.snmf.optimizers import get_weights
 
 
 def initialize_components(number_of_components, number_of_signals, grid_vector):
-    """Initializes ComponentSignals for each of the components in the decomposition
+    """Initializes ComponentSignals for each of the components in the decomposition.
 
     Parameters
     ----------
@@ -31,15 +32,15 @@ def initialize_components(number_of_components, number_of_signals, grid_vector):
 
 
 def lift_data(data_input, lift=1):
-    """Lifts values of data_input
+    """Lifts values of data_input.
 
     Adds 'lift' * the minimum value in data_input to data_input element-wise.
 
     Parameters
     ----------
     data_input: 2d array like
-      The matrix containing a series of signals to be decomposed. Has dimensions N x M where N is the length of each
-      signal and M is the number of signals.
+      The matrix containing a series of signals to be decomposed. Has dimensions N x M where N is the length
+      of each signal and M is the number of signals.
 
     lift: float
       The factor representing how much to lift 'data_input'.
@@ -48,14 +49,13 @@ def lift_data(data_input, lift=1):
     -------
     2d array like
       The matrix that contains data_input - (min(data_input) * lift).
-
     """
     data_input = np.asarray(data_input)
     return data_input + np.abs(np.min(data_input) * lift)
 
 
 def construct_stretching_matrix(components, number_of_components, number_of_signals):
-    """Constructs the stretching factor matrix
+    """Constructs the stretching factor matrix.
 
     Parameters
     ----------
@@ -67,9 +67,8 @@ def construct_stretching_matrix(components, number_of_components, number_of_sign
     Returns
     -------
     2d array
-      The matrix containing the stretching factors for the component signals for each of the signals in the raw data.
-      Has dimensions `component_signal` x `number_of_signals`
-
+      The matrix containing the stretching factors for the component signals for each of the signals in the
+      raw data. Has dimensions `component_signal` x `number_of_signals`
     """
     if (len(components)) == 0:
         raise ValueError(f"Number of components = {number_of_components}. Number_of_components must be >= 1.")
@@ -85,7 +84,7 @@ def construct_stretching_matrix(components, number_of_components, number_of_sign
 
 
 def construct_component_matrix(components):
-    """Constructs the component matrix
+    """Constructs the component matrix.
 
     Parameters
     ----------
@@ -96,7 +95,6 @@ def construct_component_matrix(components):
     -------
     2d array
       The matrix containing the component signal values. Has dimensions `signal_length` x `number_of_components`.
-
     """
     signal_length = len(components[0].iq)
     number_of_components = len(components)
@@ -112,7 +110,7 @@ def construct_component_matrix(components):
 
 
 def construct_weight_matrix(components):
-    """Constructs the weights matrix
+    """Constructs the weights matrix.
 
     Constructs a Ķ x M matrix where K is the number of components and M is the
     number of signals. Each element is the stretching factor for a specific
@@ -150,16 +148,16 @@ def update_weights(components, data_input, method=None):
     components: tuple of ComponentSignal objects
       The tuple containing the component signals.
     method: str
-      The string specifying which method should be used to find a new weight matrix: non-negative least squares or a
-      quadratic program.
+      The string specifying which method should be used to find a new weight matrix: non-negative least squares
+      or a quadratic program.
     data_input: 2d array
       The 2d array containing the user-provided signals.
 
     Returns
     -------
     2d array
-      The 2d array containing the weight factors for each component for each signal from `data_input`. Has dimensions
-      K x M where K is the number of components and M is the number of signals in `data_input.`
+      The 2d array containing the weight factors for each component for each signal from `data_input`.
+      Has dimensions K x M where K is the number of components and M is the number of signals in `data_input.`
     """
     data_input = np.asarray(data_input)
     weight_matrix = construct_weight_matrix(components)
@@ -200,7 +198,6 @@ def reconstruct_signal(components, signal_idx):
     -------
     1d array like
       The reconstruction of a signal from calculated weights, stretching factors, and iq values.
-
     """
     signal_length = len(components[0].grid)
     reconstruction = np.zeros(signal_length)
@@ -212,13 +209,14 @@ def reconstruct_signal(components, signal_idx):
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
-    """Generates the initial guesses for the weight, stretching, and component matrices
+    """Generates the initial guesses for the weight, stretching, and component matrices.
 
-    Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The initial
-    guess for the component matrix is a random (signal_length) x (number_of_components) matrix where each element is
-    between 0 and 1. The initial stretching factor matrix is a random (number_of_components) x (number_of_moments)
-    matrix where each element is number slightly perturbed from 1. The initial weight matrix guess is a random
-    (number_of_components) x (number_of_moments) matrix where each element is between 0 and 1.
+    Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The
+    initial guess for the component matrix is a random (signal_length) x (number_of_components) matrix where
+    each element is between 0 and 1. The initial stretching factor matrix is a random
+    (number_of_components) x (number_of_moments) matrix where each element is number slightly perturbed from 1.
+    The initial weight matrix guess is a random (number_of_components) x (number_of_moments) matrix where
+    each element is between 0 and 1.
 
     Parameters
     ----------
@@ -236,7 +234,6 @@ def initialize_arrays(number_of_components, number_of_moments, signal_length):
     tuple of 2d arrays of floats
       The tuple containing three elements: the initial component matrix guess, the initial stretching factor matrix
       guess, and the initial weight factor matrix guess in that order.
-
     """
     component_matrix_guess = np.random.rand(signal_length, number_of_components)
     weight_matrix_guess = np.random.rand(number_of_components, number_of_moments)
@@ -258,25 +255,26 @@ def objective_function(
     Parameters
     ----------
     residual_matrix: 2d array like
-      The matrix where each column is the difference between an experimental PDF/XRD pattern and a calculated PDF/XRD
-      pattern at each grid point. Has dimensions R x M where R is the length of each pattern and M is the amount of
-      patterns.
+      The matrix where each column is the difference between an experimental PDF/XRD pattern and a calculated
+      PDF/XRD pattern at each grid point. Has dimensions R x M where R is the length of each pattern and M is
+      the amount of patterns.
 
     stretching_factor_matrix: 2d array like
-      The matrix containing the stretching factors of the calculated component signal. Has dimensions K x M where K is
-      the amount of components and M is the number of experimental PDF/XRD patterns.
+      The matrix containing the stretching factors of the calculated component signal. Has dimensions K x M where
+      K is the amount of components and M is the number of experimental PDF/XRD patterns.
 
     smoothness: float
-      The coefficient of the smoothness term which determines the intensity of the smoothness term and its behavior.
-      It is not very sensitive and is usually adjusted by multiplying it by ten.
+      The coefficient of the smoothness term which determines the intensity of the smoothness term and its
+      behavior. It is not very sensitive and is usually adjusted by multiplying it by ten.
 
     smoothness_term: 2d array like
       The regularization term that ensures that smooth changes in the component stretching signals are favored.
-      Has dimensions (M-2) x M where M is the amount of experimentally obtained PDF/XRD patterns, the moment amount.
+      Has dimensions (M-2) x M where M is the amount of experimentally obtained PDF/XRD patterns, the moment
+      amount.
 
     component_matrix: 2d array like
-      The matrix containing the calculated component signals of the experimental PDF/XRD patterns. Has dimensions R x K
-      where R is the signal length and K is the number of component signals.
+      The matrix containing the calculated component signals of the experimental PDF/XRD patterns. Has dimensions
+      R x K where R is the signal length and K is the number of component signals.
 
     sparsity: float
       The parameter determining the intensity of the sparsity regularization term which enables the algorithm to
@@ -286,7 +284,6 @@ def objective_function(
     -------
     float
       The value of the objective function.
-
     """
     residual_matrix = np.asarray(residual_matrix)
     stretching_factor_matrix = np.asarray(stretching_factor_matrix)
@@ -301,10 +298,10 @@ def objective_function(
 def get_stretched_component(stretching_factor, component, signal_length):
     """Applies a stretching factor to a component signal.
 
-    Computes a stretched signal and reinterpolates it onto the original grid of points. Uses a normalized grid of evenly
-    spaced integers counting from 0 to signal_length (exclusive) to approximate values in between grid nodes. Once this
-    grid is stretched, values at grid nodes past the unstretched signal's domain are set to zero. Returns the
-    approximate values of x(r/a) from x(r) where x is a component signal.
+    Computes a stretched signal and reinterpolates it onto the original grid of points. Uses a normalized grid
+    of evenly spaced integers counting from 0 to signal_length (exclusive) to approximate values in between grid
+    nodes. Once this grid is stretched, values at grid nodes past the unstretched signal's domain are set to zero.
+    Returns the approximate values of x(r/a) from x(r) where x is a component signal.
 
     Parameters
     ----------
@@ -320,7 +317,6 @@ def get_stretched_component(stretching_factor, component, signal_length):
     tuple of 1d array of floats
       The calculated component signal with stretching factors applied. Has length N, the length of the unstretched
       component signal. Also returns the gradient and hessian of the stretching transformation.
-
     """
     component = np.asarray(component)
     normalized_grid = np.arange(signal_length)
@@ -363,23 +359,23 @@ def update_weights_matrix(
       The length of the experimental signal patterns
 
     stretching_factor_matrix: 2d array like
-      The matrx containing the stretching factors of the calculated component signals. Has dimensions K x M where K is
-      the number of component signals and M is the number of XRD/PDF patterns.
+      The matrx containing the stretching factors of the calculated component signals. Has dimensions K x M
+      where K is the number of component signals and M is the number of XRD/PDF patterns.
 
-    component_matrix: 2d array like
-      The matrix containing the unstretched calculated component signals. Has dimensions N x K where N is the length of
-      the signals and K is the number of component signals.
+    component_matrix: 2d array lik
+      The matrix containing the unstretched calculated component signals. Has dimensions N x K where N is the
+      length of the signals and K is the number of component signals.
 
     data_input: 2d array like
-      The experimental series of PDF/XRD patterns. Has dimensions N x M where N is the length of the PDF/XRD signals and
-      M is the number of PDF/XRD patterns.
+      The experimental series of PDF/XRD patterns. Has dimensions N x M where N is the length of the PDF/XRD
+      signals and M is the number of PDF/XRD patterns.
 
     moment_amount: int
       The number of PDF/XRD patterns from the experimental data.
 
     weights_matrix: 2d array like
-      The matrix containing the weights of the stretched component signals. Has dimensions K x M where K is the number
-      of component signals and M is the number of XRD/PDF patterns.
+      The matrix containing the weights of the stretched component signals. Has dimensions K x M where K is
+      the number of component signals and M is the number of XRD/PDF patterns.
 
     method: str
       The string specifying the method for obtaining individual weights.
@@ -388,7 +384,6 @@ def update_weights_matrix(
     -------
     2d array like
       The matrix containing the new weight factors of the stretched component signals.
-
     """
     stretching_factor_matrix = np.asarray(stretching_factor_matrix)
     component_matrix = np.asarray(component_matrix)
@@ -417,29 +412,29 @@ def update_weights_matrix(
 def get_residual_matrix(
     component_matrix, weights_matrix, stretching_matrix, data_input, moment_amount, component_amount, signal_length
 ):
-    """Obtains the residual matrix between the experimental data and calculated data
+    """Obtains the residual matrix between the experimental data and calculated data.
 
-    Calculates the difference between the experimental data and the reconstructed experimental data created from the
-    calculated components, weights, and stretching factors. For each experimental pattern, the stretched and weighted
-    components making up that pattern are subtracted.
+    Calculates the difference between the experimental data and the reconstructed experimental data created from
+    the calculated components, weights, and stretching factors. For each experimental pattern, the stretched and
+    weighted components making up that pattern are subtracted.
 
     Parameters
     ----------
     component_matrix: 2d array like
-      The matrix containing the calculated component signals. Has dimensions N x K where N is the length of the signal
-      and K is the number of calculated component signals.
+      The matrix containing the calculated component signals. Has dimensions N x K where N is the length of the
+      signal and K is the number of calculated component signals.
 
     weights_matrix: 2d array like
-      The matrix containing the calculated weights of the stretched component signals. Has dimensions K x M where K is
-      the number of components and M is the number of moments or experimental PDF/XRD patterns.
+      The matrix containing the calculated weights of the stretched component signals. Has dimensions K x M where
+      K is the number of components and M is the number of moments or experimental PDF/XRD patterns.
 
     stretching_matrix: 2d array like
-      The matrix containing the calculated stretching factors of the calculated component signals. Has dimensions K x M
-      where K is the number of components and M is the number of moments or experimental PDF/XRD patterns.
+      The matrix containing the calculated stretching factors of the calculated component signals. Has dimensions
+      K x M where K is the number of components and M is the number of moments or experimental PDF/XRD patterns.
 
     data_input: 2d array like
-      The matrix containing the experimental PDF/XRD data. Has dimensions N x M where N is the length of the signals and
-      M is the number of signal patterns.
+      The matrix containing the experimental PDF/XRD data. Has dimensions N x M where N is the length of the
+      signals and M is the number of signal patterns.
 
     moment_amount: int
       The number of patterns in the experimental data. Represents the number of moments in time in the data series
@@ -454,11 +449,10 @@ def get_residual_matrix(
     Returns
     -------
     2d array like
-      The matrix containing the residual between the experimental data and reconstructed data from calculated values.
-      Has dimensions N x M where N is the signal length and M is the number of moments. Each column contains the
-      difference between an experimental signal and a reconstruction of that signal from the calculated weights,
-      components, and stretching factors.
-
+      The matrix containing the residual between the experimental data and reconstructed data from calculated
+      values. Has dimensions N x M where N is the signal length and M is the number of moments. Each column
+      contains the difference between an experimental signal and a reconstruction of that signal from the
+      calculated weights, components, and stretching factors.
     """
     component_matrix = np.asarray(component_matrix)
     weights_matrix = np.asarray(weights_matrix)
@@ -478,7 +472,7 @@ def get_residual_matrix(
 
 
 def reconstruct_data(components):
-    """Reconstructs the `input_data` matrix
+    """Reconstructs the `input_data` matrix.
 
     Reconstructs the `input_data` matrix from calculated component signals, weights, and stretching factors.
 
@@ -491,7 +485,6 @@ def reconstruct_data(components):
     -------
     2d array
       The 2d array containing the reconstruction of input_data.
-
     """
     signal_length = len(components[0].iq)
     number_of_signals = len(components[0].weights)
