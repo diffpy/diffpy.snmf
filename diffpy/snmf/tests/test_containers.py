@@ -1,5 +1,6 @@
-import pytest
 import numpy as np
+import pytest
+
 from diffpy.snmf.containers import ComponentSignal
 
 tas = [

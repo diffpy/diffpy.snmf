@@ -1,6 +1,8 @@
+from pathlib import Path
+
 import numpy as np
 import scipy.sparse
-from pathlib import Path
+
 from diffpy.utils.parsers.loaddata import loadData
 
 
@@ -10,8 +12,8 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
     Parameters
     ----------
     data_input: 2d array like
-      The observed or simulated PDF or XRD data provided by the user. Has dimensions R x N where R is the signal length
-      and N is the number of PDF/XRD signals.
+      The observed or simulated PDF or XRD data provided by the user. Has dimensions R x N where R is the signa
+      length and N is the number of PDF/XRD signals.
 
     number_of_components: int
       The number of component signals the user would like to decompose 'data_input' into.
@@ -20,23 +22,23 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
       The type of data the user has passed into the program. Can assume the value of 'PDF' or 'XRD.'
 
     sparsity: float, optional
-      The regularization parameter that behaves as the coefficient of a "sparseness" regularization term that enhances
-      the ability to decompose signals in the case of sparse data e.g. X-ray Diffraction data. A non-zero value
-      indicates sparsity in the data; greater magnitudes indicate greater amounts of sparsity.
+      The regularization parameter that behaves as the coefficient of a "sparseness" regularization term that
+      enhances the ability to decompose signals in the case of sparse data e.g. X-ray Diffraction data.
+      A non-zero value indicates sparsity in the data; greater magnitudes indicate greater amounts of sparsity.
 
     smoothness: float, optional
-      The regularization parameter that behaves as the coefficient of a "smoothness" term that ensures that component
-      signal weightings change smoothly with time. Assumes a default value of 1e18.
+      The regularization parameter that behaves as the coefficient of a "smoothness" term that ensures that
+      component signal weightings change smoothly with time. Assumes a default value of 1e18.
 
     Returns
     -------
     dictionary
-      The collection of the names and values of the constants used in the algorithm. Contains the number of observed PDF
-      /XRD patterns, the length of each pattern, the type of the data, the number of components the user would like to
-      decompose the data into, an initial guess for the component matrix, and initial guess for the weight factor matrix
-      ,an initial guess for the stretching factor matrix, a parameter controlling smoothness of the solution, a
-      parameter controlling sparseness of the solution, the matrix representing the smoothness term, and a matrix used
-      to construct a hessian matrix.
+      The collection of the names and values of the constants used in the algorithm. Contains the number of
+      observed PDF/XRD patterns, the length of each pattern, the type of the data, the number of components
+      the user would like to decompose the data into, an initial guess for the component matrix, and initial
+      guess for the weight factor matrix, an initial guess for the stretching factor matrix, a parameter
+      controlling smoothness of the solution, a parameter controlling sparseness of the solution, the matrix
+      representing the smoothness term, and a matrix used to construct a hessian matrix.
 
     """
     signal_length = data_input.shape[0]
@@ -74,22 +76,22 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
 def load_input_signals(file_path=None):
     """Processes a directory of a series of PDF/XRD patterns into a usable format.
 
-    Constructs a 2d array out of a directory of PDF/XRD patterns containing each files dependent variable column in a
-    new column. Constructs a 1d array containing the grid values.
+    Constructs a 2d array out of a directory of PDF/XRD patterns containing each files dependent variable
+    column in a new column. Constructs a 1d array containing the grid values.
 
     Parameters
     ----------
     file_path: str or Path object, optional
-      The path to the directory containing the input XRD/PDF data. If no path is specified, defaults to the current
-      working directory. Accepts a string or a pathlib.Path object. Input data not on the same grid as the first file
-      read will be ignored.
+      The path to the directory containing the input XRD/PDF data. If no path is specified, defaults to the
+      current working directory. Accepts a string or a pathlib.Path object. Input data not on the same grid
+      as the first file read will be ignored.
 
     Returns
     -------
     tuple
-      The tuple whose first element is an R x M 2d array made of PDF/XRD patterns as each column; R is the length of the
-      signal and M is the number of patterns. The tuple contains a 1d array containing the values of the grid points as
-      its second element; Has length R.
+      The tuple whose first element is an R x M 2d array made of PDF/XRD patterns as each column; R is the
+      length of the signal and M is the number of patterns. The tuple contains a 1d array containing the values
+      of the grid points as its second element; Has length R.
 
     """
 

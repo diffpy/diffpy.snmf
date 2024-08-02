@@ -1,4 +1,5 @@
 import pytest
+
 from diffpy.snmf.optimizers import get_weights
 
 tm = [

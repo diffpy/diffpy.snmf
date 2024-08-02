@@ -1,9 +1,8 @@
-import numpy as np
 import argparse
 from pathlib import Path
-from diffpy.snmf.subroutines import lift_data, initialize_components
-from diffpy.snmf.containers import ComponentSignal
-from diffpy.snmf.io import load_input_signals, initialize_variables
+
+from diffpy.snmf.io import initialize_variables, load_input_signals
+from diffpy.snmf.subroutines import initialize_components, lift_data
 
 ALLOWED_DATA_TYPES = ["powder_diffraction", "pd", "pair_distribution_function", "pdf"]
 
@@ -38,7 +37,7 @@ def create_parser():
         "--lift-factor",
         type=float,
         default=1,
-        help="The lifting factor. Data will be lifted by lifted_data = data + abs(min(data) * lift). Default is 1.",
+        help="The lifting factor. Data will be lifted by lifted_data = data + abs(min(data) * lift). Default 1.",
     )
     parser.add_argument(
         "number-of-components",

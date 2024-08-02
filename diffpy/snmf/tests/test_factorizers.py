@@ -1,6 +1,6 @@
 import numpy as np
-import scipy
 import pytest
+
 from diffpy.snmf.factorizers import lsqnonneg
 
 tl = [

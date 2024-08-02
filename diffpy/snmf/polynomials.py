@@ -3,7 +3,8 @@ import numpy as np
 
 def rooth(linear_coefficient, constant_term):
     """
-    Returns the largest real root of x^3+(linear_coefficient) * x + constant_term. If there are no real roots return 0.
+    Returns the largest real root of x^3+(linear_coefficient) * x + constant_term. If there are no real roots
+    return 0.
 
     Parameters
     ----------
@@ -15,7 +16,8 @@ def rooth(linear_coefficient, constant_term):
     Returns
     -------
     ndarray of floats
-        The largest real root of x^3+(linear_coefficient) * x + constant_term if roots are real, else return 0 array
+        The largest real root of x^3+(linear_coefficient) * x + constant_term if roots are real, else
+        return 0 array
 
 
     """

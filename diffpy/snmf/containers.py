@@ -1,5 +1,5 @@
-import numpy as np
 import numdifftools
+import numpy as np
 
 
 class ComponentSignal:
@@ -8,7 +8,7 @@ class ComponentSignal:
     ----------
     grid: 1d array of floats
       The vector containing the grid points of the component.
-    iq: 1d array of floats
+
       The intensity/g(r) values of the component.
     weights: 1d array of floats
       The vector containing the weight of the component signal for each signal.
@@ -36,13 +36,18 @@ class ComponentSignal:
         Returns
         -------
         tuple of 1d arrays
-          The tuple of vectors where one vector is the stretched component, one vector is the 1st derivative of the
-          stretching operation, and one vector is the second derivative of the stretching operation.
+          The tuple of vectors where one vector is the stretched component, one vector is the 1st derivative
+          of the stretching operation, and one vector is the second derivative of the stretching operation.
         """
         normalized_grid = np.arange(len(self.grid))
-        func = lambda stretching_factor: np.interp(
-            normalized_grid / stretching_factor, normalized_grid, self.iq, left=0, right=0
-        )
+        # func = lambda stretching_factor: np.interp(
+        #     normalized_grid / stretching_factor, normalized_grid, self.iq, left=0, right=0
+        # )
+
+        # E731 do not assign a lambda expression, use a def
+        def func(stretching_factor):
+            return np.interp(normalized_grid / stretching_factor, normalized_grid, self.iq, left=0, right=0)
+
         derivative_func = numdifftools.Derivative(func)
         second_derivative_func = numdifftools.Derivative(derivative_func)
 
