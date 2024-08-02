@@ -36,7 +36,7 @@ class ComponentSignal:
         Returns
         -------
         NDArray[float64]
-            The interpolated values over the stretched grid.
+          Interpolated values of the self.iq values over the grid that has been adjusted by the stretching_factor
         """
 
         normalized_grid = np.arange(len(self.grid))
