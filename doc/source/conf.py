@@ -6,12 +6,13 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import os
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import sys
-import os
 
 sys.path.insert(0, os.path.abspath("../.."))
 
@@ -48,7 +49,7 @@ napoleon_use_ivar = False
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
 
 source_suffix = ".rst"
 
