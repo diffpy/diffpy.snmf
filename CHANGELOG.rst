@@ -1,5 +1,5 @@
-===========
- Change Log
-===========
+=============
+Release Notes
+=============
 
 .. current developments

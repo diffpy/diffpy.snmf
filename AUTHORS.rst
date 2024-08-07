@@ -1,9 +1,10 @@
 Authors
-====================
+=======
 
-Ran Gu, Adeolu Ajayi, Qiang Du,  Simon J.L. Billinge
+Billinge Group and community contibutors.
 
 Contributors
 ------------
-For a full list of contributors, visit
+
+For a list of contributors, visit
 https://github.com/diffpy/diffpy.snmf/graphs/contributors
