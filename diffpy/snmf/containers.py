@@ -8,7 +8,7 @@ class ComponentSignal:
     ----------
     grid: 1d array of floats
       The vector containing the grid points of the component.
-
+    iq: 1d array of floats
       The intensity/g(r) values of the component.
     weights: 1d array of floats
       The vector containing the weight of the component signal for each signal.
@@ -25,23 +25,6 @@ class ComponentSignal:
         self.stretching_factors = np.ones(number_of_signals) + np.random.randn(number_of_signals) * perturbation
         self.id = int(id_number)
 
-    def _interpolate_stretching_factor(self, stretching_factor):
-        """Interpolates the intensity values over a normalized grid scaled by a given stretching factor.
-
-        Parameters
-        ----------
-        stretching_factor : float
-            The factor by which to stretch the grid.
-
-        Returns
-        -------
-        NDArray[float64]
-          Interpolated values of the self.iq values over the grid that has been adjusted by the stretching_factor
-        """
-
-        normalized_grid = np.arange(len(self.grid))
-        return np.interp(normalized_grid / stretching_factor, normalized_grid, self.iq, left=0, right=0)
-
     def apply_stretch(self, m):
         """Applies a stretching factor to a component
 
@@ -53,14 +36,17 @@ class ComponentSignal:
         Returns
         -------
         tuple of 1d arrays
-          The tuple of vectors where one vector is the stretched component, one vector is the 1st derivative
-          of the stretching operation, and one vector is the second derivative of the stretching operation.
+          The tuple of vectors where one vector is the stretched component, one vector is the 1st derivative of the
+          stretching operation, and one vector is the second derivative of the stretching operation.
         """
-
-        derivative_func = numdifftools.Derivative(self._interpolate_stretching_factor)
+        normalized_grid = np.arange(len(self.grid))
+        func = lambda stretching_factor: np.interp(  # noqa: E731
+            normalized_grid / stretching_factor, normalized_grid, self.iq, left=0, right=0
+        )
+        derivative_func = numdifftools.Derivative(func)
         second_derivative_func = numdifftools.Derivative(derivative_func)
 
-        stretched_component = self._interpolate_stretching_factor(self.stretching_factors[m])
+        stretched_component = func(self.stretching_factors[m])
         stretched_component_gra = derivative_func(self.stretching_factors[m])
         stretched_component_hess = second_derivative_func(self.stretching_factors[m])
 
