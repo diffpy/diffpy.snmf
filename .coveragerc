@@ -1,6 +1,6 @@
 [run]
 source =
-    diffpy/snmf/
+    src
 [report]
 omit =
     */python?.?/*
