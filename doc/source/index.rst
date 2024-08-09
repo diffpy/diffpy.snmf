@@ -66,6 +66,7 @@ To get started, please go to :ref:`quick_start`
 
    license
    release
+   Package API <api/diffpy.snmf>
 
 .. include:: ../../CHANGELOG.rst
 
