@@ -16,7 +16,7 @@ MYDIR = os.path.dirname(os.path.abspath(__file__))
 # with open(os.path.join(MYDIR, 'requirements/run.txt')) as fp:
 #     requirements = [line.strip() for line in fp]
 
-with open(os.path.join(MYDIR, "README.md")) as fp:
+with open(os.path.join(MYDIR, "README.rst")) as fp:
     long_description = fp.read()
 
 
