@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# diffpy.pdffit2 documentation build configuration file, created by
+# diffpy.snmf documentation build configuration file, created by
 # sphinx-quickstart on Thu Jan 30 15:49:41 2014.
 #
 # This file is execfile()d with the current directory set to its
@@ -249,7 +249,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [("index", "diffpy.pdffit2", "diffpy.pdffit2 Documentation", ab_authors, 1)]
+man_pages = [("index", "diffpy.snmf", "diffpy.snmf Documentation", ab_authors, 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -263,10 +263,10 @@ man_pages = [("index", "diffpy.pdffit2", "diffpy.pdffit2 Documentation", ab_auth
 texinfo_documents = [
     (
         "index",
-        "diffpy.pdffit2",
-        "diffpy.pdffit2 Documentation",
+        "diffpy.snmf",
+        "diffpy.snmf Documentation",
         ab_authors,
-        "diffpy.pdffit2",
+        "diffpy.snmf",
         "One line description of project.",
         "Miscellaneous",
     ),
