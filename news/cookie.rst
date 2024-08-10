@@ -4,7 +4,8 @@
 
 **Changed:**
 
-* <news item>
+* Support Python version 3.12
+* Remove support for Python version 3.9
 
 **Deprecated:**
 
@@ -17,6 +18,7 @@
 **Fixed:**
 
 * Repo structure modified to the new diffpy standard
+* Code linting based on .pre-commit-config.yaml
 
 **Security:**
 
