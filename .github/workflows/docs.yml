@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - cookie
+      - cookie-docs
   release:
 
 jobs:
