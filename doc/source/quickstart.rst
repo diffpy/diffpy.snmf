@@ -1,6 +1,6 @@
 .. _quick_start:
 
-Tutorial
+Tutorial (To be addded)
 #################
 
 Welcome! This will be a quick tutorial to accquaint users with `snmf`.
