@@ -9,7 +9,7 @@ OPEN SOURCE LICENSE AGREEMENT
 =============================
 BSD 3-Clause License
 
-Copyright (c) 2009-2024, The Trustees of Columbia University in 
+Copyright (c) 2023-2024, The Trustees of Columbia University in 
 the City of New York.
 All Rights Reserved. 
 
