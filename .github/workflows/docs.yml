@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - cookie
   release:
 
 jobs:
@@ -23,11 +22,6 @@ jobs:
           activate-environment: build
           auto-update-conda: true
 
-      - name: Initialize Conda
-        run: |
-            conda init bash
-            source ~/.bashrc
-
       - name: install requirements
         run: >-
           conda install -n build -c conda-forge
@@ -43,7 +37,7 @@ jobs:
         run: make -C doc html
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./doc/build/html
