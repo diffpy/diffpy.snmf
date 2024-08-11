@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - cookie
   release:
 
 jobs:
@@ -21,6 +22,11 @@ jobs:
         with:
           activate-environment: build
           auto-update-conda: true
+
+      - name: Initialize Conda
+        run: |
+            conda init bash
+            source ~/.bashrc
 
       - name: install requirements
         run: >-
