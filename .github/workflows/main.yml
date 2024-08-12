@@ -19,7 +19,7 @@ jobs:
       - name: check out diffpy.snmf
         uses: actions/checkout@v3
         with:
-          repository: REPO_NAME
+          repository: diffpy/diffpy.snmf
           path: .
           fetch-depth: 0  # avoid shallow clone with no tags
 
