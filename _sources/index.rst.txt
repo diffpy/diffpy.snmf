@@ -38,6 +38,19 @@ within the chemical phases through its addition of stretching factors.
 It is important to note that the user must specify the number of component signals to obtain from the experimental data.
 Non-physical results may be obtained if the number of anticipated component signals is too high.
 
+Citation
+--------
+
+If you use this program for a scientific research that leads
+to publication, we ask that you acknowledge use of the program
+by citing the following paper in your publication:
+
+   Ran Gu, Yevgeny Rakita, Ling Lan, Zach Thatcher, Gabrielle E. Kamm, Daniel O’Nolan, Brennan Mcbride, Allison Wustrow, James R. Neilson, Karena W. Chapman, Qiang Du, and Simon J. L. Billinge,
+   `Stretched Non-negative Matrix Factorization
+   <https://doi.org/10.48550/arXiv.2311.15173>`__,
+   arXiv:2311.15173 [cond-mat.mtrl-sci] (2023).
+
+
 Authors
 -------
 
