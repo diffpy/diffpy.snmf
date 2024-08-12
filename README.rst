@@ -44,9 +44,15 @@ For more information about the diffpy.snmf library, please consult our `online d
 Citation
 --------
 
-If you use diffpy.snmf in a scientific publication, we would like you to cite this package as
+If you use this program for a scientific research that leads
+to publication, we ask that you acknowledge use of the program
+by citing the following paper in your publication:
 
-        diffpy.snmf Package, https://github.com/diffpy/diffpy.snmf
+   Ran Gu, Yevgeny Rakita, Ling Lan, Zach Thatcher, Gabrielle E. Kamm, Daniel O’Nolan, Brennan Mcbride, Allison Wustrow, James R. Neilson, Karena W. Chapman, Qiang Du, and Simon J. L. Billinge,
+   `Stretched Non-negative Matrix Factorization
+   <https://doi.org/10.48550/arXiv.2311.15173>`__,
+   arXiv:2311.15173 [cond-mat.mtrl-sci] (2023).
+
 
 Installation
 ------------
