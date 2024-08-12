@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - CI
   pull_request:
   workflow_dispatch:
 
@@ -18,10 +19,9 @@ jobs:
       - name: check out diffpy.snmf
         uses: actions/checkout@v3
         with:
-          repository: diffpy/diffpy.snmf
-          # for bookkeeping have diffpy.snmf at the same level as everything else in the
-          # directory tree
+          repository: REPO_NAME
           path: .
+          fetch-depth: 0  # avoid shallow clone with no tags
 
       - name: initialize miniconda
         # this uses a marketplace action that sets up miniconda in a way that makes
@@ -50,10 +50,6 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate test
-          coverage run run_tests.py
+          coverage run -m pytest -vv -s
           coverage report -m
-
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
+          codecov
