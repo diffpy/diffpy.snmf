@@ -37,7 +37,10 @@
 
 A python package implementing the stretched NMF algorithm.
 
-* LONGER DESCRIPTION HERE
+``diff.pysnmf`` is a Python package that increases the insight one can obtain from a measured series time-dependent signals
+through applying the stretched nonnegative matrix factorization (sNMF) and spare stretched nonnegative matrix factorization
+algorithms (ssNMF). The package seeks to answer the question: "What are the structural signals composing my measured signal at
+each moment in time?"
 
 For more information about the diffpy.snmf library, please consult our `online documentation <https://diffpy.github.io/diffpy.snmf>`_.
 
