@@ -2,7 +2,8 @@ Welcome to SNMF's Documentation!
 ====================================
 
 ``SNMF``: This library implements the stretched non negative matrix factorization (sNMF) and sparse stretched NMF
-(ssNMF) algorithms described in ...
+(ssNMF) algorithms described in the paper "Stretched Non-negative Matrix Factorization" by Ran Gu et al. (2023), 
+which is referenced under the Citation section below.
 
 This algorithm is designed to do an NMF factorization on a set of signals ignoring any uniform stretching of the signal
 on the independent variable axis. For example, for powder diffraction data taken from samples containing multiple
