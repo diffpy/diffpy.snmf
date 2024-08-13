@@ -2,7 +2,8 @@ Welcome to SNMF's Documentation!
 ====================================
 
 ``SNMF``: This library implements the stretched non negative matrix factorization (sNMF) and sparse stretched NMF
-(ssNMF) algorithms described in ...
+(ssNMF) algorithms described in the paper "Stretched Non-negative Matrix Factorization" by Ran Gu et al. (2023), 
+which is referenced under the Citation section below.
 
 This algorithm is designed to do an NMF factorization on a set of signals ignoring any uniform stretching of the signal
 on the independent variable axis. For example, for powder diffraction data taken from samples containing multiple
@@ -38,6 +39,19 @@ within the chemical phases through its addition of stretching factors.
 It is important to note that the user must specify the number of component signals to obtain from the experimental data.
 Non-physical results may be obtained if the number of anticipated component signals is too high.
 
+Citation
+--------
+
+If you use this program for a scientific research that leads
+to publication, we ask that you acknowledge use of the program
+by citing the following paper in your publication:
+
+   Ran Gu, Yevgeny Rakita, Ling Lan, Zach Thatcher, Gabrielle E. Kamm, Daniel O’Nolan, Brennan Mcbride, Allison Wustrow, James R. Neilson, Karena W. Chapman, Qiang Du, and Simon J. L. Billinge,
+   `Stretched Non-negative Matrix Factorization
+   <https://doi.org/10.48550/arXiv.2311.15173>`__,
+   arXiv:2311.15173 [cond-mat.mtrl-sci] (2023).
+
+
 Authors
 -------
 
@@ -66,6 +80,7 @@ To get started, please go to :ref:`quick_start`
 
    license
    release
+   Package API <api/diffpy.snmf>
 
 .. include:: ../../CHANGELOG.rst
 
