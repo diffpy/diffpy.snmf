@@ -1,6 +1,6 @@
 **Added:**
 
-* <news item>
+* Initial release of diffpy.snmf
 
 **Changed:**
 
