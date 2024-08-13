@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-      - cookie
-      - cookie-docs-fix
   release:
 
 jobs:
