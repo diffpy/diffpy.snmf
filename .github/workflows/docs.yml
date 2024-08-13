@@ -25,14 +25,10 @@ jobs:
           auto-update-conda: true
 
       - name: install requirements
-        run: >-
+        run: |
           conda create -n test python=3.12 --quiet --yes
           conda activate test
-          conda install -n build -c conda-forge
-          --file requirements/build.txt
-          --file requirements/run.txt
-          --file requirements/docs.txt
-          --quiet --yes
+          conda install -n build -c conda-forge --file requirements/build.txt --file requirements/run.txt --file requirements/docs.txt --quiet --yes
 
       - name: install the package
         run: python -m pip install . --no-deps
