@@ -26,6 +26,8 @@ jobs:
 
       - name: install requirements
         run: >-
+          coonda create -n test python=3.12 --quiet --yes
+          conda activate test
           conda install -n build -c conda-forge
           --file requirements/build.txt
           --file requirements/run.txt
