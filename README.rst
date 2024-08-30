@@ -56,7 +56,7 @@ by citing the following paper in your publication:
 
    Ran Gu, Yevgeny Rakita, Ling Lan, Zach Thatcher, Gabrielle E. Kamm, Daniel O’Nolan, Brennan Mcbride, Allison Wustrow, James R. Neilson, Karena W. Chapman, Qiang Du, and Simon J. L. Billinge,
    `Stretched Non-negative Matrix Factorization
-   <https://doi.org/10.48550/arXiv.2311.15173>`__,
+   <https://doi.org/10.1038/s41524-024-01377-5>`__,
    arXiv:2311.15173 [cond-mat.mtrl-sci] (2023).
 
 
