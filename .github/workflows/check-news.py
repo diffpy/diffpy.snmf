@@ -55,6 +55,8 @@ def main():
  please add a news item by copying the format from `news/TEMPLATE.rst`.
 """
         )
+        # Fail CI when no news file is added
+        assert False
 
 
 if __name__ == "__main__":
