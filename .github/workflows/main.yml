@@ -50,6 +50,4 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate test
-          coverage run -m pytest -vv -s
-          coverage report -m
-          codecov
+          pytest
