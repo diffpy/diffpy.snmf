@@ -40,7 +40,7 @@ jobs:
 
       - name: Validate diffpy.snmf
         run: |
-          coverage run -m pytest -vv -s
+          pytest --cov
           coverage report -m
           codecov
 
