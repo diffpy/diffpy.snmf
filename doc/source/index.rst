@@ -2,7 +2,7 @@ Welcome to SNMF's Documentation!
 ====================================
 
 ``SNMF``: This library implements the stretched non negative matrix factorization (sNMF) and sparse stretched NMF
-(ssNMF) algorithms described in the paper "Stretched Non-negative Matrix Factorization" by Ran Gu et al. (2023), 
+(ssNMF) algorithms described in the paper "Stretched Non-negative Matrix Factorization" by Ran Gu et al. (2023),
 which is referenced under the Citation section below.
 
 This algorithm is designed to do an NMF factorization on a set of signals ignoring any uniform stretching of the signal
@@ -63,7 +63,7 @@ Jame R. Neilson, Karena W. Chapman, Qiang Du, and Simon J. L. Billinge.
 This software implementation was developed by members of the Billinge Group at Columbia University and Brookhaven
 National Laboratory including Ran Gu, Adeolu Ajayi, Qiang Du, and Simon J. L. Billinge.
 
-For a detailed list of contributors, check `here 
+For a detailed list of contributors, check `here
 <https://github.com/diffpy/diffpy.snmf/graphs/contributors>`_.
 
 To get started, please go to :ref:`quick_start`
