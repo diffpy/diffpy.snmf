@@ -15,8 +15,8 @@
 .. |Black| image:: https://img.shields.io/badge/code_style-black-black
         :target: https://github.com/psf/black
 
-.. |CI| image:: https://github.com/diffpy/diffpy.snmf/actions/workflows/main.yml/badge.svg
-        :target: https://github.com/diffpy/diffpy.snmf/actions/workflows/main.yml
+.. |CI| image:: https://github.com/diffpy/diffpy.snmf/actions/workflows/matrix-and-codecov-on-merge-to-main.yml/badge.svg
+        :target: https://github.com/diffpy/diffpy.snmf/actions/workflows/matrix-and-codecov-on-merge-to-main.yml
 
 .. |Codecov| image:: https://codecov.io/gh/diffpy/diffpy.snmf/branch/main/graph/badge.svg
         :target: https://codecov.io/gh/diffpy/diffpy.snmf
@@ -83,11 +83,7 @@ Then, to fully install ``diffpy.snmf`` in our active environment, run ::
 
 Another option is to use ``pip`` to download and install the latest release from
 `Python Package Index <https://pypi.python.org>`_.
-To install using ``pip`` into your ``diffpy.snmf_env`` environment, we will also have to install dependencies ::
-
-        pip install -r https://raw.githubusercontent.com/diffpy/diffpy.snmf/main/requirements/run.txt
-
-and then install the package ::
+To install using ``pip`` into your ``diffpy.snmf_env`` environment, type ::
 
         pip install diffpy.snmf
 
