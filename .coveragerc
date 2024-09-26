@@ -1,12 +1,12 @@
 [run]
 source =
-    src
+    diffpy.snmf
 [report]
 omit =
     */python?.?/*
     */site-packages/nose/*
     # ignore _version.py and versioneer.py
-    *version.*
+    .*version.*
     *_version.py
 
 exclude_lines =
