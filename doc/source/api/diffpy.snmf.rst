@@ -66,4 +66,3 @@ diffpy.snmf.stretchednmfapp module
     :members:
     :undoc-members:
     :show-inheritance:
-
