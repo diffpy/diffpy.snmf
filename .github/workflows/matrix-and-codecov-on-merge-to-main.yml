@@ -8,7 +8,7 @@ on:
     types:
       - prereleased
       - published
-  workflow_dispatch:
+  workflow_dispatch: null
 
 jobs:
   coverage:
