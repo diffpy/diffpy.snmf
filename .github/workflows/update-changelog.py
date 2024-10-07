@@ -1,6 +1,6 @@
 import os
-from glob import glob
 import sys
+from glob import glob
 
 # Get the GitHub reference passed as an argument
 tag = sys.argv[1]

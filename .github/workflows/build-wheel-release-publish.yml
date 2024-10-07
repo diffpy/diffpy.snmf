@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*' 
+      - '*'
 permissions:
   contents: write
 jobs:
@@ -33,7 +33,7 @@ jobs:
         with:
           commit_message: update changelog
           branch: pypi-build  # FIXME: change to main
-  
+
   github-pre-release:
     needs: [build-package]
     if: contains(github.ref, 'rc')
