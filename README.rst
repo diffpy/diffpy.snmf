@@ -45,6 +45,8 @@ on the independent variable axis. For example, for powder diffraction data taken
 chemical phases where the measurements were done at different temperatures and the materials were undergoing thermal
 expansion.
 
+I think it is not very clear here what the package does and how it can be used to solve the example problem. You are talking about VT-PXRD experiment of samples with different phases which undergo a termal expansion, so a modification of unit cell parameters, each phase independently with respect to the other in the same sample?
+
 For more information about the diffpy.snmf library, please consult our `online documentation <https://diffpy.github.io/diffpy.snmf>`_.
 
 Citation
