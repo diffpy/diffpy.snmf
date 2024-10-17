@@ -29,7 +29,6 @@ jobs:
       contents: write
     uses: Billingegroup/release-scripts/.github/workflows/_build-wheel-release-upload.yml@v0
     with:
-      project: {{ project_name }}
+      project: diffpy.snmf
     secrets:
-      PYPI_TOKEN: {{ "${{ secrets.PYPI_TOKEN }}" }}
-
+      PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
