@@ -2,7 +2,7 @@
 name: Release checklist
 about: Checklist and communication channel for PyPI and GitHub release
 title: "Ready for <verison-number> PyPI/GitHub release"
-labels: "release" 
+labels: "release"
 assignees: ""
 ---
 
