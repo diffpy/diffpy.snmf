@@ -4,10 +4,27 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '*.*.*'
+      - '*'  # Trigger on all tags initially
 
 jobs:
+  tag-check:
+    runs-on: ubuntu-latest
+    outputs:
+      tag_valid: ${{ steps.tag-check.outputs.tag_valid }}
+    steps:
+      - name: Extract and validate tag for (pre)-release
+        id: tag-check
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+
+          # Check if the tag matches the pattern, e.g. 3.1.32 or 0.1.3rc0
+          if [[ "$TAG_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || [[ "$TAG_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+rc[0-9]+$ ]]; then
+            echo "tag_valid=true" >> $GITHUB_OUTPUT
+          fi
+
   release:
+    needs: tag-check
+    if: needs.tag-check.outputs.tag_valid == 'true'
     permissions:
       contents: write
     uses: Billingegroup/release-scripts/.github/workflows/_build-wheel-release-upload.yml@v0
