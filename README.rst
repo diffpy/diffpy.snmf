@@ -89,6 +89,12 @@ and run the following ::
 
         pip install .
 
+To confirm that the installation was successful, type ::
+                
+        python -c "import diffpy.snmf; print(diffpy.snmf.__version__)"
+
+The output should print the latest version displayed on the badges above.
+
 Support and Contribute
 ----------------------
 
