@@ -95,6 +95,8 @@ To confirm that the installation was successful, type ::
 
 The output should print the latest version displayed on the badges above.
 
+Now, you may consult our `online documentation <https://diffpy.github.io/diffpy.snmf>`_ for tutorials and API references.
+
 Support and Contribute
 ----------------------
 
