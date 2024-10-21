@@ -74,14 +74,10 @@ To add "conda-forge" to the conda channels, run the following in a terminal. ::
 We want to install our packages in a suitable conda environment.
 The following creates and activates a new environment named ``diffpy.snmf_env`` ::
 
-        conda create -n diffpy.snmf_env python=3
+        conda create -n diffpy.snmf_env diffpy.snmf
         conda activate diffpy.snmf_env
 
-Then, to fully install ``diffpy.snmf`` in our active environment, run ::
-
-        conda install diffpy.snmf
-
-Another option is to use ``pip`` to download and install the latest release from
+If the above does not work, you can use ``pip`` to download and install the latest release from
 `Python Package Index <https://pypi.python.org>`_.
 To install using ``pip`` into your ``diffpy.snmf_env`` environment, type ::
 
