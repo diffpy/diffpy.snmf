@@ -4,6 +4,15 @@ Release Notes
 
 .. current developments
 
+0.1.3
+=====
+
+**Fixed:**
+
+* Updated REAMDE instructions for pip and conda-forge install
+* Updated REAMDE instructions to check for successful installation
+
+
 0.1.2
 =====
 
