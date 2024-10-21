@@ -59,7 +59,6 @@ by citing the following paper in your publication:
    <https://doi.org/10.1038/s41524-024-01377-5>`__,
    *npj Comput Mater* **10**, 193 (2024).
 
-
 Installation
 ------------
 
@@ -77,6 +76,12 @@ The following creates and activates a new environment named ``diffpy.snmf_env`` 
         conda create -n diffpy.snmf_env diffpy.snmf
         conda activate diffpy.snmf_env
 
+To confirm that the installation was successful, type ::
+
+        python -c "import diffpy.snmf; print(diffpy.snmf.__version__)"
+
+The output should print the latest version displayed on the badges above.
+
 If the above does not work, you can use ``pip`` to download and install the latest release from
 `Python Package Index <https://pypi.python.org>`_.
 To install using ``pip`` into your ``diffpy.snmf_env`` environment, type ::
@@ -89,13 +94,10 @@ and run the following ::
 
         pip install .
 
-To confirm that the installation was successful, type ::
+Getting Started
+---------------
 
-        python -c "import diffpy.snmf; print(diffpy.snmf.__version__)"
-
-The output should print the latest version displayed on the badges above.
-
-Now, you may consult our `online documentation <https://diffpy.github.io/diffpy.snmf>`_ for tutorials and API references.
+You may consult our `online documentation <https://diffpy.github.io/diffpy.snmf>`_ for tutorials and API references.
 
 Support and Contribute
 ----------------------
