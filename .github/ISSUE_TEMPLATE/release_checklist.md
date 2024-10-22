@@ -6,7 +6,7 @@ labels: "release"
 assignees: ""
 ---
 
-**Release checklist for GitHub contributors**
+### Release checklist for GitHub contributors
 
 - [ ] All PRs/issues attached to the release are merged.
 - [ ] All the badges on the README are passing.
