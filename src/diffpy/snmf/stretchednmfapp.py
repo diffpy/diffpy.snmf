@@ -25,7 +25,7 @@ def create_parser():
         help="The directory where the results will be written. Defaults to '<input_directory>/snmf_results'.",
     )
     parser.add_argument(
-        "t",
+        "-t",
         "--data-type",
         type=str,
         default=None,
@@ -58,3 +58,6 @@ def main():
     variables = initialize_variables(lifted_input_data, args.number_of_components, args.data_type)
     components = initialize_components(variables["number_of_components"], variables["number_of_signals"], grid)
     return components
+
+if __name__ == "__main__":
+    main()
