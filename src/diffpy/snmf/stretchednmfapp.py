@@ -59,5 +59,6 @@ def main():
     components = initialize_components(variables["number_of_components"], variables["number_of_signals"], grid)
     return components
 
+
 if __name__ == "__main__":
     main()
