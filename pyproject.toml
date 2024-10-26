@@ -14,7 +14,7 @@ maintainers = [
 description = "A python package implementing the stretched NMF algorithm."
 keywords = ['diffpy', 'PDF']
 readme = "README.rst"
-requires-python = ">=3.10"
+requires-python = ">=3.10, <3.13"
 classifiers = [
         'Development Status :: 4 - Beta',
         'Environment :: Console',
@@ -41,6 +41,9 @@ enabled = true
 template = "{tag}"
 dev_template = "{tag}"
 dirty_template = "{tag}"
+
+[project.scripts]
+snmf = "diffpy.snmf.stretchednmfapp:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]  # list of folders that contain the packages (["."] by default)
