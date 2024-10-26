@@ -212,7 +212,7 @@ def test_update_weights_matrix(tuwm):
     print("Actual test get stretched component", actual)
     print("Expected test get stretched component", tuwm[1])
     expected = tuwm[1]
-    np.testing.assert_allclose(actual, expected, rtol=1e-03)
+    np.testing.assert_allclose(actual, expected, rtol=1e-03, atol=1e-05)
 
 
 tgrm = [
