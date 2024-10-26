@@ -1,5 +1,5 @@
-import cvxpy
 import numpy as np
+from scipy.optimize import minimize
 
 
 def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound, upper_bound):
@@ -36,20 +36,19 @@ def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound
       input set. Has length C
 
     """
+
     stretched_component_gram_matrix = np.asarray(stretched_component_gram_matrix)
     linear_coefficient = np.asarray(linear_coefficient)
     upper_bound = np.asarray(upper_bound)
     lower_bound = np.asarray(lower_bound)
 
-    problem_size = max(linear_coefficient.shape)
-    solution_variable = cvxpy.Variable(problem_size)
+    # Set dynamic bounds based on the size of the linear coefficient
+    bounds = [(lower_bound, upper_bound) for _ in range(len(linear_coefficient))]
+    initial_guess = np.zeros_like(linear_coefficient)
 
-    objective = cvxpy.Minimize(
-        linear_coefficient.T @ solution_variable
-        + 0.5 * cvxpy.quad_form(solution_variable, stretched_component_gram_matrix)
-    )
-    constraints = [lower_bound <= solution_variable, solution_variable <= upper_bound]
+    # Find optimal weights of linear coefficients
+    def obj_func(y):
+        return linear_coefficient.T @ y + 0.5 * y.T @ stretched_component_gram_matrix @ y
 
-    cvxpy.Problem(objective, constraints).solve()
-
-    return solution_variable.value
+    result = minimize(obj_func, initial_guess, method="L-BFGS-B", bounds=bounds)
+    return result.x
