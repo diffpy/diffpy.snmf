@@ -40,7 +40,8 @@ def create_parser():
         help="The lifting factor. Data will be lifted by lifted_data = data + abs(min(data) * lift). Default 1.",
     )
     parser.add_argument(
-        "number-of-components",
+        "-n",
+        "--number-of-components",
         type=int,
         help="The number of component signals for the NMF decomposition. Must be an integer greater than 0",
     )
@@ -54,6 +55,9 @@ def main():
     if args.input_directory is None:
         args.input_directory = Path.cwd()
     grid, input_data = load_input_signals(args.input_directory)
+    if input_data is None:
+        print("No valid input data found. Please check your input directory.")
+        return
     lifted_input_data = lift_data(input_data, args.lift_factor)
     variables = initialize_variables(lifted_input_data, args.number_of_components, args.data_type)
     components = initialize_components(variables["number_of_components"], variables["number_of_signals"], grid)
