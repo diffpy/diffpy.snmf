@@ -16,7 +16,7 @@
 
 **Fixed:**
 
-* tests folder at the root of the repo
+* Include GitHub Issues templates for bug report and feature request
 
 **Security:**
 

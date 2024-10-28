@@ -4,7 +4,7 @@
 
 **Changed:**
 
-* citation from arXiv to npj Comput Mater in docs
+* <news item>
 
 **Deprecated:**
 
@@ -16,7 +16,7 @@
 
 **Fixed:**
 
-* <news item>
+* Add getting started section and re-arrange install success check instructions
 
 **Security:**
 

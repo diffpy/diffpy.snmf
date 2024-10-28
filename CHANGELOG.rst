@@ -4,6 +4,36 @@ Release Notes
 
 .. current developments
 
+0.1.3
+=====
+
+**Fixed:**
+
+* Updated REAMDE instructions for pip and conda-forge install
+* Updated REAMDE instructions to check for successful installation
+
+
+0.1.2
+=====
+
+**Added:**
+
+* Use GitHub Actions to build, release, upload to PyPI
+* Added issue template for PyPI/GitHub release
+
+**Changed:**
+
+* Added tag check for release
+* citation from arXiv to npj Comput Mater in docs
+
+**Fixed:**
+
+* Python version from 3.9 to 3.12 in CI news item
+* tests folder at the root of the repo
+* re-cookiecuter repo to groupd's package standard
+* Add pip dependencies under pip.txt and conda dependencies under conda.txt
+
+
 0.1.0
 =====
 

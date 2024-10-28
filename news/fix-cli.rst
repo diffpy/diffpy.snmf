@@ -16,7 +16,8 @@
 
 **Fixed:**
 
-* re-cookiecuter repo to groupd's package standard
+* Add entry point to the application
+* Fix CLI bug due to typo
 
 **Security:**
 

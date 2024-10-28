@@ -61,7 +61,6 @@ by citing the following paper in your publication:
    <https://doi.org/10.1038/s41524-024-01377-5>`__,
    *npj Comput Mater* **10**, 193 (2024).
 
-
 Installation
 ------------
 
@@ -76,14 +75,16 @@ To add "conda-forge" to the conda channels, run the following in a terminal. ::
 We want to install our packages in a suitable conda environment.
 The following creates and activates a new environment named ``diffpy.snmf_env`` ::
 
-        conda create -n diffpy.snmf_env python=3
+        conda create -n diffpy.snmf_env diffpy.snmf
         conda activate diffpy.snmf_env
 
-Then, to fully install ``diffpy.snmf`` in our active environment, run ::
+To confirm that the installation was successful, type ::
 
-        conda install diffpy.snmf
+        python -c "import diffpy.snmf; print(diffpy.snmf.__version__)"
 
-Another option is to use ``pip`` to download and install the latest release from
+The output should print the latest version displayed on the badges above.
+
+If the above does not work, you can use ``pip`` to download and install the latest release from
 `Python Package Index <https://pypi.python.org>`_.
 To install using ``pip`` into your ``diffpy.snmf_env`` environment, type ::
 
@@ -94,6 +95,11 @@ If you prefer to install from sources, after installing the dependencies, obtain
 and run the following ::
 
         pip install .
+
+Getting Started
+---------------
+
+You may consult our `online documentation <https://diffpy.github.io/diffpy.snmf>`_ for tutorials and API references.
 
 Support and Contribute
 ----------------------
