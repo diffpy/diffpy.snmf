@@ -1,6 +1,6 @@
 .. _quick_start:
 
-Tutorial (To be addded)
+Tutorial (To be added)
 #################
 
 Welcome! This will be a quick tutorial to accquaint users with `snmf`.
@@ -18,5 +18,5 @@ Add extra tutorials here
 Bug Reports
 ===========
 
-Please enjoy using our software! If you come accross any bugs in the
+Please enjoy using our software! If you come across any bugs in the
 application, please report them to diffpy-users@googlegroups.com.
