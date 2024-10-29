@@ -13,7 +13,7 @@
 
 **Removed:**
 
-* cvxpy depenedency for linear weight optmization in def get_weights
+* cvxpy dependency for linear weight optimization in def get_weights
 * Support for Python 3.10
 
 **Fixed:**
