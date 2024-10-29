@@ -1,7 +1,7 @@
 ;; Please include explanations for each ignored word (lowercase) using full sentences.
 ;; See https://docs.openverse.org/meta/codespell.html for docs.
 
-;; short-form form materials in a journal title
+;; abbreviation for "materials" often used in a journal title
 mater
 
 ;; alternative use of socioeconomic
