@@ -5,10 +5,14 @@ from diffpy.snmf.containers import ComponentSignal
 
 
 @pytest.mark.parametrize(
-    "inputs, expected",
+    "grid, number_of_signals, id_number, iq, stretching_factor, expected",
     [
         (
-            [np.arange(10), 3, 0, [6.55, 0.357, 8.49, 9.33, 6.78, 7.57, 7.43, 3.92, 6.55, 1.71], 0.25],
+            np.arange(10),
+            3,
+            0,
+            [6.55, 0.357, 8.49, 9.33, 6.78, 7.57, 7.43, 3.92, 6.55, 1.71],
+            0.25,
             [
                 [6.55, 6.78, 6.55, 0, 0, 0, 0, 0, 0, 0],
                 [0, 14.07893122, 35.36478086, 0, 0, 0, 0, 0, 0, 0],
@@ -16,7 +20,11 @@ from diffpy.snmf.containers import ComponentSignal
             ],
         ),
         (
-            [np.arange(5), 10, 0, [-11.47, -10.688, -8.095, -29.44, 14.38], 1.25],
+            np.arange(5),
+            10,
+            0,
+            [-11.47, -10.688, -8.095, -29.44, 14.38],
+            1.25,
             [
                 [-11.47, -10.8444, -9.1322, -16.633, -20.6760],
                 [0, -0.50048, -3.31904, 40.9824, -112.1792],
@@ -24,7 +32,11 @@ from diffpy.snmf.containers import ComponentSignal
             ],
         ),
         (
-            [np.arange(5), 2, 0, [-11.47, -10.688, -8.095, -29.44, 14.38], 0.88],
+            np.arange(5),
+            2,
+            0,
+            [-11.47, -10.688, -8.095, -29.44, 14.38],
+            0.88,
             [
                 [-11.47, -10.3344, -13.9164, -11.5136, 0],
                 [0, -3.3484, 55.1265, -169.7572, 0],
@@ -32,7 +44,11 @@ from diffpy.snmf.containers import ComponentSignal
             ],
         ),
         (
-            [np.arange(10), 1, 2, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 0.88],
+            np.arange(10),
+            1,
+            2,
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            0.88,
             [
                 [1, 2.1364, 3.2727, 4.4091, 5.5455, 6.6818, 7.8182, 8.9545, 0, 0],
                 [0, -1.29, -2.58, -3.87, -5.165, -6.45, -7.74, -9.039, 0, 0],
@@ -40,28 +56,26 @@ from diffpy.snmf.containers import ComponentSignal
             ],
         ),
         (
+            np.arange(14),
+            100,
+            3,
             [
-                np.arange(14),
-                100,
-                3,
-                [
-                    -2.9384,
-                    -1.4623,
-                    -2.0913,
-                    4.6304,
-                    -1.2127,
-                    1.4737,
-                    -0.3791,
-                    1.7506,
-                    -1.5068,
-                    -2.7625,
-                    0.9617,
-                    -0.3494,
-                    -0.3862,
-                    2.7960,
-                ],
-                0.55,
+                -2.9384,
+                -1.4623,
+                -2.0913,
+                4.6304,
+                -1.2127,
+                1.4737,
+                -0.3791,
+                1.7506,
+                -1.5068,
+                -2.7625,
+                0.9617,
+                -0.3494,
+                -0.3862,
+                2.7960,
             ],
+            0.55,
             [
                 [-2.9384, -1.9769, 0.9121, 0.6314, 0.8622, -2.4239, -0.2302, 1.9281, 0, 0, 0, 0, 0, 0],
                 [0, 2.07933, 38.632, 18.3748, 43.07305, -61.557, 26.005, -73.637, 0, 0, 0, 0, 0, 0],
@@ -69,7 +83,11 @@ from diffpy.snmf.containers import ComponentSignal
             ],
         ),
         (
-            [np.arange(11), 20, 4, [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5], 0.987],
+            np.arange(11),
+            20,
+            4,
+            [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5],
+            0.987,
             [
                 [0, 0.2533, 0.5066, 0.7599, 1.0132, 1.2665, 1.5198, 1.7730, 2.0263, 2.2796, 0],
                 [0, -0.2566, -0.5132, -0.7699, -1.0265, -1.2831, -1.5398, -1.7964, -2.0530, -2.3097, 0],
@@ -77,33 +95,37 @@ from diffpy.snmf.containers import ComponentSignal
             ],
         ),
         (
-            [np.arange(9), 15, 3, [-1, -2, -3, -4, -5, -6, -7, -8, -9], -0.4],
+            np.arange(9),
+            15,
+            3,
+            [-1, -2, -3, -4, -5, -6, -7, -8, -9],
+            -0.4,
             [[-1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]],
         ),
     ],
 )
-def test_apply_stretch(inputs, expected):
-    component = ComponentSignal(inputs[0], inputs[1], inputs[2])
-    component.iq = inputs[3]
-    component.stretching_factors[0] = inputs[4]
+def test_apply_stretch(grid, number_of_signals, id_number, iq, stretching_factor, expected):
+    component = ComponentSignal(grid, number_of_signals, id_number)
+    component.iq = iq
+    component.stretching_factors[0] = stretching_factor
     actual = component.apply_stretch(0)
     np.testing.assert_allclose(actual, expected, rtol=1e-01)
 
 
 @pytest.mark.parametrize(
-    "inputs, expected",
+    "grid, number_of_signals, id_number, iq, weight, expected",
     [
-        ([np.arange(5), 2, 0, [0, 1, 2, 3, 4], 0.5], [0, 0.5, 1, 1.5, 2]),
-        ([np.arange(5), 20, 2, [0, -1, -2, -3, -4], 0.25], [0, -0.25, -0.5, -0.75, -1]),
-        ([np.arange(40), 200, 4, np.arange(0, 10, 0.25), 0.3], np.arange(0, 10, 0.25) * 0.3),
-        ([np.arange(1), 10, 2, [10.5, 11.5, -10.5], 0], [0, 0, 0]),
-        ([[-12, -10, -15], 5, 2, [-0.5, -1, -1.2], 0.9], [-0.45, -0.9, -1.08]),
-        ([[-12, -10, -15], 5, 2, [0, 0, 0], 0.9], [0, 0, 0]),
+        (np.arange(5), 2, 0, [0, 1, 2, 3, 4], 0.5, [0, 0.5, 1, 1.5, 2]),
+        (np.arange(5), 20, 2, [0, -1, -2, -3, -4], 0.25, [0, -0.25, -0.5, -0.75, -1]),
+        (np.arange(40), 200, 4, np.arange(0, 10, 0.25), 0.3, np.arange(0, 10, 0.25) * 0.3),
+        (np.arange(1), 10, 2, [10.5, 11.5, -10.5], 0, [0, 0, 0]),
+        ([-12, -10, -15], 5, 2, [-0.5, -1, -1.2], 0.9, [-0.45, -0.9, -1.08]),
+        ([-12, -10, -15], 5, 2, [0, 0, 0], 0.9, [0, 0, 0]),
     ],
 )
-def test_apply_weight(inputs, expected):
-    component = ComponentSignal(inputs[0], inputs[1], inputs[2])
-    component.iq = np.array(inputs[3])
-    component.weights[0] = inputs[4]
+def test_apply_weight(grid, number_of_signals, id_number, iq, weight, expected):
+    component = ComponentSignal(grid, number_of_signals, id_number)
+    component.iq = np.array(iq)
+    component.weights[0] = weight
     actual = component.apply_weight(0)
     np.testing.assert_allclose(actual, expected, rtol=1e-04)
