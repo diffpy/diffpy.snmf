@@ -90,14 +90,17 @@ def test_apply_stretch(inputs, expected):
     np.testing.assert_allclose(actual, expected, rtol=1e-01)
 
 
-@pytest.mark.parametrize("inputs, expected", [
-    ([np.arange(5), 2, 0, [0, 1, 2, 3, 4], 0.5], [0, 0.5, 1, 1.5, 2]),
-    ([np.arange(5), 20, 2, [0, -1, -2, -3, -4], 0.25], [0, -0.25, -0.5, -0.75, -1]),
-    ([np.arange(40), 200, 4, np.arange(0, 10, 0.25), 0.3], np.arange(0, 10, 0.25) * 0.3),
-    ([np.arange(1), 10, 2, [10.5, 11.5, -10.5], 0], [0, 0, 0]),
-    ([[-12, -10, -15], 5, 2, [-0.5, -1, -1.2], 0.9], [-0.45, -0.9, -1.08]),
-    ([[-12, -10, -15], 5, 2, [0, 0, 0], 0.9], [0, 0, 0]),
-])
+@pytest.mark.parametrize(
+    "inputs, expected",
+    [
+        ([np.arange(5), 2, 0, [0, 1, 2, 3, 4], 0.5], [0, 0.5, 1, 1.5, 2]),
+        ([np.arange(5), 20, 2, [0, -1, -2, -3, -4], 0.25], [0, -0.25, -0.5, -0.75, -1]),
+        ([np.arange(40), 200, 4, np.arange(0, 10, 0.25), 0.3], np.arange(0, 10, 0.25) * 0.3),
+        ([np.arange(1), 10, 2, [10.5, 11.5, -10.5], 0], [0, 0, 0]),
+        ([[-12, -10, -15], 5, 2, [-0.5, -1, -1.2], 0.9], [-0.45, -0.9, -1.08]),
+        ([[-12, -10, -15], 5, 2, [0, 0, 0], 0.9], [0, 0, 0]),
+    ],
+)
 def test_apply_weight(inputs, expected):
     component = ComponentSignal(inputs[0], inputs[1], inputs[2])
     component.iq = np.array(inputs[3])
