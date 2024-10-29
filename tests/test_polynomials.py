@@ -5,7 +5,7 @@ from diffpy.snmf.polynomials import compute_root
 
 
 @pytest.mark.parametrize(
-    "inputs, expected",  # Corrected here to match the variables used in the function
+    "inputs, expected",
     [
         ([0, 0], 0),
         ([-99.99, 12.50], 9.936397678254531),
