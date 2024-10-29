@@ -362,7 +362,7 @@ def update_weights_matrix(
       The matrx containing the stretching factors of the calculated component signals. Has dimensions K x M
       where K is the number of component signals and M is the number of XRD/PDF patterns.
 
-    component_matrix: 2d array lik
+    component_matrix: 2d array like
       The matrix containing the unstretched calculated component signals. Has dimensions N x K where N is the
       length of the signals and K is the number of component signals.
 

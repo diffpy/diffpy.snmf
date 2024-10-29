@@ -9,8 +9,8 @@ Release Notes
 
 **Fixed:**
 
-* Updated REAMDE instructions for pip and conda-forge install
-* Updated REAMDE instructions to check for successful installation
+* Updated README instructions for pip and conda-forge install
+* Updated README instructions to check for successful installation
 
 
 0.1.2
