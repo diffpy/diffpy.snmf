@@ -104,7 +104,7 @@ def load_input_signals(file_path=None):
 
     values_list = []
     grid_list = []
-    #current_grid = []
+    # current_grid = []
     current_grid = None  # Initialize as None
     for item in directory_path.iterdir():
         if item.is_file():
@@ -112,32 +112,32 @@ def load_input_signals(file_path=None):
             x_values = data[:, 0]  # First column as X values
             y_values = data[:, 1]  # Second column as Y values
 
-            #data = loadData(item.resolve())
-            #if current_grid is not None and not np.array_equal(current_grid, data[:, 0]):
-                #print(f"{item.name} was ignored as it is not on a compatible grid.")
-                #continue
-            #if current_grid is not None and not np.array_equal(current_grid, x_values):
-                #print(f"{item.name} was ignored as it is not on a compatible grid.")
+            # data = loadData(item.resolve())
+            # if current_grid is not None and not np.array_equal(current_grid, data[:, 0]):
+            # print(f"{item.name} was ignored as it is not on a compatible grid.")
+            # continue
+            # if current_grid is not None and not np.array_equal(current_grid, x_values):
+            # print(f"{item.name} was ignored as it is not on a compatible grid.")
             if current_grid is not None:
                 if not np.array_equal(current_grid, x_values):
                     print(f"{item.name} has incompatible grid: {x_values}")
                     continue
             else:
-                #grid_list.append(data[:, 0])
-                #current_grid = grid_list[-1]
-                #values_list.append(data[:, 1])
+                # grid_list.append(data[:, 0])
+                # current_grid = grid_list[-1]
+                # values_list.append(data[:, 1])
                 current_grid = x_values  # Update the current grid
                 values_list.append(y_values)  # Store the Y values
 
     if not grid_list:
         print("No compatible grid found.")
         return None, None
-    
+
     # Stack Y values and create a unique grid array
     values_array = np.column_stack(values_list)
 
-    #grid_array = np.column_stack(grid_list)
-    #grid_vector = np.unique(grid_array, axis=1)
-    #values_array = np.column_stack(values_list)
+    # grid_array = np.column_stack(grid_list)
+    # grid_vector = np.unique(grid_array, axis=1)
+    # values_array = np.column_stack(values_list)
     print(f"Grid vector shape: {grid_vector.shape}, Values array shape: {values_array.shape}")
     return grid_vector, values_array
