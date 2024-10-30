@@ -18,8 +18,6 @@
 
 Fixed 3 typos in docstring of subroutines.py
 
-* <news item>
-
 **Security:**
 
 * <news item>
