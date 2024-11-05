@@ -15,4 +15,4 @@ jobs:
       c_extension: false
       headless: false
     secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      CODECOV_TOKEN: secrets.CODECOV_TOKEN
