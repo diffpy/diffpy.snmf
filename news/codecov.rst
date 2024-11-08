@@ -1,6 +1,6 @@
 **Added:**
 
-* Codecov coverage report in PR
+* Coverage report in each PR
 
 **Changed:**
 
