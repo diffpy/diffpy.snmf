@@ -1,6 +1,7 @@
 import numpy as np
-from scipy.sparse import diags, block_diag, coo_matrix, spdiags
 from scipy.optimize import minimize
+from scipy.sparse import block_diag, coo_matrix, diags, spdiags
+
 
 class SNMFOptimizer:
     def __init__(self, MM, Y0, X0=None, A=None, rho=1e18, eta=1, maxiter=300):
@@ -97,7 +98,7 @@ class SNMFOptimizer:
 
         # Ensure `a` is an array and reshape for broadcasting
         a = np.atleast_1d(np.asarray(a))  # Ensures a is at least 1D
-        #a = np.asarray(a)[None, :]  # Shape (1, M) to allow broadcasting
+        # a = np.asarray(a)[None, :]  # Shape (1, M) to allow broadcasting
 
         # Compute fractional indices, broadcasting over `a`
         ii = np.arange(N)[:, None] / a  # Shape (N, M)
@@ -125,7 +126,7 @@ class SNMFOptimizer:
         Tx = np.vstack([Tx, np.zeros((N - len(I), Tx.shape[1]))])
 
         # Compute second derivative (Hx)
-        ddi = -di / a + i * a ** -2
+        ddi = -di / a + i * a**-2
         Hx = x[I] * (-ddi) + x[np.minimum(I + 1, N - 1)] * ddi
         Hx = np.vstack([Hx, np.zeros((N - len(I), Hx.shape[1]))])
 
@@ -152,10 +153,10 @@ class SNMFOptimizer:
             R = self.R
         if A is None:
             A = self.A
-        residual_term = 0.5 * np.linalg.norm(R, 'fro') ** 2
+        residual_term = 0.5 * np.linalg.norm(R, "fro") ** 2
         # original code selected indices, but for now we'll compute the norm over the whole matrix
         # residual_term = 0.5 * np.linalg.norm(self.R[index, :], 'fro') ** 2
-        regularization_term = 0.5 * self.rho * np.linalg.norm(self.P @ A.T, 'fro') ** 2
+        regularization_term = 0.5 * self.rho * np.linalg.norm(self.P @ A.T, "fro") ** 2
         sparsity_term = self.eta * np.sum(np.sqrt(self.X))  # Square root penalty
         # Final objective function value
         function = residual_term + regularization_term + sparsity_term
@@ -250,7 +251,7 @@ class SNMFOptimizer:
         iI = ii - II
 
         # Expand row indices (MATLAB: repm = repmat(1:K, Nindex, M))
-        repm = np.tile(np.arange(self.K), (self.N, self.M)) # indexed to zero here
+        repm = np.tile(np.arange(self.K), (self.N, self.M))  # indexed to zero here
 
         # Compute transformations (MATLAB: kro = kron(R(index,:), ones(1, K)))
         kro = np.kron(R, np.ones((1, self.K)))  # Use full `R`
@@ -313,7 +314,7 @@ class SNMFOptimizer:
         y0 = np.ones(K)
 
         # Solve QP
-        result = minimize(objective, y0, bounds=bounds, method='SLSQP')
+        result = minimize(objective, y0, bounds=bounds, method="SLSQP")
 
         return result.x  # Optimal solution
 
@@ -339,18 +340,21 @@ class SNMFOptimizer:
             denom = np.linalg.norm(self.curX - self.preX, "fro") ** 2  # Frobenius norm squared
             L = num / denom if denom > 0 else L0  # Ensure L0 fallback
 
-        L = np.maximum(L, L0) # ensure L is positive
-        while True: # iterate updating X
+        L = np.maximum(L, L0)  # ensure L is positive
+        while True:  # iterate updating X
             X_ = self.curX - self.GraX / L
             # Solve x^3 + p*x + q = 0 for the largest real root
             # off the shelf solver did not work element-wise for matrices
             X = np.square(rooth(-X_, self.eta / (2 * L)))
             # Mask values that should be set to zero
-            mask = (X ** 2 * L / 2 - L * X * X_ + self.eta * np.sqrt(X)) < 0
+            mask = (X**2 * L / 2 - L * X * X_ + self.eta * np.sqrt(X)) < 0
             X[mask] = 0
             # Check if objective function improves
-            if self.objective_history[-1] - self.get_objective_function(
-                    self.get_residual_matrix(np.maximum(0, X), self.Y, self.A), self.A) > 0:
+            if (
+                self.objective_history[-1]
+                - self.get_objective_function(self.get_residual_matrix(np.maximum(0, X), self.Y, self.A), self.A)
+                > 0
+            ):
                 break
             # Increase L
             L *= 2
@@ -405,29 +409,29 @@ class SNMFOptimizer:
         fun = self.get_objective_function(RA, A)
 
         # Compute gradient (removed index filtering)
-        gra = np.reshape(
-            np.sum(TX * np.tile(RA, (1, K)), axis=0), (M, K)
-        ).T + self.rho * A @ self.P.T @ self.P  # Gradient matrix
+        gra = (
+            np.reshape(np.sum(TX * np.tile(RA, (1, K)), axis=0), (M, K)).T + self.rho * A @ self.P.T @ self.P
+        )  # Gradient matrix
 
         # Compute Hessian (removed index filtering)
         hess = np.zeros((M * K, M * K))
 
         for m in range(M):
             Tx = TX[:, m + M * np.arange(K)]  # Now using all rows
-            hess[m * K: (m + 1) * K, m * K: (m + 1) * K] = Tx.T @ Tx
+            hess[m * K : (m + 1) * K, m * K : (m + 1) * K] = Tx.T @ Tx
 
         hess = (
-                hess
-                + spdiags(
-            np.reshape(
-                np.reshape(np.sum(HX * np.tile(RA, (1, K)), axis=0), (M, K)).T,
-                (M * K,),  # ✅ Ensure 1D instead of (M*K,1)
-            ),
-            0,  # Diagonal index
-            M * K,  # Number of rows
-            M * K,  # Number of columns
-        ).toarray()
-                + self.rho * self.PPPP
+            hess
+            + spdiags(
+                np.reshape(
+                    np.reshape(np.sum(HX * np.tile(RA, (1, K)), axis=0), (M, K)).T,
+                    (M * K,),  # ✅ Ensure 1D instead of (M*K,1)
+                ),
+                0,  # Diagonal index
+                M * K,  # Number of rows
+                M * K,  # Number of columns
+            ).toarray()
+            + self.rho * self.PPPP
         )
 
         return fun, gra, hess
@@ -467,7 +471,7 @@ def rooth(p, q):
     Solves x^3 + p*x + q = 0 element-wise for matrices, returning the largest real root.
     """
     # Handle special case where q == 0
-    y = np.where(q == 0, np.maximum(0, -p)**0.5, np.zeros_like(p))  # q=0 case
+    y = np.where(q == 0, np.maximum(0, -p) ** 0.5, np.zeros_like(p))  # q=0 case
 
     # Compute discriminant
     delta = (q / 2) ** 2 + (p / 3) ** 3
@@ -490,4 +494,3 @@ def rooth(p, q):
     y = np.max(real_roots, axis=0) * (delta < 0)  # Keep only real roots when delta < 0
 
     return y
-

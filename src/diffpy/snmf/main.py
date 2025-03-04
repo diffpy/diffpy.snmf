@@ -1,23 +1,24 @@
-import snmf
-
 import numpy as np
 import pandas as pd
+import snmf
 
 # Define fixed feature matrix (X) with distinct, structured features
-X = np.array([
-    [10, 0, 0],  # First component dominates first feature
-    [0, 8, 0],   # Second component dominates second feature
-    [0, 0, 6],   # Third component dominates third feature
-    [4, 4, 0],   # Mixed contribution to the fourth feature
-    [3, 2, 5]    # Mixed contribution to the fifth feature
-], dtype=float)
+X = np.array(
+    [
+        [10, 0, 0],  # First component dominates first feature
+        [0, 8, 0],  # Second component dominates second feature
+        [0, 0, 6],  # Third component dominates third feature
+        [4, 4, 0],  # Mixed contribution to the fourth feature
+        [3, 2, 5],  # Mixed contribution to the fifth feature
+    ],
+    dtype=float,
+)
 
 # Define fixed coefficient matrix (Y) representing weights
-Y = np.array([
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-    [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
-    [3, 6, 9, 12, 15, 18, 21, 24, 27, 30]
-], dtype=float)
+Y = np.array(
+    [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [2, 4, 6, 8, 10, 12, 14, 16, 18, 20], [3, 6, 9, 12, 15, 18, 21, 24, 27, 30]],
+    dtype=float,
+)
 
 # Compute the resulting data matrix M
 MM = np.dot(X, Y)
@@ -28,11 +29,14 @@ Y_norm = (Y - Y.min()) / (Y.max() - Y.min())
 MM_norm = (MM - MM.min()) / (MM.max() - MM.min())
 
 # Generate an initial guess Y0 with slightly perturbed values
-Y0 = np.array([
-    [1.5, 1.8, 2.9, 3.6, 4.8, 5.7, 7.1, 8.2, 9.4, 10.3],
-    [2.2, 4.1, 5.9, 8.1, 9.8, 11.9, 14.2, 16.5, 18.1, 19.7],
-    [2.7, 5.5, 8.8, 11.5, 14.6, 17.8, 20.5, 23.9, 26.3, 29.2]
-], dtype=float)
+Y0 = np.array(
+    [
+        [1.5, 1.8, 2.9, 3.6, 4.8, 5.7, 7.1, 8.2, 9.4, 10.3],
+        [2.2, 4.1, 5.9, 8.1, 9.8, 11.9, 14.2, 16.5, 18.1, 19.7],
+        [2.7, 5.5, 8.8, 11.5, 14.6, 17.8, 20.5, 23.9, 26.3, 29.2],
+    ],
+    dtype=float,
+)
 
 # Normalize Y0 as well
 Y0_norm = (Y0 - Y0.min()) / (Y0.max() - Y0.min())
