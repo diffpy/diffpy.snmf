@@ -1,10 +1,13 @@
+import cvxpy as cp
 import numpy as np
 from scipy.optimize import minimize
-from scipy.sparse import block_diag, coo_matrix, diags, spdiags
+from scipy.sparse import block_diag, coo_matrix, diags
+
+# from scipy.sparse import csr_matrix, spdiags (needed for hessian once fixed)
 
 
 class SNMFOptimizer:
-    def __init__(self, MM, Y0, X0=None, A=None, rho=1e12, eta=610, maxiter=300):
+    def __init__(self, MM, Y0=None, X0=None, A=None, rho=1e12, eta=610, maxiter=300, components=None):
         print("Initializing SNMF Optimizer")
         self.MM = MM
         self.X0 = X0
@@ -15,8 +18,16 @@ class SNMFOptimizer:
         self.maxiter = maxiter
         # Capture matrix dimensions
         self.N, self.M = MM.shape
-        self.K = Y0.shape[0]
         self.num_updates = 0
+
+        if Y0 is None:
+            if components is None:
+                raise ValueError("Must provide either Y0 or a number of components.")
+            else:
+                self.K = components
+                self.Y0 = np.random.beta(a=2.5, b=1.5, size=(self.K, self.M))
+        else:
+            self.K = Y0.shape[0]
 
         # Initialize A, X0 if not provided
         if self.A is None:
@@ -45,15 +56,15 @@ class SNMFOptimizer:
         self.objective_history = [self.objective_function]
 
         # Set up tracking variables for updateX()
-        self.preX = np.zeros_like(self.X)  # Previously stored X (zeros for now)
+        self.preX = self.X.copy()  # Previously stored X (like X0 for now)
         self.GraX = np.zeros_like(self.X)  # Gradient of X (zeros for now)
         self.preGraX = np.zeros_like(self.X)  # Previous gradient of X (zeros for now)
 
         regularization_term = 0.5 * rho * np.linalg.norm(self.P @ self.A.T, "fro") ** 2
         sparsity_term = eta * np.sum(np.sqrt(self.X))  # Square root penalty
         print(
-            f"Start of loop, Objective function: {self.objective_function:.4e}"
-            f", Obj - reg/sparse: {self.objective_function - regularization_term - sparsity_term:.4e}"
+            f"Start, Objective function: {self.objective_function:.5e}"
+            f", Obj - reg/sparse: {self.objective_function - regularization_term - sparsity_term:.5e}"
         )
 
         for outiter in range(self.maxiter):
@@ -63,26 +74,27 @@ class SNMFOptimizer:
             regularization_term = 0.5 * rho * np.linalg.norm(self.P @ self.A.T, "fro") ** 2
             sparsity_term = eta * np.sum(np.sqrt(self.X))  # Square root penalty
             print(
-                f"Num_updates: {self.num_updates} "
-                f"Objective function: {self.objective_function:.4e}, "
-                f"Obj - reg/sparse: {self.objective_function - regularization_term - sparsity_term:.4e}"
-                f"Iteration: {self.outiter}"
+                f"Num_updates: {self.num_updates}, "
+                f"Obj fun: {self.objective_function:.5e}, "
+                f"Obj - reg/sparse: {self.objective_function - regularization_term - sparsity_term:.5e}, "
+                f"Iter: {self.outiter}"
             )
 
             # Convergence check: Stop if diffun is small and at least 20 iterations have passed
-            if self.objective_difference < self.objective_function * 1e-6 and outiter >= 20:
+            # This check is not working, so have temporarily set 20->120 instead
+            if self.objective_difference < self.objective_function * 1e-6 and outiter >= 120:
                 break
 
     def outer_loop(self):
         # This inner loop runs up to four times per outer loop, making updates to X, Y
         for iter in range(4):
             self.iter = iter
-            self.preX = self.X.copy()
+            self.preGraX = self.GraX.copy()
             self.updateX()
             self.num_updates += 1
             self.R = self.get_residual_matrix()
             self.objective_function = self.get_objective_function()
-            print(f"Objective function after updateX: {self.objective_function:.4e}")
+            print(f"Objective function after updateX: {self.objective_function:.5e}")
             self.objective_history.append(self.objective_function)
             if self.outiter == 0 and self.iter == 0:
                 self.objective_difference = self.objective_history[-1] - self.objective_function
@@ -92,7 +104,7 @@ class SNMFOptimizer:
             self.num_updates += 1
             self.R = self.get_residual_matrix()
             self.objective_function = self.get_objective_function()
-            print(f"Objective function after updateY2: {self.objective_function:.4e}")
+            print(f"Objective function after updateY2: {self.objective_function:.5e}")
             self.objective_history.append(self.objective_function)
 
             # Check whether to break out early
@@ -100,10 +112,19 @@ class SNMFOptimizer:
                 if self.objective_history[-3] - self.objective_function < self.objective_difference * 1e-3:
                     break  # Stop if improvement is too small
 
+        if self.outiter == 0:
+            print("Testing regularize_function:")
+            test_fun, test_gra, test_hess = self.regularize_function()
+            print(f"Fun: {test_fun:.5e}")
+            np.savetxt("output/py_test_gra.txt", test_gra, fmt="%.8g", delimiter=" ")
+            np.savetxt("output/py_test_hess.txt", test_hess, fmt="%.8g", delimiter=" ")
+
         self.updateA2()
+
         self.num_updates += 1
         self.R = self.get_residual_matrix()
         self.objective_function = self.get_objective_function()
+        print(f"Objective function after updateA2: {self.objective_function:.5e}")
         self.objective_history.append(self.objective_function)
         self.objective_difference = self.objective_history[-1] - self.objective_function
 
@@ -172,8 +193,6 @@ class SNMFOptimizer:
         if A is None:
             A = self.A
         residual_term = 0.5 * np.linalg.norm(R, "fro") ** 2
-        # original code selected indices, but for now we'll compute the norm over the whole matrix
-        # residual_term = 0.5 * np.linalg.norm(self.R[index, :], 'fro') ** 2
         regularization_term = 0.5 * self.rho * np.linalg.norm(self.P @ A.T, "fro") ** 2
         sparsity_term = self.eta * np.sum(np.sqrt(self.X))  # Square root penalty
         # Final objective function value
@@ -321,46 +340,39 @@ class SNMFOptimizer:
 
         Parameters:
         - T: (N, K) matrix computed from getAfun(A(k,m), X(:,k))
-        - MM: (N, M) matrix in the stretched NMF formulation
-        - m: Column index for MM
+        - MM_col: (N,) column of MM for the corresponding m
 
         Returns:
         - y: (K,) optimal solution
         """
 
+        MM_col = self.MM[:, m]
+
         # Compute Q and d
         Q = T.T @ T  # Gram matrix (K x K)
-        d = -T.T @ self.MM[:, m]  # Linear term (K,)
+        d = -T.T @ MM_col  # Linear term (K,)
 
         K = Q.shape[0]  # Number of variables
 
         # Regularize Q to ensure positive semi-definiteness
-        Q += np.eye(K) * 1e-10
+        reg_factor = 1e-8 * np.linalg.norm(Q, ord="fro")  # Adaptive regularization, original was fixed
+        Q += np.eye(K) * reg_factor
 
-        # Always start with y0 = 1 (like MATLAB with cA=1)
-        y0 = np.ones(K)
+        # Define optimization variable
+        y = cp.Variable(K)
 
-        # Cholesky stabilization for numerical stability
-        try:
-            L = np.linalg.cholesky(Q)
-            Q_inv = np.linalg.inv(L.T) @ np.linalg.inv(L)
-        except np.linalg.LinAlgError:
-            Q_inv = np.linalg.pinv(Q)  # Fall back to pseudo-inverse
+        # Define quadratic objective
+        objective = cp.Minimize(0.5 * cp.quad_form(y, Q) + d.T @ y)
 
-        # Improved initial guess using stable inversion (but still clipped to [0,1])
-        y0 = np.clip(-Q_inv @ d, 0, 1)
+        # Define constraints (0 ≤ y ≤ 1)
+        constraints = [y >= 0, y <= 1]
 
-        # Objective function
-        def objective(y):
-            return 0.5 * np.dot(y, Q @ y) + np.dot(d, y)
+        # Solve using a QP solver
+        prob = cp.Problem(objective, constraints)
+        prob.solve(solver=cp.OSQP, verbose=False)
 
-        # Bounds (0 ≤ y ≤ 1)
-        bounds = [(0, 1)] * K
-
-        # Solve QP with max iterations and tolerance
-        result = minimize(objective, y0, bounds=bounds, method="SLSQP", options={"maxiter": 1000, "ftol": 1e-10})
-
-        return result.x
+        # Get the solution
+        return np.maximum(y.value, 0)  # Ensure non-negative values in case of solver tolerance issues
 
     def updateX(self):
         """
@@ -373,7 +385,6 @@ class SNMFOptimizer:
         RA = intermediate_RA.sum(axis=1).reshape((self.N, self.M), order="F")
         RR = RA - self.MM
         # Compute gradient `GraX`
-        preGraX = self.GraX.copy()
         self.GraX = self.apply_transformation_matrix(R=RR).toarray()  # toarray equivalent of full, make non-sparse
 
         # Compute initial step size `L0`
@@ -382,11 +393,15 @@ class SNMFOptimizer:
         if self.outiter == 0 and self.iter == 0:
             L = L0
         else:
-            num = np.sum((self.GraX - preGraX) * (self.X - self.preX))  # Element-wise multiplication
+            num = np.sum((self.GraX - self.preGraX) * (self.X - self.preX))  # Element-wise multiplication
             denom = np.linalg.norm(self.X - self.preX, "fro") ** 2  # Frobenius norm squared
-            L = num / denom if denom > 0 else L0  # Ensure L0 fallback
+            L = num / denom if denom > 0 else L0
+            if L <= 0:
+                L = L0
 
-        L = np.maximum(L, L0)  # ensure L is positive
+        # Store our old X before updating because it is used in step selection
+        self.preX = self.X.copy()
+
         while True:  # iterate updating X
             x_step = self.preX - self.GraX / L
             # Solve x^3 + p*x + q = 0 for the largest real root
@@ -412,8 +427,10 @@ class SNMFOptimizer:
         """
         Updates Y using matrix operations, solving a quadratic program via `solve_mkr_box`.
         """
-        K, M = self.Y.shape
-        N = self.X.shape[0]
+
+        K = self.K
+        N = self.N
+        M = self.M
 
         for m in range(M):
             T = np.zeros((N, K))  # Initialize T as an (N, K) zero matrix
@@ -423,7 +440,6 @@ class SNMFOptimizer:
                 T[:, k] = self.apply_interpolation(self.A[k, m], self.X[:, k])[0].squeeze()
 
             # Solve quadratic problem for y using solve_mkr_box
-            # y = self.solve_mkr_box(T=T, m=m)
             y = self.solve_mkr_box(T=T, m=m)
 
             # Update Y
@@ -435,31 +451,55 @@ class SNMFOptimizer:
         Returns:
         - fun: Objective function value (scalar)
         - gra: Gradient (same shape as A)
-        - hess: Hessian matrix (M*K, M*K)
+        - hes: Hessian matrix (M*K, M*K)
         """
         if A is None:
             A = self.A
-        K, M = A.shape
-        N = self.X.shape[0]
+
+        K = self.K
+        M = self.M
+        N = self.N
 
         # Compute interpolated matrices
         AX, TX, HX = self.apply_interpolation_matrix(A=A)
 
         # Compute residual
-        RA = np.reshape(np.sum(np.reshape(AX, (N * M, K)), axis=1), (N, M)) - self.MM
-        # intermediate_RA = AX.flatten(order='F').reshape((N * M, K), order='F')
-        # RA = intermediate_RA.sum(axis=1).reshape((N, M), order='F')
-        # RA = RA - self.MM
+        intermediate_RA = AX.flatten(order="F").reshape((N * M, K), order="F")
+        RA = intermediate_RA.sum(axis=1).reshape((N, M), order="F")
+        RA = RA - self.MM
 
         # Compute objective function
         fun = self.get_objective_function(RA, A)
 
-        # Compute gradient (removed index filtering)
-        gra = (
-            np.reshape(np.sum(TX * np.tile(RA, (1, K)), axis=0), (M, K)).T + self.rho * A @ self.P.T @ self.P
-        )  # Gradient matrix
+        # Compute gradient
+        tiled_derivative = np.sum(TX * np.tile(RA, (1, K)), axis=0)
+        der_reshaped = np.asarray(tiled_derivative).reshape((M, K), order="F")
+        gra = der_reshaped.T + self.rho * A @ self.P.T @ self.P
 
-        # Compute Hessian (removed index filtering)
+        # Compute Hessian
+        hess = np.zeros((K * M, K * M))
+
+        for m in range(M):
+            Tx = TX[:, m + M * np.arange(K)]  # shape (N, K)
+
+            TxT_Tx = Tx.T @ Tx
+            for k1 in range(K):
+                for k2 in range(K):
+                    i = k1 * M + m
+                    j = k2 * M + m
+                    hess[i, j] += TxT_Tx[k1, k2]
+
+        # Add diagonal
+        hess += np.diag(np.sum(HX * np.tile(RA, (1, K)), axis=0).reshape((M, K)).T.flatten(order="C"))
+
+        # Add PPPP
+        hess += self.rho * self.PPPP
+
+        # Final cleanup (optional but good practice)
+        hess = (hess + hess.T) / 2
+        hess = np.asarray(hess, dtype=np.float64)
+
+        """
         hess = np.zeros((M * K, M * K))
 
         for m in range(M):
@@ -470,8 +510,8 @@ class SNMFOptimizer:
             hess
             + spdiags(
                 np.reshape(
-                    np.reshape(np.sum(HX * np.tile(RA, (1, K)), axis=0), (M, K)).T,
-                    (M * K,),  # ✅ Ensure 1D instead of (M*K,1)
+                    np.reshape(np.sum(HX * np.tile(RA, (1, K)), axis=0), (M, K), order='F').T,
+                    (M * K,),
                 ),
                 0,  # Diagonal index
                 M * K,  # Number of rows
@@ -479,6 +519,7 @@ class SNMFOptimizer:
             ).toarray()
             + self.rho * self.PPPP
         )
+        """
 
         return fun, gra, hess
 
@@ -493,7 +534,9 @@ class SNMFOptimizer:
         # Define the optimization function
         def objective(A_vec):
             A_matrix = A_vec.reshape(self.A.shape)  # Reshape back to matrix form
-            return self.regularize_function(A_matrix)
+            fun, gra, hess = self.regularize_function(A_matrix)
+            gra = gra.flatten()
+            return fun, gra, hess
 
         # Optimization constraints: lower bound 0.1, no upper bound
         bounds = [(0.1, None)] * A_initial.size  # Equivalent to 0.1 * ones(K, M)
@@ -503,8 +546,8 @@ class SNMFOptimizer:
             fun=lambda A_vec: objective(A_vec)[0],  # Objective function
             x0=A_initial,  # Initial guess
             method="trust-constr",  # Equivalent to 'trust-region-reflective'
-            jac=lambda A_vec: objective(A_vec)[1].flatten(),  # Gradient
-            hess=lambda A_vec: objective(A_vec)[2],  # Hessian
+            jac=lambda A_vec: objective(A_vec)[1],  # Gradient
+            # hess=lambda A_vec: objective(A_vec)[2],  # Hessian
             bounds=bounds,  # Lower bounds on A
         )
 
@@ -524,6 +567,7 @@ def rooth(p, q):
 
     # Compute square root of delta safely
     d = np.where(delta >= 0, np.sqrt(delta), np.sqrt(np.abs(delta)) * 1j)
+    # TODO: this line causes a warning but results seem correct
 
     # Compute cube roots safely
     a1 = (-q / 2 + d) ** (1 / 3)
