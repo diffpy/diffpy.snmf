@@ -3,8 +3,6 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.sparse import block_diag, coo_matrix, diags
 
-# from scipy.sparse import csr_matrix, spdiags (needed for hessian once fixed)
-
 
 class SNMFOptimizer:
     def __init__(self, MM, Y0=None, X0=None, A=None, rho=1e12, eta=610, maxiter=300, components=None):
@@ -67,6 +65,7 @@ class SNMFOptimizer:
             f", Obj - reg/sparse: {self.objective_function - regularization_term - sparsity_term:.5e}"
         )
 
+        # Main optimization loop
         for outiter in range(self.maxiter):
             self.outiter = outiter
             self.outer_loop()
@@ -81,9 +80,17 @@ class SNMFOptimizer:
             )
 
             # Convergence check: Stop if diffun is small and at least 20 iterations have passed
-            # This check is not working, so have temporarily set 20->120 instead
-            if self.objective_difference < self.objective_function * 1e-6 and outiter >= 120:
+            print(self.objective_difference, " < ", self.objective_function * 1e-6)
+            if self.objective_difference < self.objective_function * 1e-6 and outiter >= 20:
                 break
+
+        # Normalize our results
+        Y_row_max = np.max(self.Y, axis=1, keepdims=True)
+        self.Y = self.Y / Y_row_max
+        A_row_max = np.max(self.A, axis=1, keepdims=True)
+        self.A = self.A / A_row_max
+        # TODO loop to normalize X (currently not normalized)
+        # effectively just re-running class with non-normalized X, normalized Y/A as inputs, then only update X
 
     def outer_loop(self):
         # This inner loop runs up to four times per outer loop, making updates to X, Y
@@ -108,16 +115,10 @@ class SNMFOptimizer:
             self.objective_history.append(self.objective_function)
 
             # Check whether to break out early
+            # TODO this condition has not been tested, and may have issues
             if len(self.objective_history) >= 3:  # Ensure at least 3 values exist
                 if self.objective_history[-3] - self.objective_function < self.objective_difference * 1e-3:
                     break  # Stop if improvement is too small
-
-        if self.outiter == 0:
-            print("Testing regularize_function:")
-            test_fun, test_gra, test_hess = self.regularize_function()
-            print(f"Fun: {test_fun:.5e}")
-            np.savetxt("output/py_test_gra.txt", test_gra, fmt="%.8g", delimiter=" ")
-            np.savetxt("output/py_test_hess.txt", test_hess, fmt="%.8g", delimiter=" ")
 
         self.updateA2()
 
@@ -126,7 +127,7 @@ class SNMFOptimizer:
         self.objective_function = self.get_objective_function()
         print(f"Objective function after updateA2: {self.objective_function:.5e}")
         self.objective_history.append(self.objective_function)
-        self.objective_difference = self.objective_history[-1] - self.objective_function
+        self.objective_difference = self.objective_history[-2] - self.objective_history[-1]
 
     def apply_interpolation(self, a, x):
         """
