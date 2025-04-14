@@ -80,17 +80,44 @@ class SNMFOptimizer:
             )
 
             # Convergence check: Stop if diffun is small and at least 20 iterations have passed
-            print(self.objective_difference, " < ", self.objective_function * 1e-6)
-            if self.objective_difference < self.objective_function * 1e-6 and outiter >= 20:
+            # MATLAB uses 1e-6 but also gets faster convergence, so this makes up that difference
+            print(self.objective_difference, " < ", self.objective_function * 5e-7)
+            if self.objective_difference < self.objective_function * 5e-7 and outiter >= 20:
                 break
 
         # Normalize our results
+        # TODO make this much cleaner
         Y_row_max = np.max(self.Y, axis=1, keepdims=True)
         self.Y = self.Y / Y_row_max
         A_row_max = np.max(self.A, axis=1, keepdims=True)
         self.A = self.A / A_row_max
-        # TODO loop to normalize X (currently not normalized)
+        # loop to normalize X
         # effectively just re-running class with non-normalized X, normalized Y/A as inputs, then only update X
+        # reset difference trackers and initialize
+        self.preX = self.X.copy()  # Previously stored X (like X0 for now)
+        self.GraX = np.zeros_like(self.X)  # Gradient of X (zeros for now)
+        self.preGraX = np.zeros_like(self.X)  # Previous gradient of X (zeros for now)
+        self.R = self.get_residual_matrix()
+        self.objective_function = self.get_objective_function()
+        self.objective_difference = None
+        self.objective_history = [self.objective_function]
+        self.outiter = 0
+        self.iter = 0
+        for outiter in range(100):
+            if iter == 1:
+                self.iter = 1  # So step size can adapt without an inner loop
+            self.updateX()
+            self.R = self.get_residual_matrix()
+            self.objective_function = self.get_objective_function()
+            print(f"Objective function after normX: {self.objective_function:.5e}")
+            self.objective_history.append(self.objective_function)
+            self.objective_difference = self.objective_history[-2] - self.objective_history[-1]
+            if self.objective_difference < self.objective_function * 5e-7 and outiter >= 20:
+                break
+        # end of normalization (and program)
+        # note that objective function does not fully recover after normalization
+        # it is still higher than pre-normalization, but that is okay and matches MATLAB
+        print("Finished optimization.")
 
     def outer_loop(self):
         # This inner loop runs up to four times per outer loop, making updates to X, Y
