@@ -21,6 +21,7 @@ print("Data Matrix (MM):\n", df_MM, "\n")
 print("Initial Guess (Y0):\n", df_Y0, "\n")
 """
 
+
 my_model = snmf_class.SNMFOptimizer(MM=MM, Y0=Y0, X0=X0, A=A0, components=2)
 print("Done")
 # print(f"My final guess for X: {my_model.X}")
