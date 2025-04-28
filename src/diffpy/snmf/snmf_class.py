@@ -343,7 +343,7 @@ class SNMFOptimizer:
 
         return AT
 
-    def solve_quadratic_two(self, T, m):
+    def solve_quadratic_program(self, T, m, alg="trust-constr"):
         """
         Solves the quadratic program for updating y in stretched NMF using scipy.optimize:
 
@@ -351,6 +351,8 @@ class SNMFOptimizer:
             subject to: 0 ≤ y ≤ 1
 
         Uses the 'trust-constr' solver with the analytical gradient and Hessian.
+        Alternatively, can use scipy's L-BFGS-B algorithm, which supports bound
+        constraints.
 
         Parameters:
         - T: (N, K) ndarray
@@ -363,84 +365,32 @@ class SNMFOptimizer:
             Optimal solution for y, clipped to ensure non-negativity.
         """
         MM_col = self.MM[:, m]
-
         Q = T.T @ T
         d = -T.T @ MM_col
-
         K = Q.shape[0]
-
         reg_factor = 1e-8 * np.linalg.norm(Q, ord="fro")
         Q += np.eye(K) * reg_factor
 
-        # Objective function
         def objective(y):
             return 0.5 * y @ Q @ y + d @ y
 
-        # Gradient (first derivative)
         def grad(y):
             return Q @ y + d
 
-        # Hessian (constant for quadratic problems)
-        def hess(y):
-            return csc_matrix(Q)  # sparse format for efficiency
+        if alg == "trust-constr":
 
-        bounds = [(0, 1)] * K
-        y0 = np.clip(-np.linalg.solve(Q + np.eye(K) * 1e-5, d), 0, 1)
+            def hess(y):
+                return csc_matrix(Q)  # sparse format for efficiency
 
-        result = minimize(
-            objective, y0, method="trust-constr", jac=grad, hess=hess, bounds=bounds, options={"verbose": 0}
-        )
-
-        return np.maximum(result.x, 0)
-
-    def solve_quadratic_program(self, T, m):
-        """
-        Solves the quadratic program for updating y in stretched NMF using scipy.optimize:
-
-            min J(y) = 0.5 * y^T Q y + d^T y
-            subject to: 0 ≤ y ≤ 1
-
-        This uses scipy's L-BFGS-B algorithm,which supports bound
-        constraints and is compatible with scikit-learn dependencies.
-        Something like trust-constr could be worth trying as well.
-
-        Parameters:
-        - T: (N, K) ndarray
-            Matrix computed from getAfun(A(k, m), X[:, k]).
-        - m: int
-            Index of the current column in MM.
-
-        Returns:
-        - y: (K,) ndarray
-            Optimal solution for y, clipped to ensure non-negativity.
-        """
-        MM_col = self.MM[:, m]
-
-        # Compute Q and d
-        Q = T.T @ T
-        d = -T.T @ MM_col
-
-        K = Q.shape[0]
-
-        # Regularize Q to ensure positive semi-definiteness
-        reg_factor = 1e-8 * np.linalg.norm(Q, ord="fro")
-        Q += np.eye(K) * reg_factor
-
-        # Define the objective function: 0.5 * y^T Q y + d^T y
-        def objective(y):
-            return 0.5 * y @ Q @ y + d @ y
-
-        # Gradient of the objective
-        def grad(y):
-            return Q @ y + d
-
-        # Bounds for each variable: 0 ≤ y_i ≤ 1
-        bounds = [(0, 1) for _ in range(K)]
-
-        # Initial guess (can also use np.random.rand(K) or something more informed)
-        y0 = np.clip(-np.linalg.solve(Q + np.eye(K) * 1e-5, d), 0, 1)
-
-        result = minimize(objective, y0, method="L-BFGS-B", jac=grad, bounds=bounds)
+            bounds = [(0, 1)] * K
+            y0 = np.clip(-np.linalg.solve(Q + np.eye(K) * 1e-5, d), 0, 1)
+            result = minimize(
+                objective, y0, method="trust-constr", jac=grad, hess=hess, bounds=bounds, options={"verbose": 0}
+            )
+        elif alg == "L-BFGS-B":
+            bounds = [(0, 1) for _ in range(K)]  # per-variable bounds
+            y0 = np.clip(-np.linalg.solve(Q + np.eye(K) * 1e-5, d), 0, 1)  # Initial guess
+            result = minimize(objective, y0, method="L-BFGS-B", jac=grad, bounds=bounds)
 
         return np.maximum(result.x, 0)
 
