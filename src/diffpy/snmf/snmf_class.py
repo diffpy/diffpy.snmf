@@ -4,8 +4,20 @@ from scipy.sparse import coo_matrix, csc_matrix, diags
 
 
 class SNMFOptimizer:
-    def __init__(self, MM, Y0=None, X0=None, A=None, rho=1e12, eta=610, max_iter=500, tol=5e-7, components=None):
-        print("Initializing SNMF Optimizer")
+    def __init__(
+        self,
+        MM,
+        Y0=None,
+        X0=None,
+        A=None,
+        rho=1e12,
+        eta=610,
+        max_iter=500,
+        tol=5e-7,
+        components=None,
+        random_state=None,
+    ):
+
         self.MM = MM
         self.X0 = X0
         self.Y0 = Y0
@@ -15,23 +27,22 @@ class SNMFOptimizer:
         # Capture matrix dimensions
         self.N, self.M = MM.shape
         self.num_updates = 0
+        self.rng = np.random.default_rng(random_state)
 
         if Y0 is None:
             if components is None:
                 raise ValueError("Must provide either Y0 or a number of components.")
             else:
                 self.K = components
-                self.Y0 = np.random.beta(a=2.5, b=1.5, size=(self.K, self.M))  # This is untested
+                self.Y0 = self.rng.beta(a=2.5, b=1.5, size=(self.K, self.M))
         else:
             self.K = Y0.shape[0]
 
-        # Initialize A, X0 if not provided
         if self.A is None:
-            self.A = np.ones((self.K, self.M)) + np.random.randn(self.K, self.M) * 1e-3  # Small perturbation
+            self.A = np.ones((self.K, self.M)) + self.rng.normal(0, 1e-3, size=(self.K, self.M))
         if self.X0 is None:
-            self.X0 = np.random.rand(self.N, self.K)  # Ensures values in [0,1]
+            self.X0 = self.rng.random((self.N, self.K))
 
-        # Initialize solution matrices to be iterated on
         self.X = np.maximum(0, self.X0)
         self.Y = np.maximum(0, self.Y0)
 
