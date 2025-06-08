@@ -17,6 +17,64 @@ class SNMFOptimizer:
         components=None,
         random_state=None,
     ):
+        """Run sNMF based on an ndarray, parameters, and either a number
+        of components or a set of initial guess matrices.
+
+        Currently instantiating the SNMFOptimizer class runs all the analysis
+        immediately. The results can then be accessed as instance attributes
+        of the class (X, Y, and A). Eventually, this will be changed such
+        that __init__ only prepares for the optimization, which will can then
+        be done using fit_transform.
+
+        Parameters
+        ----------
+        MM: ndarray
+            A numpy array containing the data to be decomposed. Rows correspond
+            to different samples/angles, while columns correspond to different
+            conditions with different stretching. Currently, there is no option
+            to treat the first column (commonly containing 2theta angles, sample
+            index, etc) differently, so if present it must be stripped in advance.
+        Y0: ndarray
+            A numpy array containing initial guesses for the component weights
+            at each stretching condition, with number of rows equal to the assumed
+            number of components and number of columns equal to the number of
+            conditions (same number of columns as MM). Must be provided if components
+            is not provided. Will override components if both are provided.
+        X0: ndarray
+            A numpy array containing initial guesses for the intensities of each
+            component per row/sample/angle. Has rows equal to the rows of MM and
+            columns equal to n_components or the number of rows of Y0.
+        A: ndarray
+            A numpy array containing initial guesses for the stretching factor for
+            each component, at each condition. Has number of rows equal to n_components
+            or the number of rows of Y0, and columns equal to the number of conditions
+            (columns of MM).
+        rho: float
+            A stretching factor that influences the decomposition. Zero corresponds to
+            no stretching present. Relatively insensitive and typically adjusted in
+            powers of 10.
+        eta: float
+            A sparsity factor than influences the decomposition. Should be set to zero
+            for non sparse data such as PDF. Can be used to improve results for sparse
+            data such as XRD, but due to instability, should be used only after first
+            selecting the best value for rho.
+        max_iter: int
+            The maximum number of times to update each of A, X, and Y before stopping
+            the optimization.
+        tol: float
+            The minimum fractional improvement in the objective function to allow
+            without terminating the optimization. Note that a minimum of 20 updates
+            are run before this parameter is checked.
+        components: int
+            The number of components to attempt to extract from MM. Note that this will
+            be overridden by Y0 if that is provided, but must be provided if no Y0 is
+            provided.
+        random_state: int
+            Used to set a reproducible seed for the initial matrices used in the
+            optimization. Due to the non-convex nature of the problem, results may vary
+            even with the same initial guesses, so this does not make the program
+            deterministic.
+        """
 
         self.MM = MM
         self.X0 = X0
