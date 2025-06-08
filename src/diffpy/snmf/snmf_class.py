@@ -14,7 +14,7 @@ class SNMFOptimizer:
         eta=610,
         max_iter=500,
         tol=5e-7,
-        components=None,
+        n_components=None,
         random_state=None,
     ):
         """Run sNMF based on an ndarray, parameters, and either a number
@@ -38,8 +38,9 @@ class SNMFOptimizer:
             A numpy array containing initial guesses for the component weights
             at each stretching condition, with number of rows equal to the assumed
             number of components and number of columns equal to the number of
-            conditions (same number of columns as MM). Must be provided if components
-            is not provided. Will override components if both are provided.
+            conditions (same number of columns as MM). Must be provided if
+            n_components is not provided. Will override n_components if both are
+            provided.
         X0: ndarray
             A numpy array containing initial guesses for the intensities of each
             component per row/sample/angle. Has rows equal to the rows of MM and
@@ -65,7 +66,7 @@ class SNMFOptimizer:
             The minimum fractional improvement in the objective function to allow
             without terminating the optimization. Note that a minimum of 20 updates
             are run before this parameter is checked.
-        components: int
+        n_components: int
             The number of components to attempt to extract from MM. Note that this will
             be overridden by Y0 if that is provided, but must be provided if no Y0 is
             provided.
@@ -88,10 +89,10 @@ class SNMFOptimizer:
         self.rng = np.random.default_rng(random_state)
 
         if Y0 is None:
-            if components is None:
-                raise ValueError("Must provide either Y0 or a number of components.")
+            if n_components is None:
+                raise ValueError("Must provide either Y0 or n_components.")
             else:
-                self.K = components
+                self.K = n_components
                 self.Y0 = self.rng.beta(a=2.5, b=1.5, size=(self.K, self.M))
         else:
             self.K = Y0.shape[0]
