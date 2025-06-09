@@ -4,6 +4,18 @@ from scipy.sparse import coo_matrix, csc_matrix, diags
 
 
 class SNMFOptimizer:
+    """A self-contained implementation of the stretched NMF algorithm (sNMF),
+    including sparse stretched NMF.
+
+    Instantiating the SNMFOptimizer class runs all the analysis immediately.
+    The results matrices can then be accessed as instance attributes
+    of the class (X, Y, and A).
+
+    For more information on sNMF, please reference:
+    Gu, R., Rakita, Y., Lan, L. et al. Stretched non-negative matrix factorization.
+    npj Comput Mater 10, 193 (2024). https://doi.org/10.1038/s41524-024-01377-5
+    """
+
     def __init__(
         self,
         MM,
@@ -17,48 +29,33 @@ class SNMFOptimizer:
         n_components=None,
         random_state=None,
     ):
-        """Run sNMF based on an ndarray, parameters, and either a number
-        of components or a set of initial guess matrices.
-
-        Currently instantiating the SNMFOptimizer class runs all the analysis
-        immediately. The results can then be accessed as instance attributes
-        of the class (X, Y, and A). Eventually, this will be changed such
-        that __init__ only prepares for the optimization, which will can then
-        be done using fit_transform.
+        """Initialize an instance of SNMF and run the optimization
 
         Parameters
         ----------
         MM: ndarray
-            A numpy array containing the data to be decomposed. Rows correspond
-            to different samples/angles, while columns correspond to different
-            conditions with different stretching. Currently, there is no option
-            to treat the first column (commonly containing 2theta angles, sample
-            index, etc) differently, so if present it must be stripped in advance.
+            The array containing the data to be decomposed. Shape is (length_of_signal,
+            number_of_conditions).
         Y0: ndarray
-            A numpy array containing initial guesses for the component weights
-            at each stretching condition, with number of rows equal to the assumed
-            number of components and number of columns equal to the number of
-            conditions (same number of columns as MM). Must be provided if
-            n_components is not provided. Will override n_components if both are
-            provided.
+            The array containing initial guesses for the component weights
+            at each stretching condition. Shape is (number of components, number of
+            conditions) Must be provided if n_components is not provided. Will override
+            n_components if both are provided.
         X0: ndarray
-            A numpy array containing initial guesses for the intensities of each
-            component per row/sample/angle. Has rows equal to the rows of MM and
-            columns equal to n_components or the number of rows of Y0.
+            The array containing initial guesses for the intensities of each component per
+            row/sample/angle. Shape is (length_of_signal, number_of_components).
         A: ndarray
-            A numpy array containing initial guesses for the stretching factor for
-            each component, at each condition. Has number of rows equal to n_components
-            or the number of rows of Y0, and columns equal to the number of conditions
-            (columns of MM).
+            The array containing initial guesses for the stretching factor for each component,
+            at each condition. Shape is (number_of_components, number_of_conditions).
         rho: float
-            A stretching factor that influences the decomposition. Zero corresponds to
-            no stretching present. Relatively insensitive and typically adjusted in
-            powers of 10.
+            The float which sets a stretching factor that influences the decomposition.
+            Zero corresponds to no stretching present. Relatively insensitive and typically
+            adjusted in powers of 10.
         eta: float
-            A sparsity factor than influences the decomposition. Should be set to zero
-            for non sparse data such as PDF. Can be used to improve results for sparse
-            data such as XRD, but due to instability, should be used only after first
-            selecting the best value for rho.
+            The integer which sets a sparsity factor than influences the decomposition.
+            Should be set to zero for non sparse data such as PDF. Can be used to improve
+            results for sparse data such as XRD, but due to instability, should be used
+            only after first selecting the best value for rho.
         max_iter: int
             The maximum number of times to update each of A, X, and Y before stopping
             the optimization.
@@ -71,10 +68,9 @@ class SNMFOptimizer:
             be overridden by Y0 if that is provided, but must be provided if no Y0 is
             provided.
         random_state: int
-            Used to set a reproducible seed for the initial matrices used in the
-            optimization. Due to the non-convex nature of the problem, results may vary
-            even with the same initial guesses, so this does not make the program
-            deterministic.
+            The integer which acts as a reproducible seed for the initial matrices used in
+            the optimization. Due to the non-convex nature of the problem, results may vary
+            even with the same initial guesses, so this does not make the program deterministic.
         """
 
         self.MM = MM
