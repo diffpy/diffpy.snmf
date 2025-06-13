@@ -4,8 +4,7 @@ from scipy.sparse import coo_matrix, csc_matrix, diags
 
 
 class SNMFOptimizer:
-    """A self-contained implementation of the stretched NMF algorithm (sNMF),
-    including sparse stretched NMF.
+    """A implementation of stretched NMF (sNMF), including sparse stretched NMF.
 
     Instantiating the SNMFOptimizer class runs all the analysis immediately.
     The results matrices can then be accessed as instance attributes
@@ -33,44 +32,39 @@ class SNMFOptimizer:
 
         Parameters
         ----------
-        MM: ndarray
-            The array containing the data to be decomposed. Shape is (length_of_signal,
-            number_of_conditions).
-        Y0: ndarray
-            The array containing initial guesses for the component weights
-            at each stretching condition. Shape is (number of components, number of
-            conditions) Must be provided if n_components is not provided. Will override
-            n_components if both are provided.
-        X0: ndarray
-            The array containing initial guesses for the intensities of each component per
+        MM : ndarray
+            The data to be decomposed. Shape is (length_of_signal, number_of_conditions).
+        Y0 : ndarray
+            The initial guesses for the component weights at each stretching condition.
+            Shape is (number of components, number ofconditions) Must be provided if
+            n_components is not provided. Will override n_components if both are provided.
+        X0 : ndarray
+            The initial guesses for the intensities of each component per
             row/sample/angle. Shape is (length_of_signal, number_of_components).
-        A: ndarray
-            The array containing initial guesses for the stretching factor for each component,
-            at each condition. Shape is (number_of_components, number_of_conditions).
-        rho: float
-            The float which sets a stretching factor that influences the decomposition.
-            Zero corresponds to no stretching present. Relatively insensitive and typically
-            adjusted in powers of 10.
-        eta: float
-            The integer which sets a sparsity factor than influences the decomposition.
-            Should be set to zero for non sparse data such as PDF. Can be used to improve
-            results for sparse data such as XRD, but due to instability, should be used
-            only after first selecting the best value for rho.
-        max_iter: int
+        A : ndarray
+            The initial guesses for the stretching factor for each component, at each
+            condition. Shape is (number_of_components, number_of_conditions).
+        rho : float
+            The stretching factor that influences the decomposition. Zero corresponds to no
+            stretching present. Relatively insensitive and typically adjusted in powers of 10.
+        eta : float
+            The sparsity factor than influences the decomposition. Should be set to zero for
+            non-sparse data such as PDF. Can be used to improve results for sparse data such
+            as XRD, but due to instability, should be used only after first selecting the
+            best value for rho.
+        max_iter : int
             The maximum number of times to update each of A, X, and Y before stopping
             the optimization.
-        tol: float
-            The minimum fractional improvement in the objective function to allow
-            without terminating the optimization. Note that a minimum of 20 updates
-            are run before this parameter is checked.
-        n_components: int
+        tol : float
+            The convergence threshold. This is the minimum fractional improvement in the
+            objective function to allow without terminating the optimization. Note that
+            a minimum of 20 updates are run before this parameter is checked.
+        n_components : int
             The number of components to attempt to extract from MM. Note that this will
             be overridden by Y0 if that is provided, but must be provided if no Y0 is
             provided.
-        random_state: int
-            The integer which acts as a reproducible seed for the initial matrices used in
-            the optimization. Due to the non-convex nature of the problem, results may vary
-            even with the same initial guesses, so this does not make the program deterministic.
+        random_state : int
+            The seed for the initial matrices used in the optimization.
         """
 
         self.MM = MM
