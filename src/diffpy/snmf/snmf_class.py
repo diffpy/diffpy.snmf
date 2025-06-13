@@ -4,8 +4,69 @@ from scipy.sparse import coo_matrix, csc_matrix, diags
 
 
 class SNMFOptimizer:
-    def __init__(self, MM, Y0=None, X0=None, A=None, rho=1e12, eta=610, max_iter=500, tol=5e-7, components=None):
-        print("Initializing SNMF Optimizer")
+    """A implementation of stretched NMF (sNMF), including sparse stretched NMF.
+
+    Instantiating the SNMFOptimizer class runs all the analysis immediately.
+    The results matrices can then be accessed as instance attributes
+    of the class (X, Y, and A).
+
+    For more information on sNMF, please reference:
+    Gu, R., Rakita, Y., Lan, L. et al. Stretched non-negative matrix factorization.
+    npj Comput Mater 10, 193 (2024). https://doi.org/10.1038/s41524-024-01377-5
+    """
+
+    def __init__(
+        self,
+        MM,
+        Y0=None,
+        X0=None,
+        A=None,
+        rho=1e12,
+        eta=610,
+        max_iter=500,
+        tol=5e-7,
+        n_components=None,
+        random_state=None,
+    ):
+        """Initialize an instance of SNMF and run the optimization
+
+        Parameters
+        ----------
+        MM : ndarray
+            The data to be decomposed. Shape is (length_of_signal, number_of_conditions).
+        Y0 : ndarray
+            The initial guesses for the component weights at each stretching condition.
+            Shape is (number of components, number ofconditions) Must be provided if
+            n_components is not provided. Will override n_components if both are provided.
+        X0 : ndarray
+            The initial guesses for the intensities of each component per
+            row/sample/angle. Shape is (length_of_signal, number_of_components).
+        A : ndarray
+            The initial guesses for the stretching factor for each component, at each
+            condition. Shape is (number_of_components, number_of_conditions).
+        rho : float
+            The stretching factor that influences the decomposition. Zero corresponds to no
+            stretching present. Relatively insensitive and typically adjusted in powers of 10.
+        eta : float
+            The sparsity factor that influences the decomposition. Should be set to zero for
+            non-sparse data such as PDF. Can be used to improve results for sparse data such
+            as XRD, but due to instability, should be used only after first selecting the
+            best value for rho. Suggested adjustment is by powers of 2.
+        max_iter : int
+            The maximum number of times to update each of A, X, and Y before stopping
+            the optimization.
+        tol : float
+            The convergence threshold. This is the minimum fractional improvement in the
+            objective function to allow without terminating the optimization. Note that
+            a minimum of 20 updates are run before this parameter is checked.
+        n_components : int
+            The number of components to attempt to extract from MM. Note that this will
+            be overridden by Y0 if that is provided, but must be provided if no Y0 is
+            provided.
+        random_state : int
+            The seed for the initial matrices used in the optimization.
+        """
+
         self.MM = MM
         self.X0 = X0
         self.Y0 = Y0
@@ -15,23 +76,22 @@ class SNMFOptimizer:
         # Capture matrix dimensions
         self.N, self.M = MM.shape
         self.num_updates = 0
+        self.rng = np.random.default_rng(random_state)
 
         if Y0 is None:
-            if components is None:
-                raise ValueError("Must provide either Y0 or a number of components.")
+            if n_components is None:
+                raise ValueError("Must provide either Y0 or n_components.")
             else:
-                self.K = components
-                self.Y0 = np.random.beta(a=2.5, b=1.5, size=(self.K, self.M))  # This is untested
+                self.K = n_components
+                self.Y0 = self.rng.beta(a=2.5, b=1.5, size=(self.K, self.M))
         else:
             self.K = Y0.shape[0]
 
-        # Initialize A, X0 if not provided
         if self.A is None:
-            self.A = np.ones((self.K, self.M)) + np.random.randn(self.K, self.M) * 1e-3  # Small perturbation
+            self.A = np.ones((self.K, self.M)) + self.rng.normal(0, 1e-3, size=(self.K, self.M))
         if self.X0 is None:
-            self.X0 = np.random.rand(self.N, self.K)  # Ensures values in [0,1]
+            self.X0 = self.rng.random((self.N, self.K))
 
-        # Initialize solution matrices to be iterated on
         self.X = np.maximum(0, self.X0)
         self.Y = np.maximum(0, self.Y0)
 
