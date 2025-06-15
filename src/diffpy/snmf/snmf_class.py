@@ -60,11 +60,12 @@ class SNMFOptimizer:
             objective function to allow without terminating the optimization. Note that
             a minimum of 20 updates are run before this parameter is checked.
         n_components : int
-            The number of components to attempt to extract from MM. Note that this will
+            The number of components to extract from MM. Note that this will
             be overridden by Y0 if that is provided, but must be provided if no Y0 is
             provided.
         random_state : int
-            The seed for the initial matrices used in the optimization.
+            The seed for the initial guesses at the matrices (A, X, and Y) created by
+            the decomposition.
         """
 
         self.MM = MM
@@ -76,21 +77,21 @@ class SNMFOptimizer:
         # Capture matrix dimensions
         self.N, self.M = MM.shape
         self.num_updates = 0
-        self.rng = np.random.default_rng(random_state)
+        self._rng = np.random.default_rng(random_state)
 
         if Y0 is None:
             if n_components is None:
                 raise ValueError("Must provide either Y0 or n_components.")
             else:
                 self.K = n_components
-                self.Y0 = self.rng.beta(a=2.5, b=1.5, size=(self.K, self.M))
+                self.Y0 = self._rng.beta(a=2.5, b=1.5, size=(self.K, self.M))
         else:
             self.K = Y0.shape[0]
 
         if self.A is None:
-            self.A = np.ones((self.K, self.M)) + self.rng.normal(0, 1e-3, size=(self.K, self.M))
+            self.A = np.ones((self.K, self.M)) + self._rng.normal(0, 1e-3, size=(self.K, self.M))
         if self.X0 is None:
-            self.X0 = self.rng.random((self.N, self.K))
+            self.X0 = self._rng.random((self.N, self.K))
 
         self.X = np.maximum(0, self.X0)
         self.Y = np.maximum(0, self.Y0)
