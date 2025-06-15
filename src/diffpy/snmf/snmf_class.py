@@ -20,7 +20,7 @@ class SNMFOptimizer:
         MM,
         Y0=None,
         X0=None,
-        A=None,
+        A0=None,
         rho=1e12,
         eta=610,
         max_iter=500,
@@ -36,12 +36,12 @@ class SNMFOptimizer:
             The data to be decomposed. Shape is (length_of_signal, number_of_conditions).
         Y0 : ndarray
             The initial guesses for the component weights at each stretching condition.
-            Shape is (number of components, number ofconditions) Must be provided if
-            n_components is not provided. Will override n_components if both are provided.
+            Shape is (number_of_components, number_of_conditions) Must provide exactly one
+            of this or n_components.
         X0 : ndarray
             The initial guesses for the intensities of each component per
             row/sample/angle. Shape is (length_of_signal, number_of_components).
-        A : ndarray
+        A0 : ndarray
             The initial guesses for the stretching factor for each component, at each
             condition. Shape is (number_of_components, number_of_conditions).
         rho : float
@@ -60,18 +60,14 @@ class SNMFOptimizer:
             objective function to allow without terminating the optimization. Note that
             a minimum of 20 updates are run before this parameter is checked.
         n_components : int
-            The number of components to extract from MM. Note that this will
-            be overridden by Y0 if that is provided, but must be provided if no Y0 is
-            provided.
+            The number of components to extract from MM. Must be provided when and only when
+            Y0 is not provided.
         random_state : int
             The seed for the initial guesses at the matrices (A, X, and Y) created by
             the decomposition.
         """
 
         self.MM = MM
-        self.X0 = X0
-        self.Y0 = Y0
-        self.A = A
         self.rho = rho
         self.eta = eta
         # Capture matrix dimensions
@@ -79,22 +75,33 @@ class SNMFOptimizer:
         self.num_updates = 0
         self._rng = np.random.default_rng(random_state)
 
+        # Enforce exclusive specification of n_components or Y0
+        if (n_components is None) == (Y0 is not None):
+            raise ValueError("Must provide exactly one of Y0 or n_components, but not both.")
+
+        # Initialize Y0 and determine number of components
         if Y0 is None:
-            if n_components is None:
-                raise ValueError("Must provide either Y0 or n_components.")
-            else:
-                self.K = n_components
-                self.Y0 = self._rng.beta(a=2.5, b=1.5, size=(self.K, self.M))
+            self.K = n_components
+            self.Y = self._rng.beta(a=2.5, b=1.5, size=(self.K, self.M))
         else:
             self.K = Y0.shape[0]
+            self.Y = Y0
 
+        # Initialize A if not provided
         if self.A is None:
             self.A = np.ones((self.K, self.M)) + self._rng.normal(0, 1e-3, size=(self.K, self.M))
-        if self.X0 is None:
-            self.X0 = self._rng.random((self.N, self.K))
+        else:
+            self.A = A0
 
-        self.X = np.maximum(0, self.X0)
-        self.Y = np.maximum(0, self.Y0)
+        # Initialize X0 if not provided
+        if self.X is None:
+            self.X = self._rng.random((self.N, self.K))
+        else:
+            self.X = X0
+
+        # Enforce non-negativity
+        self.X = np.maximum(0, self.X)
+        self.Y = np.maximum(0, self.Y)
 
         # Second-order spline: Tridiagonal (-2 on diagonal, 1 on sub/superdiagonals)
         self.P = 0.25 * diags([1, -2, 1], offsets=[0, 1, 2], shape=(self.M - 2, self.M))
