@@ -13,6 +13,52 @@ class SNMFOptimizer:
     For more information on sNMF, please reference:
     Gu, R., Rakita, Y., Lan, L. et al. Stretched non-negative matrix factorization.
     npj Comput Mater 10, 193 (2024). https://doi.org/10.1038/s41524-024-01377-5
+
+    Attributes
+    ----------
+    MM : ndarray
+        The original, unmodified data to be decomposed and later, compared against.
+        Shape is (length_of_signal, number_of_conditions).
+    Y : ndarray
+        The best guess (or while running, the current guess) for the stretching
+        factor matrix.
+    X : ndarray
+        The best guess (or while running, the current guess) for the matrix of
+        component intensities.
+    A : ndarray
+        The best guess (or while running, the current guess) for the matrix of
+        component weights.
+    rho : float
+            The stretching factor that influences the decomposition. Zero corresponds to no
+            stretching present. Relatively insensitive and typically adjusted in powers of 10.
+    eta : float
+        The sparsity factor that influences the decomposition. Should be set to zero for
+        non-sparse data such as PDF. Can be used to improve results for sparse data such
+        as XRD, but due to instability, should be used only after first selecting the
+        best value for rho. Suggested adjustment is by powers of 2.
+    max_iter : int
+            The maximum number of times to update each of A, X, and Y before stopping
+            the optimization.
+    tol : float
+        The convergence threshold. This is the minimum fractional improvement in the
+        objective function to allow without terminating the optimization. Note that
+        a minimum of 20 updates are run before this parameter is checked.
+    n_components : int
+        The number of components to extract from MM. Must be provided when and only when
+        Y0 is not provided.
+    random_state : int
+        The seed for the initial guesses at the matrices (A, X, and Y) created by
+        the decomposition.
+    num_updates : int
+        The total number of times that any of (A, X, and Y) have had their values changed.
+        If not terminated by other means, this value is used to stop when reaching max_iter.
+    objective_function: float
+        The value corresponding to the minimization of the difference between the MM and the
+        products of A, X, and Y. For full details see the sNMF paper. Smaller corresponds to
+        better agreement and is desirable.
+    objective_difference : float
+        The change in the objective function value since the last update. A negative value
+        means that the result improved.
     """
 
     def __init__(
@@ -28,7 +74,7 @@ class SNMFOptimizer:
         n_components=None,
         random_state=None,
     ):
-        """Initialize an instance of SNMF and run the optimization
+        """Initialize an instance of SNMF and run the optimization.
 
         Parameters
         ----------
@@ -71,7 +117,7 @@ class SNMFOptimizer:
         self.rho = rho
         self.eta = eta
         # Capture matrix dimensions
-        self.N, self.M = MM.shape
+        self._N, self._M = MM.shape
         self.num_updates = 0
         self._rng = np.random.default_rng(random_state)
 
@@ -81,21 +127,21 @@ class SNMFOptimizer:
 
         # Initialize Y0 and determine number of components
         if Y0 is None:
-            self.K = n_components
-            self.Y = self._rng.beta(a=2.5, b=1.5, size=(self.K, self.M))
+            self._K = n_components
+            self.Y = self._rng.beta(a=2.5, b=1.5, size=(self._K, self._M))
         else:
-            self.K = Y0.shape[0]
+            self._K = Y0.shape[0]
             self.Y = Y0
 
         # Initialize A if not provided
         if self.A is None:
-            self.A = np.ones((self.K, self.M)) + self._rng.normal(0, 1e-3, size=(self.K, self.M))
+            self.A = np.ones((self._K, self._M)) + self._rng.normal(0, 1e-3, size=(self._K, self._M))
         else:
             self.A = A0
 
         # Initialize X0 if not provided
         if self.X is None:
-            self.X = self._rng.random((self.N, self.K))
+            self.X = self._rng.random((self._N, self._K))
         else:
             self.X = X0
 
@@ -104,19 +150,19 @@ class SNMFOptimizer:
         self.Y = np.maximum(0, self.Y)
 
         # Second-order spline: Tridiagonal (-2 on diagonal, 1 on sub/superdiagonals)
-        self.P = 0.25 * diags([1, -2, 1], offsets=[0, 1, 2], shape=(self.M - 2, self.M))
+        self.P = 0.25 * diags([1, -2, 1], offsets=[0, 1, 2], shape=(self._M - 2, self._M))
         self.PP = self.P.T @ self.P
 
         # Set up residual matrix, objective function, and history
         self.R = self.get_residual_matrix()
         self.objective_function = self.get_objective_function()
         self.objective_difference = None
-        self.objective_history = [self.objective_function]
+        self._objective_history = [self.objective_function]
 
         # Set up tracking variables for updateX()
-        self.preX = None
-        self.GraX = np.zeros_like(self.X)  # Gradient of X (zeros for now)
-        self.preGraX = np.zeros_like(self.X)  # Previous gradient of X (zeros for now)
+        self._preX = None
+        self._GraX = np.zeros_like(self.X)  # Gradient of X (zeros for now)
+        self._preGraX = np.zeros_like(self.X)  # Previous gradient of X (zeros for now)
 
         regularization_term = 0.5 * rho * np.linalg.norm(self.P @ self.A.T, "fro") ** 2
         sparsity_term = eta * np.sum(np.sqrt(self.X))  # Square root penalty
@@ -151,20 +197,20 @@ class SNMFOptimizer:
         # loop to normalize X
         # effectively just re-running class with non-normalized X, normalized Y/A as inputs, then only update X
         # reset difference trackers and initialize
-        self.preX = None
-        self.GraX = np.zeros_like(self.X)  # Gradient of X (zeros for now)
-        self.preGraX = np.zeros_like(self.X)  # Previous gradient of X (zeros for now)
+        self._preX = None
+        self._GraX = np.zeros_like(self.X)  # Gradient of X (zeros for now)
+        self._preGraX = np.zeros_like(self.X)  # Previous gradient of X (zeros for now)
         self.R = self.get_residual_matrix()
         self.objective_function = self.get_objective_function()
         self.objective_difference = None
-        self.objective_history = [self.objective_function]
+        self._objective_history = [self.objective_function]
         for norm_iter in range(100):
             self.updateX()
             self.R = self.get_residual_matrix()
             self.objective_function = self.get_objective_function()
             print(f"Objective function after normX: {self.objective_function:.5e}")
-            self.objective_history.append(self.objective_function)
-            self.objective_difference = self.objective_history[-2] - self.objective_history[-1]
+            self._objective_history.append(self.objective_function)
+            self.objective_difference = self._objective_history[-2] - self._objective_history[-1]
             if self.objective_difference < self.objective_function * tol and norm_iter >= 20:
                 break
         # end of normalization (and program)
@@ -172,15 +218,15 @@ class SNMFOptimizer:
         print("Finished optimization.")
 
     def optimize_loop(self):
-        self.preGraX = self.GraX.copy()
+        self._preGraX = self._GraX.copy()
         self.updateX()
         self.num_updates += 1
         self.R = self.get_residual_matrix()
         self.objective_function = self.get_objective_function()
         print(f"Objective function after updateX: {self.objective_function:.5e}")
-        self.objective_history.append(self.objective_function)
+        self._objective_history.append(self.objective_function)
         if self.objective_difference is None:
-            self.objective_difference = self.objective_history[-1] - self.objective_function
+            self.objective_difference = self._objective_history[-1] - self.objective_function
 
         # Now we update Y
         self.updateY2()
@@ -188,7 +234,7 @@ class SNMFOptimizer:
         self.R = self.get_residual_matrix()
         self.objective_function = self.get_objective_function()
         print(f"Objective function after updateY2: {self.objective_function:.5e}")
-        self.objective_history.append(self.objective_function)
+        self._objective_history.append(self.objective_function)
 
         self.updateA2()
 
@@ -196,8 +242,8 @@ class SNMFOptimizer:
         self.R = self.get_residual_matrix()
         self.objective_function = self.get_objective_function()
         print(f"Objective function after updateA2: {self.objective_function:.5e}")
-        self.objective_history.append(self.objective_function)
-        self.objective_difference = self.objective_history[-2] - self.objective_history[-1]
+        self._objective_history.append(self.objective_function)
+        self.objective_difference = self._objective_history[-2] - self._objective_history[-1]
 
     def apply_interpolation(self, a, x, return_derivatives=False):
         """
@@ -469,36 +515,38 @@ class SNMFOptimizer:
         # Compute `AX` using the interpolation function
         AX, _, _ = self.apply_interpolation_matrix()  # Skip the other two outputs
         # Compute RA and RR
-        intermediate_RA = AX.flatten(order="F").reshape((self.N * self.M, self.K), order="F")
-        RA = intermediate_RA.sum(axis=1).reshape((self.N, self.M), order="F")
+        intermediate_RA = AX.flatten(order="F").reshape((self._N * self._M, self._K), order="F")
+        RA = intermediate_RA.sum(axis=1).reshape((self._N, self._M), order="F")
         RR = RA - self.MM
         # Compute gradient `GraX`
-        self.GraX = self.apply_transformation_matrix(R=RR).toarray()  # toarray equivalent of full, make non-sparse
+        self._GraX = self.apply_transformation_matrix(
+            R=RR
+        ).toarray()  # toarray equivalent of full, make non-sparse
 
         # Compute initial step size `L0`
         L0 = np.linalg.eigvalsh(self.Y.T @ self.Y).max() * np.max([self.A.max(), 1 / self.A.min()])
         # Compute adaptive step size `L`
-        if self.preX is None:
+        if self._preX is None:
             L = L0
         else:
-            num = np.sum((self.GraX - self.preGraX) * (self.X - self.preX))  # Element-wise multiplication
-            denom = np.linalg.norm(self.X - self.preX, "fro") ** 2  # Frobenius norm squared
+            num = np.sum((self._GraX - self._preGraX) * (self.X - self._preX))  # Element-wise multiplication
+            denom = np.linalg.norm(self.X - self._preX, "fro") ** 2  # Frobenius norm squared
             L = num / denom if denom > 0 else L0
             if L <= 0:
                 L = L0
 
         # Store our old X before updating because it is used in step selection
-        self.preX = self.X.copy()
+        self._preX = self.X.copy()
 
         while True:  # iterate updating X
-            x_step = self.preX - self.GraX / L
+            x_step = self._preX - self._GraX / L
             # Solve x^3 + p*x + q = 0 for the largest real root
             self.X = np.square(cubic_largest_real_root(-x_step, self.eta / (2 * L)))
             # Mask values that should be set to zero
             mask = self.X**2 * L / 2 - L * self.X * x_step + self.eta * np.sqrt(self.X) < 0
             self.X = mask * self.X
 
-            objective_improvement = self.objective_history[-1] - self.get_objective_function(
+            objective_improvement = self._objective_history[-1] - self.get_objective_function(
                 R=self.get_residual_matrix()
             )
 
@@ -515,9 +563,9 @@ class SNMFOptimizer:
         Updates Y using matrix operations, solving a quadratic program via `solve_mkr_box`.
         """
 
-        K = self.K
-        N = self.N
-        M = self.M
+        K = self._K
+        N = self._N
+        M = self._M
 
         for m in range(M):
             T = np.zeros((N, K))  # Initialize T as an (N, K) zero matrix
@@ -544,9 +592,9 @@ class SNMFOptimizer:
         if A is None:
             A = self.A
 
-        K = self.K
-        M = self.M
-        N = self.N
+        K = self._K
+        M = self._M
+        N = self._N
 
         # Compute interpolated matrices
         AX, TX, HX = self.apply_interpolation_matrix(A=A, return_derivatives=True)
