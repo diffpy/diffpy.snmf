@@ -12,12 +12,8 @@ assignees: ""
 - [ ] All the badges on the README are passing.
 - [ ] License information is verified as correct. If you are unsure, please comment below.
 - [ ] Locally rendered documentation contains all appropriate pages, including API references (check no modules are
-      <<<<<<< Updated upstream
-      missing), tutorials, and other human written text is up-to-date with any changes in the code.
-- [ ] # Installation instructions in the README, documentation and on the website (e.g., diffpy.org) are updated.
-        missing), tutorials, and other human-written text is up-to-date with any changes in the code.
+      missing), tutorials, and other human-written text is up-to-date with any changes in the code.
 - [ ] Installation instructions in the README, documentation, and the website are updated.
-  > > > > > > > Stashed changes
 - [ ] Successfully run any tutorial examples or do functional testing with the latest Python version.
 - [ ] Grammar and writing quality are checked (no typos).
 - [ ] Install `pip install build twine`, run `python -m build` and `twine check dist/*` to ensure that the package can be built and is correctly formatted for PyPI release.
