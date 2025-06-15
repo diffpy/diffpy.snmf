@@ -3,7 +3,8 @@ import scipy.optimize
 
 
 def lsqnonneg(stretched_component_matrix, target_signal):
-    """Finds the weights of stretched component signals under one-sided constraint.
+    """Finds the weights of stretched component signals under one-sided
+    constraint.
 
     Solves ``argmin_x || Ax - b ||_2`` for ``x>=0`` where A is the stretched_component_matrix and b is the
     target_signal vector. Finds the weights of component signals given undecomposed signal data and stretched

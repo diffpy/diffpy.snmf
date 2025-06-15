@@ -7,7 +7,8 @@ from diffpy.snmf.optimizers import get_weights
 
 
 def initialize_components(number_of_components, number_of_signals, grid_vector):
-    """Initializes ComponentSignals for each of the components in the decomposition.
+    """Initializes ComponentSignals for each of the components in the
+    decomposition.
 
     Parameters
     ----------
@@ -182,7 +183,8 @@ def update_weights(components, data_input, method=None):
 
 
 def reconstruct_signal(components, signal_idx):
-    """Reconstructs a specific signal from its weighted and stretched components.
+    """Reconstructs a specific signal from its weighted and stretched
+    components.
 
     Calculates the linear combination of stretched components where each term is the stretched component multiplied
     by its weight factor.
@@ -209,7 +211,8 @@ def reconstruct_signal(components, signal_idx):
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
-    """Generates the initial guesses for the weight, stretching, and component matrices.
+    """Generates the initial guesses for the weight, stretching, and component
+    matrices.
 
     Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The
     initial guess for the component matrix is a random (signal_length) x (number_of_components) matrix where
@@ -245,7 +248,12 @@ def initialize_arrays(number_of_components, number_of_moments, signal_length):
 
 
 def objective_function(
-    residual_matrix, stretching_factor_matrix, smoothness, smoothness_term, component_matrix, sparsity
+    residual_matrix,
+    stretching_factor_matrix,
+    smoothness,
+    smoothness_term,
+    component_matrix,
+    sparsity,
 ):
     """Defines the objective function of the algorithm and returns its value.
 
@@ -322,7 +330,13 @@ def get_stretched_component(stretching_factor, component, signal_length):
     normalized_grid = np.arange(signal_length)
 
     def stretched_component_func(stretching_factor):
-        return np.interp(normalized_grid / stretching_factor, normalized_grid, component, left=0, right=0)
+        return np.interp(
+            normalized_grid / stretching_factor,
+            normalized_grid,
+            component,
+            left=0,
+            right=0,
+        )
 
     derivative_func = numdifftools.Derivative(stretched_component_func)
     second_derivative_func = numdifftools.Derivative(derivative_func)
@@ -394,10 +408,15 @@ def update_weights_matrix(
         stretched_components = np.zeros((signal_length, component_amount))
         for n in range(component_amount):
             stretched_components[:, n] = get_stretched_component(
-                stretching_factor_matrix[n, i], component_matrix[:, n], signal_length
+                stretching_factor_matrix[n, i],
+                component_matrix[:, n],
+                signal_length,
             )[0]
         if method == "align":
-            weight = lsqnonneg(stretched_components[0:signal_length, :], data_input[0:signal_length, i])
+            weight = lsqnonneg(
+                stretched_components[0:signal_length, :],
+                data_input[0:signal_length, i],
+            )
         else:
             weight = get_weights(
                 stretched_components[0:signal_length, :].T @ stretched_components[0:signal_length, :],
@@ -410,9 +429,16 @@ def update_weights_matrix(
 
 
 def get_residual_matrix(
-    component_matrix, weights_matrix, stretching_matrix, data_input, moment_amount, component_amount, signal_length
+    component_matrix,
+    weights_matrix,
+    stretching_matrix,
+    data_input,
+    moment_amount,
+    component_amount,
+    signal_length,
 ):
-    """Obtains the residual matrix between the experimental data and calculated data.
+    """Obtains the residual matrix between the experimental data and calculated
+    data.
 
     Calculates the difference between the experimental data and the reconstructed experimental data created from
     the calculated components, weights, and stretching factors. For each experimental pattern, the stretched and
@@ -465,7 +491,11 @@ def get_residual_matrix(
             residual = (
                 residual
                 + weights_matrix[k, m]
-                * get_stretched_component(stretching_matrix[k, m], component_matrix[:, k], signal_length)[0]
+                * get_stretched_component(
+                    stretching_matrix[k, m],
+                    component_matrix[:, k],
+                    signal_length,
+                )[0]
             )
         residual_matrx[:, m] = residual
     return residual_matrx
