@@ -1,5 +1,5 @@
 import numpy as np
-import snmf_class
+from snmf_class import SNMFOptimizer
 
 X0 = np.loadtxt("input/X0.txt", dtype=float)
 MM = np.loadtxt("input/MM.txt", dtype=float)
