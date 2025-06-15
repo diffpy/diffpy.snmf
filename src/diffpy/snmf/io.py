@@ -39,7 +39,6 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
       guess for the weight factor matrix, an initial guess for the stretching factor matrix, a parameter
       controlling smoothness of the solution, a parameter controlling sparseness of the solution, the matrix
       representing the smoothness term, and a matrix used to construct a hessian matrix.
-
     """
     signal_length = data_input.shape[0]
     number_of_signals = data_input.shape[1]
@@ -74,7 +73,8 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
 
 
 def load_input_signals(file_path=None):
-    """Processes a directory of a series of PDF/XRD patterns into a usable format.
+    """Processes a directory of a series of PDF/XRD patterns into a usable
+    format.
 
     Constructs a 2d array out of a directory of PDF/XRD patterns containing each files dependent variable
     column in a new column. Constructs a 1d array containing the grid values.
@@ -92,7 +92,6 @@ def load_input_signals(file_path=None):
       The tuple whose first element is an R x M 2d array made of PDF/XRD patterns as each column; R is the
       length of the signal and M is the number of patterns. The tuple contains a 1d array containing the values
       of the grid points as its second element; Has length R.
-
     """
 
     if file_path is None:

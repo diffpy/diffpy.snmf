@@ -4,12 +4,18 @@ from pathlib import Path
 from diffpy.snmf.io import initialize_variables, load_input_signals
 from diffpy.snmf.subroutines import initialize_components, lift_data
 
-ALLOWED_DATA_TYPES = ["powder_diffraction", "pd", "pair_distribution_function", "pdf"]
+ALLOWED_DATA_TYPES = [
+    "powder_diffraction",
+    "pd",
+    "pair_distribution_function",
+    "pdf",
+]
 
 
 def create_parser():
     parser = argparse.ArgumentParser(
-        prog="stretched_nmf", description="Stretched Nonnegative Matrix Factorization"
+        prog="stretched_nmf",
+        description="Stretched Nonnegative Matrix Factorization",
     )
     parser.add_argument(
         "-i",
@@ -44,7 +50,12 @@ def create_parser():
         type=int,
         help="The number of component signals for the NMF decomposition. Must be an integer greater than 0",
     )
-    parser.add_argument("-v", "--version", action="version", help="Print the software version number")
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        help="Print the software version number",
+    )
     args = parser.parse_args()
     return args
 

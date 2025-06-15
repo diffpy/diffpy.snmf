@@ -2,8 +2,14 @@ import numpy as np
 from scipy.optimize import minimize
 
 
-def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound, upper_bound):
-    """Finds the weights of stretched component signals under a two-sided constraint
+def get_weights(
+    stretched_component_gram_matrix,
+    linear_coefficient,
+    lower_bound,
+    upper_bound,
+):
+    """Finds the weights of stretched component signals under a two-sided
+    constraint.
 
     Solves min J(y) = (linear_coefficient)' * y + (1/2) * y' * (quadratic coefficient) * y where
     lower_bound <= y <= upper_bound and stretched_component_gram_matrix is symmetric positive definite.
@@ -34,7 +40,6 @@ def get_weights(stretched_component_gram_matrix, linear_coefficient, lower_bound
     1d array like
       The vector containing the weightings of the components needed to reconstruct a given input signal from the
       input set. Has length C
-
     """
 
     stretched_component_gram_matrix = np.asarray(stretched_component_gram_matrix)

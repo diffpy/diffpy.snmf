@@ -26,7 +26,7 @@ class ComponentSignal:
         self.id = int(id_number)
 
     def apply_stretch(self, m):
-        """Applies a stretching factor to a component
+        """Applies a stretching factor to a component.
 
         Parameters
         ----------
@@ -41,7 +41,11 @@ class ComponentSignal:
         """
         normalized_grid = np.arange(len(self.grid))
         interpolate_intensity = lambda stretching_factor: np.interp(  # noqa: E731
-            normalized_grid / stretching_factor, normalized_grid, self.iq, left=0, right=0
+            normalized_grid / stretching_factor,
+            normalized_grid,
+            self.iq,
+            left=0,
+            right=0,
         )
         derivative_func = numdifftools.Derivative(interpolate_intensity)
         second_derivative_func = numdifftools.Derivative(derivative_func)
