@@ -35,7 +35,7 @@
 .. |Tracking| image:: https://img.shields.io/badge/issue_tracking-github-blue
         :target: https://github.com/diffpy/diffpy.snmf/issues
 
-Python package implementing the stretched NMF algorithm.
+A python package implementing the stretched NMF algorithm.
 
 ``diffpy.snmf`` implements the stretched non negative matrix factorization (sNMF) and sparse stretched NMF
 (ssNMF) algorithms.
@@ -50,9 +50,14 @@ For more information about the diffpy.snmf library, please consult our `online d
 Citation
 --------
 
-If you use diffpy.snmf in a scientific publication, we would like you to cite this package as
+If you use this program for a scientific research that leads
+to publication, we ask that you acknowledge use of the program
+by citing the following paper in your publication:
 
-        diffpy.snmf Package, https://github.com/diffpy/diffpy.snmf
+   Ran Gu, Yevgeny Rakita, Ling Lan, Zach Thatcher, Gabrielle E. Kamm, Daniel O’Nolan, Brennan Mcbride, Allison Wustrow, James R. Neilson, Karena W. Chapman, Qiang Du, and Simon J. L. Billinge,
+   `Stretched Non-negative Matrix Factorization
+   <https://doi.org/10.1038/s41524-024-01377-5>`__,
+   *npj Comput Mater* **10**, 193 (2024).
 
 Installation
 ------------
