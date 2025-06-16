@@ -1,7 +1,7 @@
 Authors
 =======
 
-Simon J.L. Billinge group
+Billinge Group and community contributors.
 
 Contributors
 ------------
