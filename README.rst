@@ -8,7 +8,7 @@
         :target: https://diffpy.github.io/diffpy.snmf
         :height: 100px
 
-|PyPi| |Forge| |PythonVersion| |PR|
+|PyPI| |Forge| |PythonVersion| |PR|
 
 |CI| |Codecov| |Black| |Tracking|
 
@@ -26,7 +26,7 @@
 
 .. |PR| image:: https://img.shields.io/badge/PR-Welcome-29ab47ff
 
-.. |PyPi| image:: https://img.shields.io/pypi/v/diffpy.snmf
+.. |PyPI| image:: https://img.shields.io/pypi/v/diffpy.snmf
         :target: https://pypi.org/project/diffpy.snmf/
 
 .. |PythonVersion| image:: https://img.shields.io/pypi/pyversions/diffpy.snmf
@@ -35,7 +35,7 @@
 .. |Tracking| image:: https://img.shields.io/badge/issue_tracking-github-blue
         :target: https://github.com/diffpy/diffpy.snmf/issues
 
-A python package implementing the stretched NMF algorithm.
+Python package implementing the stretched NMF algorithm.
 
 ``diffpy.snmf`` implements the stretched non negative matrix factorization (sNMF) and sparse stretched NMF
 (ssNMF) algorithms.
@@ -50,14 +50,9 @@ For more information about the diffpy.snmf library, please consult our `online d
 Citation
 --------
 
-If you use this program for a scientific research that leads
-to publication, we ask that you acknowledge use of the program
-by citing the following paper in your publication:
+If you use diffpy.snmf in a scientific publication, we would like you to cite this package as
 
-   Ran Gu, Yevgeny Rakita, Ling Lan, Zach Thatcher, Gabrielle E. Kamm, Daniel O’Nolan, Brennan Mcbride, Allison Wustrow, James R. Neilson, Karena W. Chapman, Qiang Du, and Simon J. L. Billinge,
-   `Stretched Non-negative Matrix Factorization
-   <https://doi.org/10.1038/s41524-024-01377-5>`__,
-   *npj Comput Mater* **10**, 193 (2024).
+        diffpy.snmf Package, https://github.com/diffpy/diffpy.snmf
 
 Installation
 ------------
@@ -104,7 +99,7 @@ Support and Contribute
 
 `Diffpy user group <https://groups.google.com/g/diffpy-users>`_ is the discussion forum for general questions and discussions about the use of diffpy.snmf. Please join the diffpy.snmf users community by joining the Google group. The diffpy.snmf project welcomes your expertise and enthusiasm!
 
-If you see a bug or want to request a feature, please `report it as an issue <https://github.com/diffpy/diffpy.snmf/issues>`_ and/or `submit a fix as a PR <https://github.com/diffpy/diffpy.snmf/pulls>`_. You can also post it to the `Diffpy user group <https://groups.google.com/g/diffpy-users>`_.
+If you see a bug or want to request a feature, please `report it as an issue <https://github.com/diffpy/diffpy.snmf/issues>`_ and/or `submit a fix as a PR <https://github.com/diffpy/diffpy.snmf/pulls>`_.
 
 Feel free to fork the project and contribute. To install diffpy.snmf
 in a development mode, with its sources being directly used by Python
@@ -132,4 +127,9 @@ Before contributing, please read our `Code of Conduct <https://github.com/diffpy
 Contact
 -------
 
-For more information on diffpy.snmf please visit the project `web-page <https://diffpy.github.io/>`_ or email Prof. Simon Billinge at sb2896@columbia.edu.
+For more information on diffpy.snmf please visit the project `web-page <https://diffpy.github.io/>`_ or email Simon J.L. Billinge group at sb2896@columbia.edu.
+
+Acknowledgements
+----------------
+
+``diffpy.snmf`` is built and maintained with `scikit-package <https://scikit-package.github.io/scikit-package/>`_.
