@@ -122,7 +122,7 @@ class SNMFOptimizer:
         self._rng = np.random.default_rng(random_state)
 
         # Enforce exclusive specification of n_components or Y0
-        if (n_components is None) == (Y0 is not None):
+        if (n_components is None and Y0 is None) or (n_components is not None and Y0 is not None):
             raise ValueError("Must provide exactly one of Y0 or n_components, but not both.")
 
         # Initialize Y0 and determine number of components
@@ -134,13 +134,13 @@ class SNMFOptimizer:
             self.Y = Y0
 
         # Initialize A if not provided
-        if self.A is None:
+        if A0 is None:
             self.A = np.ones((self._K, self._M)) + self._rng.normal(0, 1e-3, size=(self._K, self._M))
         else:
             self.A = A0
 
         # Initialize X0 if not provided
-        if self.X is None:
+        if X0 is None:
             self.X = self._rng.random((self._N, self._K))
         else:
             self.X = X0
