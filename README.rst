@@ -8,7 +8,7 @@
         :target: https://diffpy.github.io/diffpy.snmf
         :height: 100px
 
-|PyPi| |Forge| |PythonVersion| |PR|
+|PyPI| |Forge| |PythonVersion| |PR|
 
 |CI| |Codecov| |Black| |Tracking|
 
@@ -26,7 +26,7 @@
 
 .. |PR| image:: https://img.shields.io/badge/PR-Welcome-29ab47ff
 
-.. |PyPi| image:: https://img.shields.io/pypi/v/diffpy.snmf
+.. |PyPI| image:: https://img.shields.io/pypi/v/diffpy.snmf
         :target: https://pypi.org/project/diffpy.snmf/
 
 .. |PythonVersion| image:: https://img.shields.io/pypi/pyversions/diffpy.snmf
@@ -132,4 +132,9 @@ Before contributing, please read our `Code of Conduct <https://github.com/diffpy
 Contact
 -------
 
-For more information on diffpy.snmf please visit the project `web-page <https://diffpy.github.io/>`_ or email Prof. Simon Billinge at sb2896@columbia.edu.
+For more information on diffpy.snmf please visit the project `web-page <https://diffpy.github.io/>`_ or email Simon J.L. Billinge group at sb2896@columbia.edu.
+
+Acknowledgements
+----------------
+
+``diffpy.snmf`` is built and maintained with `scikit-package <https://scikit-package.github.io/scikit-package/>`_.
