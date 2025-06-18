@@ -211,8 +211,8 @@ def reconstruct_signal(components, signal_idx):
 
 
 def initialize_arrays(number_of_components, number_of_moments, signal_length):
-    """Generates the initial guesses for the weight, stretching, and component
-    matrices.
+    """Generates the initial guesses for the weight, stretching, and
+    component matrices.
 
     Calculates the initial guesses for the component matrix, stretching factor matrix, and weight matrix. The
     initial guess for the component matrix is a random (signal_length) x (number_of_components) matrix where
@@ -255,7 +255,8 @@ def objective_function(
     component_matrix,
     sparsity,
 ):
-    """Defines the objective function of the algorithm and returns its value.
+    """Defines the objective function of the algorithm and returns its
+    value.
 
     Calculates the value of '(||residual_matrix||_F) ** 2 + smoothness * (||smoothness_term *
     stretching_factor_matrix.T||)**2 + sparsity * sum(component_matrix ** .5)' and returns its value.
@@ -437,8 +438,8 @@ def get_residual_matrix(
     component_amount,
     signal_length,
 ):
-    """Obtains the residual matrix between the experimental data and calculated
-    data.
+    """Obtains the residual matrix between the experimental data and
+    calculated data.
 
     Calculates the difference between the experimental data and the reconstructed experimental data created from
     the calculated components, weights, and stretching factors. For each experimental pattern, the stretched and
