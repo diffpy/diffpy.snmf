@@ -1,6 +1,11 @@
 Welcome to SNMF's Documentation!
 ====================================
 
+``diffpy.snmf`` - Python package implementing the stretched NMF algorithm.
+
+| Software version |release|
+| Last updated |today|.
+
 ``SNMF``: This library implements the stretched non negative matrix factorization (sNMF) and sparse stretched NMF
 (ssNMF) algorithms described in the paper "Stretched Non-negative Matrix Factorization" by Ran Gu et al. (2023),
 which is referenced under the Citation section below.
@@ -52,8 +57,9 @@ by citing the following paper in your publication:
    *npj Comput Mater* **10**, 193 (2024).
 
 
+=======
 Authors
--------
+=======
 
 ``snmf`` implements the algorithms described in ...., developed by members of the Billinge Group at
 Columbia University, Brookhaven National Laboratory, Stony Brook University, Nankai University, and Colorado State
@@ -67,6 +73,19 @@ For a detailed list of contributors, check `here
 <https://github.com/diffpy/diffpy.snmf/graphs/contributors>`_.
 
 To get started, please go to :ref:`quick_start`
+
+============
+Installation
+============
+
+See the `README <https://github.com/diffpy/diffpy.snmf#installation>`_
+file included with the distribution.
+
+================
+Acknowledgements
+================
+
+``diffpy.snmf`` is built and maintained with `scikit-package <https://scikit-package.github.io/scikit-package/>`_.
 
 .. toctree::
    :maxdepth: 3
@@ -84,8 +103,9 @@ To get started, please go to :ref:`quick_start`
 
 .. include:: ../../CHANGELOG.rst
 
+=======
 Indices
--------
+=======
 
 * :ref:`genindex`
 * :ref:`search`
