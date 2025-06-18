@@ -8,8 +8,8 @@ def get_weights(
     lower_bound,
     upper_bound,
 ):
-    """Finds the weights of stretched component signals under a two-sided
-    constraint.
+    """Finds the weights of stretched component signals under a two-
+    sided constraint.
 
     Solves min J(y) = (linear_coefficient)' * y + (1/2) * y' * (quadratic coefficient) * y where
     lower_bound <= y <= upper_bound and stretched_component_gram_matrix is symmetric positive definite.

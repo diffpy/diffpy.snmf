@@ -7,7 +7,8 @@ from diffpy.utils.parsers.loaddata import loadData
 
 
 def initialize_variables(data_input, number_of_components, data_type, sparsity=1, smoothness=1e18):
-    """Determines the variables and initial values used in the SNMF algorithm.
+    """Determines the variables and initial values used in the SNMF
+    algorithm.
 
     Parameters
     ----------
@@ -73,8 +74,8 @@ def initialize_variables(data_input, number_of_components, data_type, sparsity=1
 
 
 def load_input_signals(file_path=None):
-    """Processes a directory of a series of PDF/XRD patterns into a usable
-    format.
+    """Processes a directory of a series of PDF/XRD patterns into a
+    usable format.
 
     Constructs a 2d array out of a directory of PDF/XRD patterns containing each files dependent variable
     column in a new column. Constructs a 1d array containing the grid values.
