@@ -233,7 +233,7 @@ class SNMFOptimizer:
         self.num_updates += 1
         self.residuals = self.get_residual_matrix()
         self.objective_function = self.get_objective_function()
-        print(f"Objective function after updateX: {self.objective_function:.5e}")
+        print(f"Objective function after update_comps: {self.objective_function:.5e}")
         self._objective_history.append(self.objective_function)
         if self.objective_difference is None:
             self.objective_difference = self._objective_history[-1] - self.objective_function
@@ -243,7 +243,7 @@ class SNMFOptimizer:
         self.num_updates += 1
         self.residuals = self.get_residual_matrix()
         self.objective_function = self.get_objective_function()
-        print(f"Objective function after updateY2: {self.objective_function:.5e}")
+        print(f"Objective function after update_weights: {self.objective_function:.5e}")
         self._objective_history.append(self.objective_function)
 
         # Now we update stretch
@@ -266,14 +266,16 @@ class SNMFOptimizer:
         a = np.atleast_1d(np.asarray(a))  # Ensures a is at least 1D
 
         # Compute fractional indices, broadcasting over `a`
-        ii = np.arange(x_len)[:, None] / a  # Shape (N, M)
+        fractional_indices = np.arange(x_len)[:, None] / a  # Shape (N, M)
 
-        II = np.floor(ii).astype(int)  # Integer part (still (N, M))
-        valid_mask = II < (x_len - 1)  # Ensure indices are within bounds
+        integer_indices = np.floor(fractional_indices).astype(int)  # Integer part (still (N, M))
+        valid_mask = integer_indices < (x_len - 1)  # Ensure indices are within bounds
 
         # Apply valid_mask to keep correct indices
-        idx_int = np.where(valid_mask, II, x_len - 2)  # Prevent out-of-bounds indexing (previously "I")
-        idx_frac = np.where(valid_mask, ii, II)  # Keep aligned (previously "i")
+        idx_int = np.where(
+            valid_mask, integer_indices, x_len - 2
+        )  # Prevent out-of-bounds indexing (previously "I")
+        idx_frac = np.where(valid_mask, fractional_indices, integer_indices)  # Keep aligned (previously "i")
 
         # Ensure x is a 1D array
         x = np.asarray(x).ravel()
@@ -351,7 +353,7 @@ class SNMFOptimizer:
         stretch_tiled = np.tile(stretch_flat, (self._signal_len, 1))
 
         # Compute `ii` (MATLAB: ii = repmat((0:N-1)',1,K*M).*tiled_stretch)
-        ii = (
+        fractional_indices = (
             np.tile(np.arange(self._signal_len)[:, None], (1, self._num_conditions * self._n_components))
             * stretch_tiled
         )
@@ -368,44 +370,45 @@ class SNMFOptimizer:
         ).reshape(self._signal_len, self._n_components * self._num_conditions)
 
         # Handle boundary conditions for interpolation (MATLAB: X1=[X;X(end,:)])
-        X1 = np.vstack([comps, comps[-1, :]])  # Duplicate last row (like MATLAB)
+        comps_bounded = np.vstack([comps, comps[-1, :]])  # Duplicate last row (like MATLAB)
 
         # Compute floor indices (MATLAB: II = floor(ii); II1=min(II+1,N+1); II2=min(II1+1,N+1))
-        II = np.floor(ii).astype(int)
+        floor_indices = np.floor(fractional_indices).astype(int)
 
-        II1 = np.minimum(II + 1, self._signal_len)
-        II2 = np.minimum(II1 + 1, self._signal_len)
+        floor_ind_1 = np.minimum(floor_indices + 1, self._signal_len)
+        floor_ind_2 = np.minimum(floor_ind_1 + 1, self._signal_len)
 
         # Compute fractional part (MATLAB: iI = ii - II)
-        iI = ii - II
+        fractional_floor_indices = fractional_indices - floor_indices
 
         # Compute offset indices (MATLAB: II1_ = II1 + bias; II2_ = II2 + bias)
-        II1_ = II1 + bias
-        II2_ = II2 + bias
+        offset_floor_ind_1 = floor_ind_1 + bias
+        offset_floor_ind_2 = floor_ind_2 + bias
 
         # Extract values (MATLAB: XI1 = reshape(X1(II1_), N, K*M); XI2 = reshape(X1(II2_), N, K*M))
         # Note: this "-1" corrects an off-by-one error that may have originated in an earlier line
-        XI1 = X1.flatten(order="F")[(II1_ - 1).ravel()].reshape(
+        # order = F uses FORTRAN, column major order
+        comps_val_1 = comps_bounded.flatten(order="F")[(offset_floor_ind_1 - 1).ravel()].reshape(
             self._signal_len, self._n_components * self._num_conditions
-        )  # order = F uses FORTRAN, column major order
-        XI2 = X1.flatten(order="F")[(II2_ - 1).ravel()].reshape(
+        )
+        comps_val_2 = comps_bounded.flatten(order="F")[(offset_floor_ind_2 - 1).ravel()].reshape(
             self._signal_len, self._n_components * self._num_conditions
         )
 
         # Interpolation (MATLAB: Ax2=XI1.*(1-iI)+XI2.*(iI); stretched_comps=Ax2.*YY)
-        Ax2 = XI1 * (1 - iI) + XI2 * iI
-        stretched_comps = Ax2 * weights_tiled  # Apply weighting
+        stretch_comps2 = comps_val_1 * (1 - fractional_floor_indices) + comps_val_2 * fractional_floor_indices
+        stretched_comps = stretch_comps2 * weights_tiled  # Apply weighting
 
         if return_derivatives:
             # Compute first derivative (MATLAB: Tx2=XI1.*(-di)+XI2.*di; d_str_cmps=Tx2.*YY)
-            di = -ii * stretch_tiled
-            d_x2 = XI1 * (-di) + XI2 * di
-            d_str_cmps = d_x2 * weights_tiled
+            di = -fractional_indices * stretch_tiled
+            d_comps2 = comps_val_1 * (-di) + comps_val_2 * di
+            d_str_cmps = d_comps2 * weights_tiled
 
             # Compute second derivative (MATLAB: Hx2=XI1.*(-ddi)+XI2.*ddi; dd_str_comps=Hx2.*YY)
             ddi = -di * stretch_tiled * 2
-            dd_x2 = XI1 * (-ddi) + XI2 * ddi
-            dd_str_cmps = dd_x2 * weights_tiled
+            dd_comps2 = comps_val_1 * (-ddi) + comps_val_2 * ddi
+            dd_str_cmps = dd_comps2 * weights_tiled
         else:
             shape = stretched_comps.shape
             d_str_cmps = np.empty(shape)
@@ -430,13 +433,17 @@ class SNMFOptimizer:
         K = weights.shape[0]
 
         # Compute scaling matrix (MATLAB: AA = repmat(reshape(A,1,M*K).^-1,Nindex,1))
-        AA = np.tile(stretch.reshape(1, M * K, order="F") ** -1, (N, 1))
+        stretch_tiled = np.tile(
+            stretch.reshape(1, self._num_conditions * self._n_components, order="F") ** -1, (self._signal_len, 1)
+        )
 
         # Compute indices (MATLAB: ii = repmat((index-1)',1,K*M).*AA)
-        ii = np.arange(N)[:, None] * AA  # Shape (N, M*K), replacing `index`
+        ii = np.arange(self._signal_len)[:, None] * stretch_tiled  # Shape (N, M*K), replacing `index`
 
         # Weighting coefficients (MATLAB: YY = repmat(reshape(Y,1,M*K),Nindex,1))
-        YY = np.tile(weights.reshape(1, M * K, order="F"), (N, 1))
+        weights_tiled = np.tile(
+            weights.reshape(1, self._num_conditions * self._n_components, order="F"), (self._signal_len, 1)
+        )
 
         # Compute floor indices (MATLAB: II = floor(ii); II1 = min(II+1,N+1); II2 = min(II1+1,N+1))
         II = np.floor(ii).astype(int)
@@ -448,7 +455,7 @@ class SNMFOptimizer:
         II2_ = II2
 
         # Compute fractional part (MATLAB: iI = ii - II)
-        iI = ii - II
+        fractional_indices = ii - II
 
         # Expand row indices (MATLAB: repm = repmat(1:K, Nindex, M))
         repm = np.tile(np.arange(K), (N, M))
@@ -457,12 +464,14 @@ class SNMFOptimizer:
         kron = np.kron(residuals, np.ones((1, K)))
 
         # (MATLAB: kroiI = kro .* (iI); iIYY = (iI-1) .* YY)
-        kron_iI = kron * iI
-        iIYY = (iI - 1) * YY
+        kron_iI = kron * fractional_indices
+        iIYY = (fractional_indices - 1) * weights_tiled
 
         # Construct sparse matrices (MATLAB: sparse(II1_,repm,kro.*-iIYY,(N+1),K))
         x2 = coo_matrix(((-kron * iIYY).flatten(), (II1_.flatten() - 1, repm.flatten())), shape=(N + 1, K)).tocsc()
-        x3 = coo_matrix(((kron_iI * YY).flatten(), (II2_.flatten() - 1, repm.flatten())), shape=(N + 1, K)).tocsc()
+        x3 = coo_matrix(
+            ((kron_iI * weights_tiled).flatten(), (II2_.flatten() - 1, repm.flatten())), shape=(N + 1, K)
+        ).tocsc()
 
         # Combine the last row into previous, then remove the last row
         x2[N - 1, :] += x2[N, :]
@@ -527,46 +536,53 @@ class SNMFOptimizer:
 
     def update_comps(self):
         """
-        Updates `comps` using gradient-based optimization with adaptive step size L.
+        Updates `comps` using gradient-based optimization with adaptive step size step_size.
         """
         # Compute `stretched_comps` using the interpolation function
         stretched_comps, _, _ = self.apply_interpolation_matrix()  # Skip the other two outputs (derivatives)
         # Compute RA and RR
-        intermediate_RA = stretched_comps.flatten(order="F").reshape(
+        intermediate_reshaped = stretched_comps.flatten(order="F").reshape(
             (self._signal_len * self._num_conditions, self._n_components), order="F"
         )
-        RA = intermediate_RA.sum(axis=1).reshape((self._signal_len, self._num_conditions), order="F")
-        RR = RA - self.source_matrix
+        reshaped_stretched_components = intermediate_reshaped.sum(axis=1).reshape(
+            (self._signal_len, self._num_conditions), order="F"
+        )
+        component_residuals = reshaped_stretched_components - self.source_matrix
         # Compute gradient `GraX`
         self.grad_comps = self.apply_transformation_matrix(
-            residuals=RR
-        ).toarray()  # toarray equivalent of full, make non-sparse
+            residuals=component_residuals
+        ).toarray()  # toarray equivalent of MATLAB "full", makes non-sparse
 
-        # Compute initial step size `L0`
-        L0 = np.linalg.eigvalsh(self.weights.T @ self.weights).max() * np.max(
+        # Compute initial step size `initial_step_size`
+        initial_step_size = np.linalg.eigvalsh(self.weights.T @ self.weights).max() * np.max(
             [self.stretch.max(), 1 / self.stretch.min()]
         )
-        # Compute adaptive step size `L`
+        # Compute adaptive step size `step_size`
         if self._prev_comps is None:
-            L = L0
+            step_size = initial_step_size
         else:
             num = np.sum(
                 (self.grad_comps - self._prev_grad_comps) * (self.comps - self._prev_comps)
             )  # Elem-wise multiply
             denom = np.linalg.norm(self.comps - self._prev_comps, "fro") ** 2  # Frobenius norm squared
-            L = num / denom if denom > 0 else L0
-            if L <= 0:
-                L = L0
+            step_size = num / denom if denom > 0 else initial_step_size
+            if step_size <= 0:
+                step_size = initial_step_size
 
         # Store our old component matrix before updating because it is used in step selection
         self._prev_comps = self.comps.copy()
 
         while True:  # iterate updating components
-            comps_step = self._prev_comps - self.grad_comps / L
+            comps_step = self._prev_comps - self.grad_comps / step_size
             # Solve x^3 + p*x + q = 0 for the largest real root
-            self.comps = np.square(cubic_largest_real_root(-comps_step, self.eta / (2 * L)))
+            self.comps = np.square(cubic_largest_real_root(-comps_step, self.eta / (2 * step_size)))
             # Mask values that should be set to zero
-            mask = self.comps**2 * L / 2 - L * self.comps * comps_step + self.eta * np.sqrt(self.comps) < 0
+            mask = (
+                self.comps**2 * step_size / 2
+                - step_size * self.comps * comps_step
+                + self.eta * np.sqrt(self.comps)
+                < 0
+            )
             self.comps = mask * self.comps
 
             objective_improvement = self._objective_history[-1] - self.get_objective_function(
@@ -576,9 +592,9 @@ class SNMFOptimizer:
             # Check if objective function improves
             if objective_improvement > 0:
                 break
-            # If not, increase L (step size)
-            L *= 2
-            if np.isinf(L):
+            # If not, increase step_size (step size)
+            step_size *= 2
+            if np.isinf(step_size):
                 break
 
     def update_weights(self):
@@ -587,7 +603,7 @@ class SNMFOptimizer:
         """
 
         for m in range(self._num_conditions):
-            T = np.zeros((self._signal_len, self._n_components))  # Initialize T as an (N, K) zero matrix
+            T = np.zeros((self._signal_len, self._n_components))
 
             # Populate T using apply_interpolation
             for k in range(self._n_components):
