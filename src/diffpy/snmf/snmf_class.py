@@ -29,16 +29,16 @@ class SNMFOptimizer:
         The best guess (or while running, the current guess) for the matrix of
         component weights.
     rho : float
-            The stretching factor that influences the decomposition. Zero corresponds to no
-            stretching present. Relatively insensitive and typically adjusted in powers of 10.
+        The stretching factor that influences the decomposition. Zero corresponds to no
+        stretching present. Relatively insensitive and typically adjusted in powers of 10.
     eta : float
         The sparsity factor that influences the decomposition. Should be set to zero for
         non-sparse data such as PDF. Can be used to improve results for sparse data such
         as XRD, but due to instability, should be used only after first selecting the
         best value for rho. Suggested adjustment is by powers of 2.
     max_iter : int
-            The maximum number of times to update each of stretch, components, and weights before stopping
-            the optimization.
+        The maximum number of times to update each of stretch, components, and weights before stopping
+        the optimization.
     tol : float
         The convergence threshold. This is the minimum fractional improvement in the
         objective function to allow without terminating the optimization. Note that
