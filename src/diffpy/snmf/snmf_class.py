@@ -18,7 +18,7 @@ class SNMFOptimizer:
     ----------
     source_matrix : ndarray
         The original, unmodified data to be decomposed and later, compared against.
-        Shape is (length_of_signal, number_of_conditions).
+        Shape is (length_of_signal, number_of_signals).
     stretch : ndarray
         The best guess (or while running, the current guess) for the stretching
         factor matrix.
@@ -47,14 +47,14 @@ class SNMFOptimizer:
         The number of components to extract from source_matrix. Must be provided when and only when
         Y0 is not provided.
     random_state : int
-        The seed for the initial guesses at the matrices (A, X, and Y) created by
+        The seed for the initial guesses at the matrices (stretch, components, and weights) created by
         the decomposition.
     num_updates : int
-        The total number of times that any of (A, X, and Y) have had their values changed.
+        The total number of times that any of (stretch, components, and weights) have had their values changed.
         If not terminated by other means, this value is used to stop when reaching max_iter.
     objective_function: float
         The value corresponding to the minimization of the difference between the source_matrix and the
-        products of A, X, and Y. For full details see the sNMF paper. Smaller corresponds to
+        products of (stretch, components, and weights). For full details see the sNMF paper. Smaller corresponds to
         better agreement and is desirable.
     objective_difference : float
         The change in the objective function value since the last update. A negative value
@@ -67,8 +67,8 @@ class SNMFOptimizer:
         init_weights=None,
         init_components=None,
         init_stretch=None,
-        rho=1e12,
-        eta=610,
+        rho=0,
+        eta=0,
         max_iter=500,
         tol=5e-7,
         n_components=None,
@@ -80,35 +80,36 @@ class SNMFOptimizer:
         ----------
         source_matrix : ndarray
             The data to be decomposed. Shape is (length_of_signal, number_of_conditions).
-        init_weights : ndarray
+        init_weights : ndarray Optional  Default = rng.beta(a=2.5, b=1.5, size=(n_components, n_signals))
             The initial guesses for the component weights at each stretching condition.
-            Shape is (number_of_components, number_of_conditions) Must provide exactly one
+            Shape is (number_of_components, number_of_signals) Must provide exactly one
             of this or n_components.
-        init_components : ndarray
+        init_components : ndarray Optional  Default = rng.random((self.signal_length, self.n_components))
             The initial guesses for the intensities of each component per
             row/sample/angle. Shape is (length_of_signal, number_of_components).
-        init_stretch : ndarray
+        init_stretch : ndarray Optional  Default = np.ones((self.n_components, self.n_signals)) + self._rng.normal(
+                0, 1e-3, size=(self.n_components, self.n_signals)
             The initial guesses for the stretching factor for each component, at each
-            condition. Shape is (number_of_components, number_of_conditions).
-        rho : float
+            condition (for each signal). Shape is (number_of_components, number_of_signals).
+        rho : float Optional  Default = 0
             The stretching factor that influences the decomposition. Zero corresponds to no
             stretching present. Relatively insensitive and typically adjusted in powers of 10.
-        eta : float
+        eta : int Optional  Default = 0
             The sparsity factor that influences the decomposition. Should be set to zero for
             non-sparse data such as PDF. Can be used to improve results for sparse data such
             as XRD, but due to instability, should be used only after first selecting the
             best value for rho. Suggested adjustment is by powers of 2.
-        max_iter : int
+        max_iter : int Optional Default = 500
             The maximum number of times to update each of A, X, and Y before stopping
             the optimization.
-        tol : float
+        tol : float Optional  Default = 5e-7
             The convergence threshold. This is the minimum fractional improvement in the
             objective function to allow without terminating the optimization. Note that
             a minimum of 20 updates are run before this parameter is checked.
-        n_components : int
+        n_components : int  Optional  Default = None
             The number of components to extract from source_matrix. Must be provided when and only when
             Y0 is not provided.
-        random_state : int
+        random_state : int  Optional  Default = None
             The seed for the initial guesses at the matrices (A, X, and Y) created by
             the decomposition.
         """
@@ -157,10 +158,10 @@ class SNMFOptimizer:
         self.weights = np.maximum(0, self.weights)
 
         # Second-order spline: Tridiagonal (-2 on diagonal, 1 on sub/superdiagonals)
-        self.spline_smooth_operator = 0.25 * diags(
+        self._spline_smooth_operator = 0.25 * diags(
             [1, -2, 1], offsets=[0, 1, 2], shape=(self.n_signals - 2, self.n_signals)
         )
-        self.spline_smooth_penalty = self.spline_smooth_operator.T @ self.spline_smooth_operator
+        self._spline_smooth_penalty = self._spline_smooth_operator.T @ self._spline_smooth_operator
 
         # Set up residual matrix, objective function, and history
         self.residuals = self.get_residual_matrix()
@@ -173,7 +174,7 @@ class SNMFOptimizer:
         self.grad_components = np.zeros_like(self.components)  # Gradient of X (zeros for now)
         self._prev_grad_components = np.zeros_like(self.components)  # Previous gradient of X (zeros for now)
 
-        regularization_term = 0.5 * rho * np.linalg.norm(self.spline_smooth_operator @ self.stretch.T, "fro") ** 2
+        regularization_term = 0.5 * rho * np.linalg.norm(self._spline_smooth_operator @ self.stretch.T, "fro") ** 2
         sparsity_term = eta * np.sum(np.sqrt(self.components))  # Square root penalty
         print(
             f"Start, Objective function: {self.objective_function:.5e}"
@@ -185,7 +186,7 @@ class SNMFOptimizer:
             self.optimize_loop()
             # Print diagnostics
             regularization_term = (
-                0.5 * rho * np.linalg.norm(self.spline_smooth_operator @ self.stretch.T, "fro") ** 2
+                0.5 * rho * np.linalg.norm(self._spline_smooth_operator @ self.stretch.T, "fro") ** 2
             )
             sparsity_term = eta * np.sum(np.sqrt(self.components))  # Square root penalty
             print(
@@ -333,7 +334,7 @@ class SNMFOptimizer:
         if stretch is None:
             stretch = self.stretch
         residual_term = 0.5 * np.linalg.norm(residuals, "fro") ** 2
-        regularization_term = 0.5 * self.rho * np.linalg.norm(self.spline_smooth_operator @ stretch.T, "fro") ** 2
+        regularization_term = 0.5 * self.rho * np.linalg.norm(self._spline_smooth_operator @ stretch.T, "fro") ** 2
         sparsity_term = self.eta * np.sum(np.sqrt(self.components))  # Square root penalty
         # Final objective function value
         function = residual_term + regularization_term + sparsity_term
@@ -652,7 +653,7 @@ class SNMFOptimizer:
         )
         der_reshaped = np.asarray(tiled_derivative).reshape((self.n_signals, self.n_components), order="F")
         func_grad = (
-            der_reshaped.T + self.rho * stretch @ self.spline_smooth_operator.T @ self.spline_smooth_operator
+            der_reshaped.T + self.rho * stretch @ self._spline_smooth_operator.T @ self._spline_smooth_operator
         )
 
         return reg_func, func_grad

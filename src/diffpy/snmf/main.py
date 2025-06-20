@@ -1,10 +1,11 @@
 import numpy as np
 from snmf_class import SNMFOptimizer
 
-init_components_file = np.loadtxt("input/X0.txt", dtype=float)
-source_matrix_file = np.loadtxt("input/MM.txt", dtype=float)
-init_stretch_file = np.loadtxt("input/A0.txt", dtype=float)
-init_weights_file = np.loadtxt("input/W0.txt", dtype=float)
+# Example input files (not provided)
+init_components_file = np.loadtxt("input/init_components.txt", dtype=float)
+source_matrix_file = np.loadtxt("input/source_matrix.txt", dtype=float)
+init_stretch_file = np.loadtxt("input/init_stretch.txt", dtype=float)
+init_weights_file = np.loadtxt("input/init_weights.txt", dtype=float)
 
 my_model = SNMFOptimizer(
     source_matrix=source_matrix_file,
