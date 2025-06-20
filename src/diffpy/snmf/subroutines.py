@@ -113,9 +113,9 @@ def construct_component_matrix(components):
 def construct_weight_matrix(components):
     """Constructs the weights matrix.
 
-    Constructs a Ķ x M matrix where K is the number of components and M is the
+    Constructs a K x M matrix where K is the number of components and M is the
     number of signals. Each element is the stretching factor for a specific
-    weights for a specific signal from the data input.
+    weight factor for a specific signal from the data input.
 
     Parameters
     ----------
@@ -374,7 +374,7 @@ def update_weights_matrix(
       The length of the experimental signal patterns
 
     stretching_factor_matrix: 2d array like
-      The matrx containing the stretching factors of the calculated component signals. Has dimensions K x M
+      The matrix containing the stretching factors of the calculated component signals. Has dimensions K x M
       where K is the number of component signals and M is the number of XRD/PDF patterns.
 
     component_matrix: 2d array like
