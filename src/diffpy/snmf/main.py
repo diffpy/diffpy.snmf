@@ -1,14 +1,20 @@
 import numpy as np
 from snmf_class import SNMFOptimizer
 
-X0 = np.loadtxt("input/X0.txt", dtype=float)
-MM = np.loadtxt("input/MM.txt", dtype=float)
-A0 = np.loadtxt("input/A0.txt", dtype=float)
-Y0 = np.loadtxt("input/W0.txt", dtype=float)
-N, M = MM.shape
+# Example input files (not provided)
+init_components_file = np.loadtxt("input/init_components.txt", dtype=float)
+source_matrix_file = np.loadtxt("input/source_matrix.txt", dtype=float)
+init_stretch_file = np.loadtxt("input/init_stretch.txt", dtype=float)
+init_weights_file = np.loadtxt("input/init_weights.txt", dtype=float)
 
-my_model = SNMFOptimizer(MM=MM, Y0=Y0, X0=X0, A0=A0)
+my_model = SNMFOptimizer(
+    source_matrix=source_matrix_file,
+    init_weights=init_weights_file,
+    init_components=init_components_file,
+    init_stretch=init_stretch_file,
+)
+
 print("Done")
-np.savetxt("my_norm_X.txt", my_model.X, fmt="%.6g", delimiter=" ")
-np.savetxt("my_norm_Y.txt", my_model.Y, fmt="%.6g", delimiter=" ")
-np.savetxt("my_norm_A.txt", my_model.A, fmt="%.6g", delimiter=" ")
+np.savetxt("my_norm_components.txt", my_model.components, fmt="%.6g", delimiter=" ")
+np.savetxt("my_norm_weights.txt", my_model.weights, fmt="%.6g", delimiter=" ")
+np.savetxt("my_norm_stretch.txt", my_model.stretch, fmt="%.6g", delimiter=" ")
